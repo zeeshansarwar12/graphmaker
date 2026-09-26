@@ -1,0 +1,44 @@
+---
+interface Props {
+  hasEditor?: boolean;
+  hasFaq?: boolean;
+}
+
+const { hasEditor = true, hasFaq = true } = Astro.props;
+---
+
+<header class="border-border bg-surface border-b">
+  <div class="page-shell flex h-16 items-center justify-between gap-5">
+    <a aria-label="Graph Maker home" class="flex shrink-0 items-center gap-2 text-xl font-bold tracking-tight" href="/">
+      <svg aria-hidden="true" class="text-brand h-7 w-7" viewBox="0 0 28 28">
+        <rect fill="currentColor" height="9" rx="1" width="5" x="2" y="17"></rect>
+        <rect fill="currentColor" height="16" opacity=".72" rx="1" width="5" x="10" y="10"></rect>
+        <rect fill="currentColor" height="23" rx="1" width="5" x="18" y="3"></rect>
+      </svg>
+      <span>Graph<span class="text-brand">Maker</span></span>
+    </a>
+
+    <nav aria-label="Primary navigation" class="hidden items-center gap-8 text-sm font-medium md:flex">
+      <a class="hover:text-brand" href="/tools/">Graph Tools</a>
+      <a class="hover:text-brand" href="/about/">About</a>
+      {hasFaq && <a class="hover:text-brand" href="#faq">FAQ</a>}
+    </nav>
+
+    {hasEditor && <div class="hidden items-center gap-3 md:flex">
+      <a class="text-text-muted hover:text-text inline-flex min-h-10 items-center gap-2 px-2 text-sm font-medium" href="#editor">
+        <span aria-hidden="true">♡</span> Saved
+      </a>
+      <a class="button-primary" href="#editor">Create graph</a>
+    </div>}
+
+    <details class="relative md:hidden">
+      <summary class="border-border flex min-h-10 cursor-pointer list-none items-center rounded-md border px-3 text-sm font-semibold">Menu</summary>
+      <nav aria-label="Mobile navigation" class="border-border bg-surface shadow-editor absolute top-12 right-0 z-20 grid min-w-48 gap-1 rounded-md border p-2 text-sm font-medium">
+        <a class="hover:bg-surface-subtle rounded px-3 py-2" href="/tools/">Graph Tools</a>
+        <a class="hover:bg-surface-subtle rounded px-3 py-2" href="/about/">About</a>
+        {hasFaq && <a class="hover:bg-surface-subtle rounded px-3 py-2" href="#faq">FAQ</a>}
+        {hasEditor && <a class="bg-brand text-surface mt-1 rounded px-3 py-2 text-center" href="#editor">Create graph</a>}
+      </nav>
+    </details>
+  </div>
+</header>

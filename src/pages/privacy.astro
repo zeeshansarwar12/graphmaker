@@ -1,0 +1,16 @@
+---
+import SiteFooter from '../components/navigation/SiteFooter.astro';
+import SiteHeader from '../components/navigation/SiteHeader.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout canonical="/privacy/" title="Privacy | GraphMaker" description="How GraphMaker handles graph data in the browser." robots="noindex,follow">
+  <SiteHeader hasEditor={false} hasFaq={false} />
+  <main class="page-shell max-w-4xl py-10 sm:py-14" id="main-content">
+    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">Privacy</h1>
+    <p class="text-text-muted mt-4 leading-7">GraphMaker’s V1 editor processes pasted and uploaded graph data in your browser. The application does not require an account or cloud database.</p>
+    <h2 class="section-heading mt-9">Local projects</h2><p class="text-text-muted mt-3 leading-7">When you choose Save locally, the project is stored in IndexedDB on that device. Clearing browser storage can remove locally saved projects.</p>
+    <h2 class="section-heading mt-9">Project files and exports</h2><p class="text-text-muted mt-3 leading-7">Files you import are read by the browser. Graph images, data exports, and project files are downloaded directly to your device.</p>
+  </main>
+  <SiteFooter />
+</BaseLayout>

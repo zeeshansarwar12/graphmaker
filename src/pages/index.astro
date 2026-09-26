@@ -1,0 +1,163 @@
+---
+import { GraphEditor } from '../components/graph/GraphEditor';
+import SiteFooter from '../components/navigation/SiteFooter.astro';
+import SiteHeader from '../components/navigation/SiteHeader.astro';
+import ChartGlyph from '../components/ui/ChartGlyph.astro';
+import { graphTools } from '../content/graphTools';
+import { homepageGraphConfig } from '../graph/configs/homepage';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const benefits = [
+  { icon: '↯', title: 'Free and fast', copy: 'Create a polished graph immediately without paying or waiting.', color: 'bg-emerald-50 text-emerald-600' },
+  { icon: '⌑', title: 'No signup', copy: 'Start with your data right away. No account or login needed.', color: 'bg-violet-50 text-violet-600' },
+  { icon: '◇', title: 'Private by design', copy: 'Your data stays in your browser and is not sent to us.', color: 'bg-blue-50 text-blue-600' },
+  { icon: '★', title: 'Professional output', copy: 'Make clean visuals for reports, presentations, and assignments.', color: 'bg-rose-50 text-rose-500' },
+] as const;
+
+const useCases = [
+  { icon: '🎓', title: 'For students', copy: 'Assignments, projects, and clear classwork visuals.', color: 'bg-emerald-50' },
+  { icon: '▤', title: 'For research papers', copy: 'Publication-ready graphs for findings and reports.', color: 'bg-blue-50' },
+  { icon: '▣', title: 'For business', copy: 'Reports, presentations, and practical analysis.', color: 'bg-rose-50' },
+  { icon: '⚗', title: 'For science', copy: 'Lab results, experiments, and measurements.', color: 'bg-amber-50' },
+  { icon: '●', title: 'For teachers', copy: 'Teaching materials, examples, and worksheets.', color: 'bg-violet-50' },
+] as const;
+
+const faqs = [
+  { question: 'Is this graph maker free to use?', answer: 'Yes. The core graph-making workflow is free and does not require an account.' },
+  { question: 'Do I need to sign up before creating a graph?', answer: 'No. You can begin with the sample data, enter your own values, and create a graph without signing up.' },
+  { question: 'Does my data leave my browser?', answer: 'V1 is designed to process and save graph projects locally in your browser. Uploaded or pasted datasets are not sent to a GraphMaker server.' },
+  { question: 'Which graph types will be supported?', answer: 'The planned V1 tools are bar, line, pie, XY, scatter, box plot, radar, and histogram graphs.' },
+  { question: 'Can I use a graph in a report or presentation?', answer: 'Yes. The planned export workflow provides clean PNG and SVG files suitable for documents, slides, assignments, and reports.' },
+] as const;
+
+const siteUrl = new URL('/', Astro.site ?? Astro.url).href;
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'GraphMaker',
+  url: siteUrl,
+};
+---
+
+<BaseLayout
+  canonical="/"
+  title="Free Online Graph Maker — No Signup | GraphMaker"
+  description="Turn your data into a clear graph in seconds. Free to use, no signup, no watermark, and your data stays in your browser."
+  structuredData={websiteSchema}
+>
+  <SiteHeader />
+
+  <main id="main-content">
+    <section class="bg-surface-blue border-border border-b pb-12">
+      <div class="page-shell pt-7 text-center sm:pt-9">
+        <h1 class="text-3xl font-bold tracking-tight sm:text-4xl lg:text-[2.75rem]">Free Online Graph Maker</h1>
+        <p class="text-text-muted mx-auto mt-2 max-w-2xl text-base sm:text-lg">Turn your data into a beautiful graph in seconds — no signup required.</p>
+        <ul aria-label="Product benefits" class="text-text-muted mt-4 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-medium">
+          <li class="flex items-center gap-1.5"><span aria-hidden="true" class="bg-success grid h-4 w-4 place-items-center rounded-full text-[10px] text-white">✓</span>Free to use</li>
+          <li class="flex items-center gap-1.5"><span aria-hidden="true" class="bg-success grid h-4 w-4 place-items-center rounded-full text-[10px] text-white">✓</span>No watermark</li>
+          <li class="flex items-center gap-1.5"><span aria-hidden="true" class="bg-success grid h-4 w-4 place-items-center rounded-full text-[10px] text-white">✓</span>No signup</li>
+          <li class="flex items-center gap-1.5"><span aria-hidden="true" class="bg-success grid h-4 w-4 place-items-center rounded-full text-[10px] text-white">✓</span>Data stays in your browser</li>
+        </ul>
+      </div>
+
+      <div class="page-shell mt-6 text-left" id="editor">
+        <GraphEditor client:load config={homepageGraphConfig} />
+      </div>
+    </section>
+
+    <section aria-labelledby="popular-heading" class="page-shell py-14 sm:py-16">
+      <div class="text-center">
+        <h2 class="section-heading" id="popular-heading">Popular Graph Makers</h2>
+        <p class="text-text-muted mt-2">Choose the right graph for your data, or start with the editor above.</p>
+      </div>
+      <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
+        {graphTools.map((tool) => (
+          <a class="border-border hover:border-brand hover:shadow-editor group rounded-lg border p-4 text-center transition" href={tool.href}>
+            <span class="bg-brand-soft text-brand mx-auto grid h-14 w-14 place-items-center rounded-lg"><ChartGlyph type={tool.type} /></span>
+            <h3 class="group-hover:text-brand mt-4 text-sm font-bold">{tool.name}</h3>
+            <p class="text-text-muted mt-2 text-xs leading-5">{tool.description}</p>
+          </a>
+        ))}
+      </div>
+      <div class="mt-6 text-center">
+        <a class="button-secondary text-brand" href="/tools/">View all graph tools <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+
+    <section aria-labelledby="steps-heading" class="page-shell bg-surface-blue rounded-xl px-5 py-9 sm:px-8 lg:px-12">
+      <div class="grid items-center gap-8 lg:grid-cols-[0.75fr_2fr]">
+        <div>
+          <p class="text-brand text-sm font-bold tracking-wide uppercase">Simple by design</p>
+          <h2 class="section-heading mt-2" id="steps-heading">Create a graph in three simple steps</h2>
+        </div>
+        <ol class="grid gap-6 sm:grid-cols-3">
+          <li class="flex gap-3">
+            <span class="bg-brand grid h-9 w-9 shrink-0 place-items-center rounded-full font-bold text-white">1</span>
+            <div><h3 class="font-bold">Add your data</h3><p class="text-text-muted mt-1 text-sm leading-6">Type, paste, or upload a table from Excel, Google Sheets, or CSV.</p></div>
+          </li>
+          <li class="flex gap-3">
+            <span class="bg-brand grid h-9 w-9 shrink-0 place-items-center rounded-full font-bold text-white">2</span>
+            <div><h3 class="font-bold">Choose a graph</h3><p class="text-text-muted mt-1 text-sm leading-6">Pick the chart type that best explains your data.</p></div>
+          </li>
+          <li class="flex gap-3">
+            <span class="bg-brand grid h-9 w-9 shrink-0 place-items-center rounded-full font-bold text-white">3</span>
+            <div><h3 class="font-bold">Download and use</h3><p class="text-text-muted mt-1 text-sm leading-6">Export a clean PNG or SVG for your work.</p></div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section aria-labelledby="benefits-heading" class="page-shell py-14 sm:py-16">
+      <h2 class="section-heading text-center" id="benefits-heading">Why use our graph maker?</h2>
+      <div class="mt-9 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        {benefits.map((benefit) => (
+          <article class="flex gap-4">
+            <span aria-hidden="true" class:list={['grid h-12 w-12 shrink-0 place-items-center rounded-full text-xl font-bold', benefit.color]}>{benefit.icon}</span>
+            <div><h3 class="font-bold">{benefit.title}</h3><p class="text-text-muted mt-1 text-sm leading-6">{benefit.copy}</p></div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section aria-labelledby="use-cases-heading" class="page-shell pb-14 sm:pb-16">
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div><p class="text-brand text-sm font-bold">BUILT FOR REAL WORK</p><h2 class="section-heading mt-1" id="use-cases-heading">Popular use cases</h2></div>
+      </div>
+      <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        {useCases.map((item) => (
+          <article class:list={['rounded-lg p-5', item.color]}>
+            <span aria-hidden="true" class="text-brand text-2xl">{item.icon}</span>
+            <h3 class="mt-3 font-bold">{item.title}</h3>
+            <p class="text-text-muted mt-1 text-sm leading-6">{item.copy}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section aria-labelledby="explore-heading" class="border-border bg-surface-subtle border-y py-12">
+      <div class="page-shell">
+        <h2 class="section-heading" id="explore-heading">Explore graph-making resources</h2>
+        <div class="mt-6 grid gap-8 md:grid-cols-2">
+          <a class="group" href="/tools/"><h3 class="group-hover:text-brand font-bold">Graph tools <span aria-hidden="true">→</span></h3><p class="text-text-muted mt-2 text-sm leading-6">Find a focused tool for the graph you need to make.</p></a>
+          <a class="group" href="/about/"><h3 class="group-hover:text-brand font-bold">About GraphMaker <span aria-hidden="true">→</span></h3><p class="text-text-muted mt-2 text-sm leading-6">Learn how the privacy-first graphing workflow is designed.</p></a>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="faq-heading" class="page-shell max-w-4xl py-14 sm:py-16" id="faq">
+      <div class="text-center"><h2 class="section-heading" id="faq-heading">Frequently asked questions</h2><p class="text-text-muted mt-2">The essentials before you start creating.</p></div>
+      <div class="border-border mt-8 border-y">
+        {faqs.map((faq) => (
+          <details class="border-border group border-b last:border-b-0">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-5 py-5 font-bold">
+              {faq.question}<span aria-hidden="true" class="text-brand text-xl group-open:rotate-45">＋</span>
+            </summary>
+            <p class="text-text-muted max-w-3xl pb-5 text-sm leading-6">{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>

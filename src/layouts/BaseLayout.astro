@@ -1,0 +1,44 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  canonical?: string;
+  title: string;
+  description: string;
+  robots?: string;
+  structuredData?: Record<string, unknown> | Array<Record<string, unknown>>;
+}
+
+const {
+  canonical,
+  title,
+  description,
+  robots = 'index,follow',
+  structuredData,
+} = Astro.props;
+const canonicalUrl = canonical ? new URL(canonical, Astro.site ?? Astro.url).href : undefined;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <meta name="viewport" content="width=device-width" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text y=%2214%22>📊</text></svg>" />
+    <meta name="generator" content={Astro.generator} />
+    {structuredData && <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />}
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="bg-brand text-surface focus:top-3 fixed -top-20 left-3 z-50 rounded-md px-4 py-2 font-semibold" href="#main-content">Skip to content</a>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,215 @@
+---
+import { GraphEditor } from '../graph/GraphEditor';
+import SiteFooter from '../navigation/SiteFooter.astro';
+import SiteHeader from '../navigation/SiteHeader.astro';
+import type { ToolPageConfig } from '../../content/toolPages';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+interface Props {
+  config: ToolPageConfig;
+}
+
+const { config } = Astro.props;
+const siteBase = Astro.site ?? Astro.url;
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', siteBase).href },
+    { '@type': 'ListItem', position: 2, name: 'Graph tools', item: new URL('/tools/', siteBase).href },
+    { '@type': 'ListItem', position: 3, name: config.h1, item: new URL(config.canonical, siteBase).href },
+  ],
+};
+---
+
+<BaseLayout title={config.title} description={config.metaDescription} canonical={config.canonical} structuredData={breadcrumbSchema}>
+  <SiteHeader />
+
+  <main id="main-content">
+    <section class="bg-surface-blue border-border border-b pb-12">
+      <div class="page-shell pt-5 sm:pt-7">
+        <nav aria-label="Breadcrumb" class="text-text-muted text-sm">
+          <ol class="flex flex-wrap items-center gap-2">
+            <li><a class="hover:text-brand" href="/">Home</a></li>
+            <li aria-hidden="true">/</li>
+            <li><a class="hover:text-brand" href="/tools/">Graph tools</a></li>
+            <li aria-hidden="true">/</li>
+            <li aria-current="page" class="text-text font-medium">{config.h1}</li>
+          </ol>
+        </nav>
+
+        <div class="mx-auto mt-5 max-w-3xl text-center">
+          <h1 class="text-3xl font-bold tracking-tight sm:text-4xl lg:text-[2.75rem]">{config.h1}</h1>
+          <p class="text-text-muted mx-auto mt-3 max-w-2xl text-base leading-7 sm:text-lg">{config.intro}</p>
+          <ul aria-label="Product benefits" class="text-text-muted mt-4 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-medium">
+            <li>✓ Free</li>
+            <li>✓ No signup</li>
+            <li>✓ No watermark</li>
+            <li>✓ Data stays in your browser</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="page-shell mt-6 text-left" id="editor">
+        <GraphEditor client:load config={config.editor} />
+      </div>
+    </section>
+
+    <section aria-labelledby="how-to-heading" class="page-shell py-14 sm:py-16">
+      <div class="mx-auto max-w-5xl">
+        <h2 class="section-heading text-center" id="how-to-heading">{config.sectionHeadings.howTo}</h2>
+        <ol class="mt-8 grid gap-5 md:grid-cols-3">
+          {config.howTo.map((step, index) => (
+            <li class="border-border rounded-lg border p-5">
+              <span class="bg-brand grid h-9 w-9 place-items-center rounded-full font-bold text-white">{index + 1}</span>
+              <h3 class="mt-4 text-lg font-bold">{step.title}</h3>
+              <p class="text-text-muted mt-2 text-sm leading-6">{step.description}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section aria-labelledby="definition-heading" class="border-border bg-surface-subtle border-y py-14 sm:py-16">
+      <div class="page-shell grid gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-start">
+        <div class="max-w-3xl">
+          <h2 class="section-heading" id="definition-heading">{config.sectionHeadings.definition}</h2>
+          {config.definition.map((paragraph) => <p class="text-text-muted mt-4 leading-7">{paragraph}</p>)}
+        </div>
+        <div aria-labelledby="example-heading" class="border-border bg-surface rounded-lg border p-5 shadow-sm">
+          <h2 class="text-xl font-bold" id="example-heading">{config.sectionHeadings.example}</h2>
+          <p class="text-text-muted mt-2 text-sm leading-6">{config.example.caption}</p>
+          <div class="border-border mt-4 overflow-hidden rounded-md border">
+            <table class="w-full border-collapse text-left text-sm">
+              <thead class="bg-surface-blue">
+                <tr>{config.example.headers.map((header) => <th class="border-border border-b px-4 py-2 font-bold" scope="col">{header}</th>)}</tr>
+              </thead>
+              <tbody>
+                {config.example.rows.map((row) => (
+                  <tr class="border-border border-b last:border-b-0">{row.map((cell) => <td class="px-4 py-2">{cell}</td>)}</tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {config.beforeComparisonSections?.map((section) => (
+      <section aria-labelledby={`${section.id}-heading`} class="border-border bg-surface-subtle border-y py-14 sm:py-16" id={section.id}>
+        <div class="page-shell">
+          <div class="text-center">
+            <h2 class="section-heading" id={`${section.id}-heading`}>{section.title}</h2>
+            <p class="text-text-muted mx-auto mt-2 max-w-2xl leading-7">{section.intro}</p>
+          </div>
+          <div class="mx-auto mt-8 grid max-w-5xl gap-4 md:grid-cols-3">
+            {section.items.map((item) => (
+              <article class="border-border bg-surface rounded-lg border p-5">
+                <h3 class="font-bold">{item.title}</h3>
+                <p class="text-text-muted mt-2 text-sm leading-6">{item.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    ))}
+
+    <section aria-labelledby="comparison-heading" class="page-shell py-14 sm:py-16">
+      <div class="mx-auto max-w-5xl">
+        <div class="text-center">
+          <h2 class="section-heading" id="comparison-heading">{config.comparison.title}</h2>
+          <p class="text-text-muted mx-auto mt-2 max-w-2xl leading-7">{config.comparison.intro}</p>
+        </div>
+        <div class="mt-8 grid gap-5 md:grid-cols-2">
+          {[config.comparison.first, config.comparison.second].map((item) => (
+            <article class="border-border rounded-lg border p-6">
+              <h3 class="text-lg font-bold">{item.title}</h3>
+              <p class="text-text-muted mt-2 leading-7">{item.body}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {config.useCases && (
+      <section aria-labelledby="use-cases-heading" class="border-border bg-surface-subtle border-y py-14 sm:py-16">
+        <div class="page-shell">
+          <div class="text-center">
+            <h2 class="section-heading" id="use-cases-heading">{config.useCases.title}</h2>
+            <p class="text-text-muted mx-auto mt-2 max-w-2xl leading-7">{config.useCases.intro}</p>
+          </div>
+          <div class="mx-auto mt-8 grid max-w-5xl gap-4 md:grid-cols-3">
+            {config.useCases.items.map((item) => (
+              <article class="border-border bg-surface rounded-lg border p-5">
+                <h3 class="font-bold">{item.title}</h3>
+                <p class="text-text-muted mt-2 text-sm leading-6">{item.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    {config.additionalSections?.map((section) => (
+      <section aria-labelledby={`${section.id}-heading`} class="page-shell py-14 sm:py-16" id={section.id}>
+        <div class="text-center">
+          <h2 class="section-heading" id={`${section.id}-heading`}>{section.title}</h2>
+          <p class="text-text-muted mx-auto mt-2 max-w-2xl leading-7">{section.intro}</p>
+        </div>
+        <div class="mx-auto mt-8 grid max-w-5xl gap-4 md:grid-cols-3">
+          {section.items.map((item) => (
+            <article class="border-border rounded-lg border p-5">
+              <h3 class="font-bold">{item.title}</h3>
+              <p class="text-text-muted mt-2 text-sm leading-6">{item.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <section aria-labelledby="features-heading" class="bg-surface-blue border-border border-y py-14 sm:py-16">
+      <div class="page-shell">
+        <h2 class="section-heading text-center" id="features-heading">{config.sectionHeadings.features}</h2>
+        <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {config.features.map((feature) => (
+            <article class="border-border bg-surface rounded-lg border p-5">
+              <h3 class="font-bold">{feature.title}</h3>
+              <p class="text-text-muted mt-2 text-sm leading-6">{feature.description}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="related-heading" class="page-shell py-14 sm:py-16">
+      <h2 class="section-heading text-center" id="related-heading">{config.relatedHeading ?? 'Related graph makers'}</h2>
+      <div class="mx-auto mt-8 grid max-w-5xl gap-4 md:grid-cols-3">
+        {config.relatedTools.map((tool) => (
+          <a class="border-border hover:border-brand hover:shadow-editor group rounded-lg border p-5 transition" href={tool.href}>
+            <h3 class="group-hover:text-brand font-bold">{tool.name} <span aria-hidden="true">→</span></h3>
+            <p class="text-text-muted mt-2 text-sm leading-6">{tool.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section aria-labelledby="faq-heading" class="page-shell max-w-4xl pb-14 sm:pb-16" id="faq">
+      <div class="text-center">
+        <h2 class="section-heading" id="faq-heading">{config.sectionHeadings.faq}</h2>
+        <p class="text-text-muted mt-2">{config.sectionHeadings.faqIntro}</p>
+      </div>
+      <div class="border-border mt-8 border-y">
+        {config.faqs.map((faq) => (
+          <details class="border-border group border-b last:border-b-0">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-5 py-5 font-bold">
+              {faq.question}<span aria-hidden="true" class="text-brand text-xl group-open:rotate-45">＋</span>
+            </summary>
+            <p class="text-text-muted max-w-3xl pb-5 text-sm leading-6">{faq.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</BaseLayout>

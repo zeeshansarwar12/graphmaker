@@ -1,0 +1,43 @@
+---
+interface Props {
+  type: 'bar' | 'line' | 'pie' | 'xy' | 'scatter' | 'box' | 'radar' | 'histogram';
+}
+
+const { type } = Astro.props;
+---
+
+<svg aria-hidden="true" class="h-8 w-8" fill="none" viewBox="0 0 32 32">
+  {type === 'bar' && <>
+    <rect fill="currentColor" height="11" rx="1" width="5" x="4" y="17"></rect>
+    <rect fill="currentColor" height="18" rx="1" width="5" x="13.5" y="10"></rect>
+    <rect fill="currentColor" height="24" rx="1" width="5" x="23" y="4"></rect>
+  </>}
+  {type === 'line' && <>
+    <path d="m3 24 7-9 7 5 11-14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+    <circle cx="3" cy="24" fill="currentColor" r="2"></circle><circle cx="10" cy="15" fill="currentColor" r="2"></circle><circle cx="17" cy="20" fill="currentColor" r="2"></circle><circle cx="28" cy="6" fill="currentColor" r="2"></circle>
+  </>}
+  {type === 'pie' && <>
+    <path d="M15 3a13 13 0 1 0 13 13H15V3Z" fill="currentColor" opacity=".8"></path>
+    <path d="M18 3.4V13h9.6A13 13 0 0 0 18 3.4Z" fill="currentColor"></path>
+  </>}
+  {type === 'xy' && <>
+    <path d="M5 27V5M5 27h22" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
+    <path d="m8 22 6-7 5 3 7-10" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+    <circle cx="14" cy="15" fill="currentColor" r="2.5"></circle><circle cx="26" cy="8" fill="currentColor" r="2.5"></circle>
+  </>}
+  {type === 'scatter' && <>
+    <circle cx="7" cy="23" fill="currentColor" r="3"></circle><circle cx="12" cy="12" fill="currentColor" r="3"></circle><circle cx="18" cy="20" fill="currentColor" r="3"></circle><circle cx="24" cy="8" fill="currentColor" r="3"></circle><circle cx="26" cy="24" fill="currentColor" r="3"></circle>
+  </>}
+  {type === 'box' && <>
+    <path d="M7 5v22M4 5h6M4 27h6M22 5v22M19 5h6M19 27h6M7 10h15M7 22h15" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
+    <rect height="12" rx="1" stroke="currentColor" stroke-width="2" width="10" x="10" y="10"></rect><path d="M10 16h10" stroke="currentColor" stroke-width="2"></path>
+  </>}
+  {type === 'radar' && <>
+    <path d="m16 3 13 9-5 15H8L3 12l13-9Z" stroke="currentColor" stroke-linejoin="round" stroke-width="2"></path>
+    <path d="m16 9 7 5-3 8h-8l-3-8 7-5Z" fill="currentColor" opacity=".35" stroke="currentColor" stroke-linejoin="round"></path>
+  </>}
+  {type === 'histogram' && <>
+    <path d="M3 28h26" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
+    <rect fill="currentColor" height="9" rx="1" width="5" x="4" y="19"></rect><rect fill="currentColor" height="17" rx="1" width="5" x="10.5" y="11"></rect><rect fill="currentColor" height="23" rx="1" width="5" x="17" y="5"></rect><rect fill="currentColor" height="14" rx="1" width="5" x="23.5" y="14"></rect>
+  </>}
+</svg>

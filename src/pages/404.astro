@@ -1,0 +1,13 @@
+---
+import SiteFooter from '../components/navigation/SiteFooter.astro';
+import SiteHeader from '../components/navigation/SiteHeader.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page Not Found | GraphMaker" description="The requested GraphMaker page could not be found." robots="noindex,follow">
+  <SiteHeader hasEditor={false} hasFaq={false} />
+  <main class="page-shell grid min-h-[55vh] place-items-center py-16 text-center" id="main-content">
+    <div><p class="text-brand font-bold">404</p><h1 class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Page not found</h1><p class="text-text-muted mt-4">The page may have moved, or the address may be incorrect.</p><div class="mt-7 flex flex-wrap justify-center gap-3"><a class="button-primary" href="/">Go to GraphMaker</a><a class="button-secondary" href="/tools/">Browse graph tools</a></div></div>
+  </main>
+  <SiteFooter />
+</BaseLayout>
