@@ -18,7 +18,8 @@ const {
   structuredData,
 } = Astro.props;
 const canonicalUrl = canonical ? new URL(canonical, Astro.site ?? Astro.url).href : undefined;
-const googleAnalyticsId = normalizeGoogleAnalyticsId(import.meta.env.PUBLIC_GOOGLE_ANALYTICS_ID);
+const googleAnalyticsId = normalizeGoogleAnalyticsId(import.meta.env.PUBLIC_GOOGLE_ANALYTICS_ID)
+  ?? 'G-JM5S5JGFJJ';
 const googleAnalyticsBootstrap = googleAnalyticsId
   ? `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}

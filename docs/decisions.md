@@ -83,6 +83,6 @@ First implementation milestone: homepage shell + shared editor + functional bar-
 ## DEC-015 — Optional privacy-limited GA4 page analytics
 **Status:** Accepted
 
-Google Analytics 4 may be enabled through the `PUBLIC_GOOGLE_ANALYTICS_ID` deployment variable. It is limited to standard page-view analytics with advertising personalization and Google signals disabled.
+Google Analytics 4 is enabled with the production Measurement ID and may be overridden for alternate deployments through `PUBLIC_GOOGLE_ANALYTICS_ID`. It is limited to standard page-view analytics with advertising personalization and Google signals disabled.
 
 Graph datasets, uploaded-file contents, project names, graph titles, cell values, and other editor state must never be included in analytics events.

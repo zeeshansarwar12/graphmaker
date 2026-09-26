@@ -19,10 +19,10 @@ Use these files inside the repository so Codex can reread the decisions instead 
 
 ## Google Analytics
 
-Google Analytics 4 is optional. Copy `.env.example` to `.env` for local testing or set this environment variable in the production deployment:
+Google Analytics 4 is enabled with the production web stream. For an alternate deployment, copy `.env.example` to `.env` or override this environment variable:
 
 ```text
-PUBLIC_GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX
+PUBLIC_GOOGLE_ANALYTICS_ID=G-JM5S5JGFJJ
 ```
 
-Use the GA4 Measurement ID from the production web data stream. When the variable is absent or invalid, no Google Analytics scripts are rendered.
+The shared layout validates any override and otherwise uses the production Measurement ID. Advertising personalization and Google signals remain disabled.
