@@ -6,4 +6,7 @@ test-results/
 coverage/
 dev.log
 dev.err
+.env
+.env.*
+!.env.example
 .DS_Store

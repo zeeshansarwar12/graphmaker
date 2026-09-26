@@ -62,3 +62,41 @@ test('accepts pasted XY data and remains usable on mobile', async ({ page }) => 
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
   )).toBe(false);
 });
+
+test('does not restore a project saved on another specialist page', async ({ page }) => {
+  await page.goto('/radar-chart-maker/');
+  await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
+  await page.getByRole('button', { exact: true, name: 'Line' }).click();
+  await page.getByRole('button', { name: 'Save locally' }).click();
+  await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
+
+  await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('graph-maker', 1);
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve(request.result);
+    });
+    await new Promise<void>((resolve, reject) => {
+      const transaction = database.transaction('projects', 'readwrite');
+      const store = transaction.objectStore('projects');
+      const request = store.get('current-project:/radar-chart-maker/');
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        store.put({ ...request.result, id: 'current-project:/xy-graph-maker/' });
+      };
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error);
+    });
+    database.close();
+  });
+
+  await page.goto('/xy-graph-maker/');
+  await expect(page.getByRole('button', { exact: true, name: 'XY' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByLabel('X, row 1')).toHaveValue('1');
+  await expect(page.getByLabel('Y, row 5')).toHaveValue('7');
+  await expect(page.locator('[data-rendered-chart-type="xy"] [data-chart-status="ready"]')).toBeVisible();
+
+  await page.goto('/radar-chart-maker/');
+  await expect(page.getByRole('button', { exact: true, name: 'Radar' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByLabel('Metric, row 1')).toHaveValue('Speed');
+});

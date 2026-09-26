@@ -226,18 +226,30 @@ export function GraphEditor({ config }: GraphEditorProps) {
 
     void (async () => {
       try {
-        const stored = await loadCurrentProject();
+        const stored = await loadCurrentProject(config.slug);
         if (cancelled) return;
 
-        if (stored.status === 'ready') {
+        const storedProjectMatchesPage = stored.status === 'ready'
+          && (config.slug === '/' || stored.project.graphType === config.graphType);
+
+        if (storedProjectMatchesPage) {
           setData(stored.project.data);
           dispatchSettings({ type: 'replace-settings', value: stored.project.settings });
           setSelectedChartType(stored.project.graphType);
           createdAtRef.current = stored.project.createdAt;
           setIsSampleData(false);
           setProjectNotice('Restored your previous project from this device.');
+        } else if (stored.status === 'ready') {
+          await deleteCurrentProject(config.slug);
+          if (cancelled) return;
+          setData(createConfiguredData(config));
+          dispatchSettings({ type: 'replace-settings', value: createConfiguredSettings(config) });
+          setSelectedChartType(config.graphType);
+          createdAtRef.current = new Date().toISOString();
+          setIsSampleData(true);
+          setProjectNotice('Opened this tool with its recommended chart preset.');
         } else if (stored.status === 'corrupt') {
-          await deleteCurrentProject();
+          await deleteCurrentProject(config.slug);
           if (cancelled) return;
           setProjectError('The saved local project was corrupted, so a new graph was opened instead.');
         }
@@ -256,7 +268,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [config]);
 
   useEffect(() => {
     if (!isProjectReady || !isStorageAvailable) return;
@@ -270,7 +282,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
         settings,
       });
 
-      void saveCurrentProject(project)
+      void saveCurrentProject(project, config.slug)
         .then(() => {
           setProjectError(null);
           setSaveStatus('saved');
@@ -283,7 +295,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     }, 350);
 
     return () => window.clearTimeout(timer);
-  }, [data, isProjectReady, isStorageAvailable, selectedChartType, settings]);
+  }, [config.slug, data, isProjectReady, isStorageAvailable, selectedChartType, settings]);
 
   function updateData(nextData: TabularData, intent: 'edit' | 'replace' | 'structure' = 'edit') {
     setData(nextData);
@@ -326,7 +338,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
         data,
         graphType: selectedChartType,
         settings,
-      }));
+      }), config.slug);
       setIsStorageAvailable(true);
       setProjectError(null);
       setProjectNotice(null);
@@ -398,7 +410,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
   async function resetGraph() {
     const createdAt = new Date().toISOString();
     try {
-      await deleteCurrentProject();
+      await deleteCurrentProject(config.slug);
     } catch {
       // The new project will still replace the old record during the next autosave.
     }

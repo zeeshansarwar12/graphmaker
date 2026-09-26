@@ -79,3 +79,10 @@ Complete and validate one end-to-end graph workflow before rapidly adding every 
 **Status:** Accepted
 
 First implementation milestone: homepage shell + shared editor + functional bar-chart path. Expand only after the foundation is stable.
+
+## DEC-015 — Optional privacy-limited GA4 page analytics
+**Status:** Accepted
+
+Google Analytics 4 may be enabled through the `PUBLIC_GOOGLE_ANALYTICS_ID` deployment variable. It is limited to standard page-view analytics with advertising personalization and Google signals disabled.
+
+Graph datasets, uploaded-file contents, project names, graph titles, cell values, and other editor state must never be included in analytics events.

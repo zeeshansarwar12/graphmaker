@@ -10,6 +10,7 @@ import {
   createNewProject,
   createProjectSnapshot,
   deserializeGraphProject,
+  graphProjectStorageId,
   parseGraphProject,
   serializeGraphProject,
 } from '../../src/lib/storage/graphProject';
@@ -17,6 +18,17 @@ import {
 const timestamp = '2026-09-16T08:00:00.000Z';
 
 describe('graph project persistence model', () => {
+  it('keeps homepage and specialist-page storage keys separate', () => {
+    expect(graphProjectStorageId()).toBe('current-project');
+    expect(graphProjectStorageId('/')).toBe('current-project');
+    expect(graphProjectStorageId('/xy-graph-maker/')).toBe(
+      'current-project:/xy-graph-maker/',
+    );
+    expect(graphProjectStorageId('/radar-chart-maker/')).toBe(
+      'current-project:/radar-chart-maker/',
+    );
+  });
+
   it('creates a complete versioned snapshot for saving and restoring', () => {
     const project = createProjectSnapshot({
       data: createSampleData(),

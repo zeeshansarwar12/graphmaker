@@ -159,3 +159,5 @@ Keep export logic isolated from editor presentation. PNG/SVG export should use t
 
 ## Security/privacy
 V1 must not silently transmit uploaded/pasted datasets to third parties. Analytics events should not include user dataset contents.
+
+GA4 page-view analytics may be enabled at build time with `PUBLIC_GOOGLE_ANALYTICS_ID`. The shared layout validates the ID and disables advertising personalization and Google signals. Do not add dataset values, project names, file contents, chart titles, or other editor state to analytics events.

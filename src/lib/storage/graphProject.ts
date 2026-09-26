@@ -6,6 +6,13 @@ import type { TabularData } from '../../graph/transforms/tabularData';
 export const currentProjectId = 'current-project';
 export const graphProjectSchemaVersion = 1;
 
+export function graphProjectStorageId(slug = '/'): string {
+  const normalizedSlug = slug.trim();
+  return normalizedSlug === '' || normalizedSlug === '/'
+    ? currentProjectId
+    : `${currentProjectId}:${normalizedSlug}`;
+}
+
 export interface GraphProject {
   createdAt: string;
   data: TabularData;

@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { normalizeGoogleAnalyticsId } from '../lib/analytics/googleAnalytics';
 
 interface Props {
   canonical?: string;
@@ -17,6 +18,17 @@ const {
   structuredData,
 } = Astro.props;
 const canonicalUrl = canonical ? new URL(canonical, Astro.site ?? Astro.url).href : undefined;
+const googleAnalyticsId = normalizeGoogleAnalyticsId(import.meta.env.PUBLIC_GOOGLE_ANALYTICS_ID);
+const googleAnalyticsBootstrap = googleAnalyticsId
+  ? `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', ${JSON.stringify(googleAnalyticsId)}, {
+  allow_ad_personalization_signals: false,
+  allow_google_signals: false,
+  anonymize_ip: true
+});`
+  : null;
 ---
 
 <!doctype html>
@@ -25,6 +37,7 @@ const canonicalUrl = canonical ? new URL(canonical, Astro.site ?? Astro.url).hre
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
     <meta name="robots" content={robots} />
+    <meta name="google-site-verification" content="r9NYNACi391MLcXqqUd0w48ayLHu3l1TZ4zuUJO6dEY" />
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     <meta name="viewport" content="width=device-width" />
     <meta property="og:title" content={title} />
@@ -35,6 +48,8 @@ const canonicalUrl = canonical ? new URL(canonical, Astro.site ?? Astro.url).hre
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text y=%2214%22>📊</text></svg>" />
     <meta name="generator" content={Astro.generator} />
     {structuredData && <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />}
+    {googleAnalyticsId && <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(googleAnalyticsId)}`}></script>}
+    {googleAnalyticsBootstrap && <script is:inline set:html={googleAnalyticsBootstrap}></script>}
     <title>{title}</title>
   </head>
   <body>

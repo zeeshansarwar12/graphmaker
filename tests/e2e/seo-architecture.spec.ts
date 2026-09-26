@@ -35,6 +35,8 @@ test('every indexable page has unique production metadata and one logical H1', a
     expect(canonical, route).toBeTruthy();
     expect(new URL(canonical!).pathname, route).toBe(route);
     expect(await page.locator('meta[name="robots"]').getAttribute('content'), route).toBe('index,follow');
+    expect(await page.locator('meta[name="google-site-verification"]').getAttribute('content'), route)
+      .toBe('r9NYNACi391MLcXqqUd0w48ayLHu3l1TZ4zuUJO6dEY');
     expect(await page.locator('meta[property="og:title"]').getAttribute('content'), route).toBe(title);
     expect(await page.locator('meta[property="og:description"]').getAttribute('content'), route).toBe(description);
     expect(await page.locator('meta[property="og:url"]').getAttribute('content'), route).toBe(canonical);
@@ -168,5 +170,19 @@ test('editor controls are semantic and static information pages do not hydrate J
     expect(await page.locator('script[src]').count(), route).toBe(0);
     const unsizedImages = await page.locator('img:not([width]), img:not([height])').count();
     expect(unsizedImages, route).toBe(0);
+  }
+});
+
+test('Google Analytics is rendered only for a configured GA4 measurement ID', async ({ page }) => {
+  await page.goto('/');
+  const configuredId = process.env.PUBLIC_GOOGLE_ANALYTICS_ID?.trim().toUpperCase();
+  const analyticsScript = page.locator('script[src^="https://www.googletagmanager.com/gtag/js?id="]');
+
+  if (configuredId && configuredId !== 'G-XXXXXXXXXX' && /^G-[A-Z0-9]+$/.test(configuredId)) {
+    await expect(analyticsScript).toHaveAttribute('src', `https://www.googletagmanager.com/gtag/js?id=${configuredId}`);
+    await expect(page.locator('head')).toContainText('allow_ad_personalization_signals');
+    await expect(page.locator('head')).toContainText('allow_google_signals');
+  } else {
+    await expect(analyticsScript).toHaveCount(0);
   }
 });
