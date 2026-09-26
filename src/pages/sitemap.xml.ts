@@ -5,7 +5,7 @@ import { indexableRoutes } from '../content/graphTools';
 export const prerender = true;
 
 export const GET: APIRoute = ({ site }) => {
-  const base = site ?? new URL('http://localhost:4321');
+  const base = site ?? new URL('https://graphmaker.site');
   const urls = indexableRoutes
     .map((route) => `  <url><loc>${new URL(route, base).href}</loc></url>`)
     .join('\n');

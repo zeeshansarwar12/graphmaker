@@ -13,6 +13,7 @@ const coreToolRoutes = [
 
 const indexableRoutes = ['/', '/tools/', '/about/', ...coreToolRoutes] as const;
 const allLinkedRoutes = [...indexableRoutes, '/privacy/', '/terms/'] as const;
+const productionOrigin = 'https://graphmaker.site';
 
 test('every indexable page has unique production metadata and one logical H1', async ({ page, request }) => {
   const titles = new Set<string>();
@@ -33,7 +34,7 @@ test('every indexable page has unique production metadata and one logical H1', a
     expect(description, route).toBeTruthy();
     expect(await h1.count(), route).toBe(1);
     expect(canonical, route).toBeTruthy();
-    expect(new URL(canonical!).pathname, route).toBe(route);
+    expect(canonical, route).toBe(new URL(route, productionOrigin).href);
     expect(await page.locator('meta[name="robots"]').getAttribute('content'), route).toBe('index,follow');
     expect(await page.locator('meta[name="google-site-verification"]').getAttribute('content'), route)
       .toBe('r9NYNACi391MLcXqqUd0w48ayLHu3l1TZ4zuUJO6dEY');
@@ -88,7 +89,7 @@ test('tool pages have distinct related-tool links and valid breadcrumb schema', 
 test('sitemap and robots expose only intended production URLs', async ({ request }) => {
   const sitemap = await (await request.get('/sitemap.xml')).text();
   for (const route of indexableRoutes) {
-    expect(sitemap).toMatch(new RegExp(`<loc>https?://[^<]+${route.replaceAll('/', '\\/')}</loc>`));
+    expect(sitemap).toContain(`<loc>${new URL(route, productionOrigin).href}</loc>`);
   }
   for (const excluded of ['/404/', '/privacy/', '/terms/', '/guides/', '/use-cases/']) {
     expect(sitemap).not.toMatch(new RegExp(`<loc>https?://[^<]+${excluded.replaceAll('/', '\\/')}</loc>`));
@@ -98,7 +99,7 @@ test('sitemap and robots expose only intended production URLs', async ({ request
   const robots = await (await request.get('/robots.txt')).text();
   expect(robots).toContain('User-agent: *');
   expect(robots).toContain('Allow: /');
-  expect(robots).toMatch(/Sitemap: https?:\/\/[^\s]+\/sitemap\.xml/);
+  expect(robots).toContain(`Sitemap: ${productionOrigin}/sitemap.xml`);
   expect(robots).not.toContain('Disallow:');
 });
 

@@ -4,7 +4,7 @@ import { defineConfig } from 'astro/config';
 
 export default defineConfig({
   integrations: [react()],
-  site: process.env.SITE_URL ?? process.env.CF_PAGES_URL ?? 'http://localhost:4321',
+  site: 'https://graphmaker.site',
   trailingSlash: 'always',
   vite: {
     plugins: [tailwindcss()],
