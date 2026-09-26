@@ -38,6 +38,8 @@ test('every indexable page has unique production metadata and one logical H1', a
     expect(await page.locator('meta[name="robots"]').getAttribute('content'), route).toBe('index,follow');
     expect(await page.locator('meta[name="google-site-verification"]').getAttribute('content'), route)
       .toBe('r9NYNACi391MLcXqqUd0w48ayLHu3l1TZ4zuUJO6dEY');
+    expect(await page.locator('meta[name="msvalidate.01"]').getAttribute('content'), route)
+      .toBe('ADA32A2FC73ADC93B80B1231531C0854');
     expect(await page.locator('meta[property="og:title"]').getAttribute('content'), route).toBe(title);
     expect(await page.locator('meta[property="og:description"]').getAttribute('content'), route).toBe(description);
     expect(await page.locator('meta[property="og:url"]').getAttribute('content'), route).toBe(canonical);
