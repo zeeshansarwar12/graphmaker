@@ -2,14 +2,14 @@
 import SiteFooter from '../../components/navigation/SiteFooter.astro';
 import SiteHeader from '../../components/navigation/SiteHeader.astro';
 import ChartGlyph from '../../components/ui/ChartGlyph.astro';
-import { graphTools } from '../../content/graphTools';
+import { allGraphTools } from '../../content/graphTools';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout
   canonical="/tools/"
   title="Graph Making Tools — Choose the Right Chart | GraphMaker"
-  description="Browse GraphMaker tools for bar, line, pie, XY, scatter, histogram, box plot, and radar charts. Choose the chart that fits your data."
+  description="Browse GraphMaker tools for bar, line, pie, XY, scatter, dot plot, histogram, box plot, radar, and supply and demand graphs."
 >
   <SiteHeader hasEditor={false} hasFaq={false} />
   <main class="page-shell py-10 sm:py-14" id="main-content">
@@ -23,7 +23,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     <section aria-labelledby="tool-directory-heading" class="mt-10">
       <h2 class="section-heading text-center" id="tool-directory-heading">All graph makers</h2>
       <div class="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {graphTools.map((tool) => (
+        {allGraphTools.map((tool) => (
           <a class="border-border hover:border-brand hover:shadow-editor group rounded-lg border p-5 transition" href={tool.href}>
             <span class="bg-brand-soft text-brand grid h-12 w-12 place-items-center rounded-lg"><ChartGlyph type={tool.type} /></span>
             <h3 class="group-hover:text-brand mt-4 font-bold">{tool.name}</h3>
@@ -36,8 +36,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       <h2 class="section-heading" id="choose-heading">How to choose a graph</h2>
       <div class="mt-5 grid gap-5 md:grid-cols-3">
         <article><h3 class="font-bold">Compare categories</h3><p class="text-text-muted mt-2 text-sm leading-6">Use bar or pie charts for separate groups and parts of a whole.</p></article>
-        <article><h3 class="font-bold">Show change or relationships</h3><p class="text-text-muted mt-2 text-sm leading-6">Use line, XY, or scatter charts for ordered values and paired measurements.</p></article>
-        <article><h3 class="font-bold">Understand distributions</h3><p class="text-text-muted mt-2 text-sm leading-6">Use histograms and box plots for raw observations, or radar charts for multi-metric profiles.</p></article>
+        <article><h3 class="font-bold">Show change or relationships</h3><p class="text-text-muted mt-2 text-sm leading-6">Use line, XY, scatter, or supply and demand graphs for ordered values and paired measurements.</p></article>
+        <article><h3 class="font-bold">Understand distributions</h3><p class="text-text-muted mt-2 text-sm leading-6">Use dot plots, histograms, and box plots for raw observations, or radar charts for multi-metric profiles.</p></article>
       </div>
     </section>
   </main>

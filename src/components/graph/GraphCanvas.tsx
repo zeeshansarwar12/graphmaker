@@ -8,11 +8,13 @@ import type { RefObject } from 'react';
 
 import { createBarChartView } from '../../graph/configs/barChart';
 import { createBoxPlotChartView } from '../../graph/configs/boxPlotChart';
+import { createDotPlotChartView } from '../../graph/configs/dotPlotChart';
 import { createHistogramChartView } from '../../graph/configs/histogramChart';
 import { createLineChartView } from '../../graph/configs/lineChart';
 import { createPieChartView } from '../../graph/configs/pieChart';
 import { createRadarChartView } from '../../graph/configs/radarChart';
 import { createScatterChartView } from '../../graph/configs/scatterChart';
+import { createSupplyDemandChartView } from '../../graph/configs/supplyDemandChart';
 import { createXyChartView } from '../../graph/configs/xyChart';
 import type { GraphSettings } from '../../graph/configs/graphSettings';
 import { detectDataShape } from '../../graph/transforms/dataInterpretation';
@@ -26,7 +28,7 @@ export interface GraphCanvasHandle {
 }
 
 interface GraphCanvasProps {
-  chartType: 'bar' | 'boxplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'xy';
+  chartType: 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy';
   data: TabularData;
   incompatibleAction?: {
     label: string;
@@ -39,6 +41,7 @@ interface GraphCanvasProps {
 interface EChartProps {
   axisType: 'category' | 'none' | 'time' | 'value';
   chartRef: RefObject<EChartsType | null>;
+  insight?: string;
   labelInterval: number;
   legendSeries: Array<{ columnId: string; name: string }>;
   onToggleSeries?: (columnId: string) => boolean;
@@ -51,6 +54,7 @@ interface EChartProps {
 function EChart({
   axisType,
   chartRef,
+  insight,
   labelInterval,
   legendSeries,
   onToggleSeries,
@@ -106,6 +110,7 @@ function EChart({
   return (
     <div data-axis-type={axisType} data-chart-status="ready" data-label-interval={labelInterval} data-series-count={seriesCount}>
       {warning && <p className="mb-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900" role="status">{warning}</p>}
+      {insight && <p className="border-border bg-surface-subtle mb-2 rounded-md border px-3 py-2 text-sm font-semibold" data-chart-insight role="status">{insight}</p>}
       <div aria-hidden="true" className="h-72 w-full sm:h-80" ref={containerRef}></div>
       <p aria-live="polite" className="sr-only">{summary}</p>
     </div>
@@ -122,6 +127,8 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
       ? createLineChartView(data, settings)
       : chartType === 'boxplot'
         ? createBoxPlotChartView(data, settings)
+      : chartType === 'dotplot'
+        ? createDotPlotChartView(data, settings)
       : chartType === 'histogram'
         ? createHistogramChartView(data, settings)
       : chartType === 'pie'
@@ -130,6 +137,8 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
         ? createRadarChartView(data, settings)
       : chartType === 'scatter'
         ? createScatterChartView(data, settings)
+      : chartType === 'supplydemand'
+        ? createSupplyDemandChartView(data, settings)
       : chartType === 'xy'
         ? createXyChartView(data, settings)
         : createBarChartView(data, settings),
@@ -137,7 +146,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
   );
   const interpretation = useMemo(() => detectDataShape(data), [data]);
   const legendSeries = useMemo(() => {
-    const columnIndexes = chartType === 'histogram' || chartType === 'pie'
+    const columnIndexes = chartType === 'dotplot' || chartType === 'histogram' || chartType === 'pie' || chartType === 'supplydemand'
       ? []
       : chartType === 'scatter' || chartType === 'xy'
       ? [createScatterData(
@@ -191,7 +200,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
     const emptyStateTitle = 'title' in view && typeof view.title === 'string'
       ? view.title
       : isIncompatible
-        ? `This data isn’t suitable for ${chartType === 'scatter' ? 'Scatter' : chartType === 'xy' ? 'XY' : chartType === 'boxplot' ? 'Box Plot' : chartType.charAt(0).toUpperCase() + chartType.slice(1)}.`
+        ? `This data isn’t suitable for ${chartType === 'scatter' ? 'Scatter' : chartType === 'xy' ? 'XY' : chartType === 'boxplot' ? 'Box Plot' : chartType === 'dotplot' ? 'Dot Plot' : chartType === 'supplydemand' ? 'Supply & Demand' : chartType.charAt(0).toUpperCase() + chartType.slice(1)}.`
         : 'Your graph will appear here';
     return (
       <div
@@ -219,13 +228,14 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
       <EChart
         axisType={chartType === 'pie' || chartType === 'radar'
           ? 'none'
-          : chartType === 'scatter' || chartType === 'xy'
+          : chartType === 'dotplot' || chartType === 'scatter' || chartType === 'supplydemand' || chartType === 'xy'
           ? 'value'
           : chartType === 'line' && interpretation.shape === 'date-series' ? 'time' : 'category'}
         chartRef={chartRef}
+        insight={'insight' in view && typeof view.insight === 'string' ? view.insight : undefined}
         labelInterval={labelInterval}
         legendSeries={legendSeries}
-        onToggleSeries={chartType === 'boxplot' || chartType === 'histogram' || chartType === 'pie' ? undefined : onToggleSeries}
+        onToggleSeries={chartType === 'boxplot' || chartType === 'dotplot' || chartType === 'histogram' || chartType === 'pie' || chartType === 'supplydemand' ? undefined : onToggleSeries}
         options={view.options}
         seriesCount={view.series.length}
         summary={view.summary}

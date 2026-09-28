@@ -12,6 +12,8 @@ describe('graph settings state', () => {
     const second = createDefaultGraphSettings();
 
     expect(first).toMatchObject({
+      dotPlotSeriesColumnId: null,
+      dotSize: 10,
       histogramBinCount: null,
       histogramSeriesColumnId: null,
       orientation: 'vertical',
@@ -19,11 +21,15 @@ describe('graph settings state', () => {
       radarFilled: true,
       scatterXColumnId: null,
       scatterYColumnId: null,
+      showEquilibrium: true,
       showGrid: true,
       showLegend: true,
       showOutliers: true,
       showValueLabels: true,
       title: 'Monthly Sales',
+      supplyDemandDemandColumnId: null,
+      supplyDemandSupplyColumnId: null,
+      supplyDemandXColumnId: null,
       xAxisTitle: 'Month',
       xyConnectPoints: true,
       yAxisTitle: 'Sales',
@@ -32,6 +38,43 @@ describe('graph settings state', () => {
     expect(first.seriesColors).not.toBe(second.seriesColors);
     expect(first.hiddenSeriesIds).toEqual([]);
     expect(first.hiddenSeriesIds).not.toBe(second.hiddenSeriesIds);
+  });
+
+  it('sets a dot plot series and constrains dot size', () => {
+    const withSeries = graphSettingsReducer(createDefaultGraphSettings(), {
+      type: 'set-dot-plot-series',
+      value: 'scores-column',
+    });
+    const resized = graphSettingsReducer(withSeries, { type: 'set-dot-size', value: 30 });
+
+    expect(resized.dotPlotSeriesColumnId).toBe('scores-column');
+    expect(resized.dotSize).toBe(24);
+  });
+
+  it('stores supply and demand mapping and equilibrium visibility', () => {
+    const demand = graphSettingsReducer(createDefaultGraphSettings(), {
+      type: 'set-supply-demand-demand-column',
+      value: 'buyers',
+    });
+    const supply = graphSettingsReducer(demand, {
+      type: 'set-supply-demand-supply-column',
+      value: 'sellers',
+    });
+    const quantity = graphSettingsReducer(supply, {
+      type: 'set-supply-demand-x-column',
+      value: 'quantity',
+    });
+    const hidden = graphSettingsReducer(quantity, {
+      type: 'set-show-equilibrium',
+      value: false,
+    });
+
+    expect(hidden).toMatchObject({
+      showEquilibrium: false,
+      supplyDemandDemandColumnId: 'buyers',
+      supplyDemandSupplyColumnId: 'sellers',
+      supplyDemandXColumnId: 'quantity',
+    });
   });
 
   it('toggles box plot outliers', () => {

@@ -200,6 +200,31 @@ const histogramSampleData = {
   ],
 };
 
+const dotPlotSampleData = {
+  columns: [
+    { id: 'column-1', kind: 'number' as const, name: 'Value' },
+  ],
+  rows: ['12', '14', '14', '15', '15', '15', '16', '17', '17', '18', '18', '18', '18', '19', '20', '20', '21', '22', '22', '24']
+    .map((value, index) => ({ cells: [value], id: `row-${index + 1}` })),
+};
+
+const supplyDemandSampleData = {
+  columns: [
+    { id: 'column-1', kind: 'number' as const, name: 'Quantity' },
+    { id: 'column-2', kind: 'number' as const, name: 'Demand' },
+    { id: 'column-3', kind: 'number' as const, name: 'Supply' },
+  ],
+  rows: [
+    ['10', '90', '20'],
+    ['20', '80', '30'],
+    ['30', '70', '40'],
+    ['40', '60', '50'],
+    ['50', '50', '60'],
+    ['60', '40', '70'],
+    ['70', '30', '80'],
+  ].map((cells, index) => ({ cells, id: `row-${index + 1}` })),
+};
+
 export const xyToolPageConfig = {
   canonical: '/xy-graph-maker/',
   comparison: {
@@ -279,6 +304,7 @@ export const xyToolPageConfig = {
   relatedTools: [
     { name: 'Scatter Plot Maker', description: 'Plot independent observations and explore relationships between two variables.', href: '/scatter-plot-maker/' },
     { name: 'Line Graph Maker', description: 'Show changes and trends across categories or dates.', href: '/line-graph-maker/' },
+    { name: 'Supply and Demand Graph Maker', description: 'Map quantity, demand, and supply curves and estimate their equilibrium.', href: '/supply-and-demand-graph-maker/' },
     { name: 'Bar Graph Maker', description: 'Compare numeric values across named categories.', href: '/bar-graph-maker/' },
   ],
   sectionHeadings: {
@@ -589,6 +615,7 @@ export const lineToolPageConfig = {
   relatedTools: [
     { name: 'Bar Graph Maker', description: 'Compare numeric values across separate named categories.', href: '/bar-graph-maker/' },
     { name: 'XY Graph Maker', description: 'Plot paired numeric values and optionally connect consecutive points.', href: '/xy-graph-maker/' },
+    { name: 'Supply and Demand Graph Maker', description: 'Draw economics curves against quantity and identify an in-range equilibrium.', href: '/supply-and-demand-graph-maker/' },
     { name: 'Scatter Plot Maker', description: 'Plot independent numeric observations without connecting lines.', href: '/scatter-plot-maker/' },
   ],
   sectionHeadings: {
@@ -823,6 +850,7 @@ export const boxPlotToolPageConfig = {
   relatedHeading: 'Related tools',
   relatedTools: [
     { name: 'Histogram Maker', description: 'Explore the detailed shape and frequency of one numeric distribution.', href: '/histogram-maker/' },
+    { name: 'Dot Plot Maker', description: 'Keep individual observations visible and stack repeated values by frequency.', href: '/dot-plot-maker/' },
     { name: 'Scatter Plot Maker', description: 'Plot paired numeric observations and inspect relationships or unusual points.', href: '/scatter-plot-maker/' },
     { name: 'Bar Graph Maker', description: 'Compare aggregate values across named categories.', href: '/bar-graph-maker/' },
   ],
@@ -1038,6 +1066,7 @@ export const histogramToolPageConfig = {
   metaDescription: 'Create a histogram online from raw numeric data. Use automatic or adjustable bins, import CSV or Excel values, and export free with no signup.',
   relatedTools: [
     { name: 'Box Plot Maker', description: 'Summarize median, quartiles, spread, and outliers from raw numeric data.', href: '/box-plot-maker/' },
+    { name: 'Dot Plot Maker', description: 'Show every raw observation and stack repeated values by frequency.', href: '/dot-plot-maker/' },
     { name: 'Bar Graph Maker', description: 'Compare values across separate named categories instead of continuous ranges.', href: '/bar-graph-maker/' },
     { name: 'Scatter Plot Maker', description: 'Explore the relationship between two numeric measurements.', href: '/scatter-plot-maker/' },
   ],
@@ -1059,5 +1088,191 @@ export const histogramToolPageConfig = {
       { title: 'Spot gaps and unusual ranges', description: 'Find empty intervals, multiple peaks, or thin tails that deserve closer investigation.' },
     ],
     title: 'When to use a histogram',
+  },
+} satisfies ToolPageConfig;
+
+export const dotPlotToolPageConfig = {
+  canonical: '/dot-plot-maker/',
+  comparison: {
+    first: {
+      body: 'Choose a dot plot when you want readers to see every observation. Repeated values stack vertically, so exact values, small clusters, gaps, and unusual points remain visible.',
+      title: 'Use a dot plot',
+    },
+    intro: 'Both charts show a numeric distribution, but they preserve different levels of detail.',
+    second: {
+      body: 'Choose a histogram for a larger dataset when grouped intervals communicate the overall distribution more clearly than individual observations.',
+      title: 'Use a histogram',
+    },
+    title: 'Dot Plot vs Histogram',
+  },
+  definition: [
+    'A dot plot places each raw numeric observation on a number line. When a value occurs more than once, its dots stack vertically to show the frequency without hiding any observations.',
+    'The horizontal axis uses true numeric spacing, so the visual distance between 12 and 14 is twice the distance between 14 and 15. This makes a dot plot useful for inspecting exact values in a small or medium-sized dataset.',
+  ],
+  editor: {
+    graphType: 'dotplot',
+    initialSettings: {
+      dotPlotSeriesColumnId: null,
+      dotSize: 10,
+      showGrid: true,
+      showLegend: false,
+      showValueLabels: false,
+      title: 'Dot Plot of Value',
+      xAxisTitle: 'Value',
+      yAxisTitle: 'Frequency',
+    },
+    sampleData: dotPlotSampleData,
+    slug: '/dot-plot-maker/',
+  },
+  example: {
+    caption: 'Enter one raw numeric observation per row. Repeated values, such as 15 and 18, stack into visible frequency columns.',
+    headers: ['Value'],
+    rows: dotPlotSampleData.rows.slice(0, 12).map((row) => [...row.cells]),
+  },
+  faqs: [
+    { question: 'Is this dot plot maker free?', answer: 'Yes. This free dot plot maker works online without signup and exports clean PNG and SVG files without a watermark.' },
+    { question: 'What data works best in a dot plot?', answer: 'Use one numeric column of raw observations. Each row becomes one dot, and repeated numbers stack vertically.' },
+    { question: 'How are repeated values displayed?', answer: 'Every repeated observation receives the same horizontal position and the next available vertical stack position. Four occurrences of 18 therefore appear as four dots above 18.' },
+    { question: 'Can I choose between multiple numeric columns?', answer: 'Yes. The dot plot creator uses the first numeric series by default and lets you choose another series inside Customize. Columns are never merged silently.' },
+    { question: 'Can I paste data or upload Excel and CSV files?', answer: 'Yes. Paste a spreadsheet column or upload CSV and Excel files. Your data is processed locally in the browser.' },
+  ],
+  features: [
+    { title: 'Repeated-value stacking', description: 'Display every observation while stacking duplicate numeric values by frequency.' },
+    { title: 'True numeric spacing', description: 'Position dots on a continuous numeric X-axis instead of evenly spaced categories.' },
+    { title: 'Series selection', description: 'Choose one numeric column in Customize when the dataset contains several series.' },
+    { title: 'Compatibility guidance', description: 'Get a clear explanation and a better chart recommendation when the data is categorical, time-based, or paired XY data.' },
+    { title: 'Spreadsheet imports', description: 'Paste values or import CSV and Excel files through the shared graph editor.' },
+    { title: 'Local save and export', description: 'Save on this device and export the finished dot plot as PNG, SVG, or CSV.' },
+  ],
+  h1: 'Dot Plot Maker',
+  howTo: [
+    { title: 'Add raw observations', description: 'Enter one numeric value per row, paste a spreadsheet column, or upload a CSV or Excel file.' },
+    { title: 'Review the stacked dots', description: 'Confirm that repeated values stack vertically and use Customize to choose a series or adjust dot size.' },
+    { title: 'Label and export', description: 'Use the real column header for the title and axis, then download the dot plot as PNG or SVG.' },
+  ],
+  intro: 'Create a dot plot from raw numeric observations in seconds. This online dot plot maker stacks repeated values, supports paste, CSV, and Excel, and requires no signup.',
+  metaDescription: 'Create a dot plot online from raw numeric data. Stack repeated values, import CSV or Excel, customize dot size, and export free with no signup.',
+  relatedTools: [
+    { name: 'Histogram Maker', description: 'Group numeric observations into intervals to see the overall distribution shape.', href: '/histogram-maker/' },
+    { name: 'Box Plot Maker', description: 'Summarize median, quartiles, spread, and outliers from raw observations.', href: '/box-plot-maker/' },
+    { name: 'Scatter Plot Maker', description: 'Plot paired numeric measurements to explore relationships between variables.', href: '/scatter-plot-maker/' },
+  ],
+  sectionHeadings: {
+    definition: 'What is a dot plot?',
+    example: 'Example dot plot data',
+    faq: 'Dot plot maker FAQ',
+    faqIntro: 'Answers about observations, repeated values, imports, and series selection.',
+    features: 'Dot plot maker features',
+    howTo: 'How to make a dot plot',
+  },
+  slug: '/dot-plot-maker/',
+  title: 'Dot Plot Maker — Create a Dot Plot Online | GraphMaker',
+  useCases: {
+    intro: 'A dot plot generator is most useful when exact observations still matter and the dataset is small enough to read point by point.',
+    items: [
+      { title: 'Compare repeated measurements', description: 'See which scores, durations, or measured values occur most often without grouping them into bins.' },
+      { title: 'Find gaps and clusters', description: 'Spot concentrations, empty ranges, and isolated observations along a true numeric scale.' },
+      { title: 'Teach distributions', description: 'Show students how individual observations build a frequency distribution while keeping the raw values visible.' },
+    ],
+    title: 'When to use a dot plot',
+  },
+} satisfies ToolPageConfig;
+
+export const supplyDemandToolPageConfig = {
+  beforeComparisonSections: [
+    {
+      id: 'equilibrium',
+      intro: 'The editor compares the vertical difference between demand and supply at each quantity and interpolates only across adjacent supplied points when that difference changes sign.',
+      items: [
+        { title: 'Exact match', description: 'When demand and supply have the same value in a row, that quantity and value are reported directly as equilibrium.' },
+        { title: 'Between two rows', description: 'When the curves cross between adjacent quantities, the tool estimates the intersection using straight-line interpolation.' },
+        { title: 'No in-range crossing', description: 'If the supplied curves never meet or cross, the graph reports that no equilibrium appears in the entered range.' },
+      ],
+      title: 'How equilibrium works',
+    },
+  ],
+  canonical: '/supply-and-demand-graph-maker/',
+  comparison: {
+    first: {
+      body: 'The demand curve shows the value buyers associate with each quantity. A downward-sloping curve means demand values decrease as quantity increases.',
+      title: 'Read the demand curve',
+    },
+    intro: 'Read both curves against the numeric quantity axis, then compare their vertical positions and intersection.',
+    second: {
+      body: 'The supply curve shows the value sellers associate with each quantity. An upward-sloping curve means supply values increase as quantity increases. Their intersection is the estimated equilibrium.',
+      title: 'Read the supply curve',
+    },
+    title: 'How to read supply and demand curves',
+  },
+  definition: [
+    'A supply and demand graph plots quantity on the horizontal axis and price or value on the vertical axis. Demand commonly slopes downward while supply slopes upward, making their relationship easy to compare.',
+    'This economics graph maker keeps quantity on a true numeric scale, so irregular gaps between entered quantities remain proportional. It also identifies an approximate equilibrium only when the supplied curves meet or cross inside the entered range.',
+  ],
+  editor: {
+    graphType: 'supplydemand',
+    initialSettings: {
+      showEquilibrium: true,
+      showGrid: true,
+      showLegend: true,
+      showValueLabels: false,
+      title: 'Supply and Demand Graph',
+      xAxisTitle: 'Quantity',
+      yAxisTitle: 'Price / Value',
+    },
+    sampleData: supplyDemandSampleData,
+    slug: '/supply-and-demand-graph-maker/',
+  },
+  example: {
+    caption: 'Use one numeric quantity column followed by demand and supply values. Equivalent headers can be remapped inside Customize.',
+    headers: ['Quantity', 'Demand', 'Supply'],
+    rows: supplyDemandSampleData.rows.map((row) => [...row.cells]),
+  },
+  faqs: [
+    { question: 'Is this supply and demand graph maker free?', answer: 'Yes. The free supply and demand graph maker works online without signup or a watermark.' },
+    { question: 'How should I arrange my data?', answer: 'Use three numeric columns for quantity, demand, and supply. Headers such as Q, Buyers, and Sellers are detected, and you can change every mapping in Customize.' },
+    { question: 'How is equilibrium calculated?', answer: 'An exact matching row is used directly. If demand and supply cross between adjacent quantities, the supply demand graph generator uses straight-line interpolation between those supplied points.' },
+    { question: 'What if the curves never cross?', answer: 'No equilibrium is displayed outside your data. The editor reports that no equilibrium appears within the supplied quantity range.' },
+    { question: 'Can I paste or upload economics data?', answer: 'Yes. Paste a spreadsheet table or upload CSV and Excel files. Processing and local saving remain in your browser.' },
+  ],
+  features: [
+    { title: 'Explicit curve mapping', description: 'Choose the quantity, demand, and supply columns without silently merging numeric series.' },
+    { title: 'True numeric quantity axis', description: 'Preserve proportional spacing for regular or irregular quantity values.' },
+    { title: 'Equilibrium detection', description: 'Report exact or interpolated intersections only when they occur inside the entered range.' },
+    { title: 'Focused validation', description: 'Handle missing columns, blank cells, non-numeric values, and non-crossing curves without crashing.' },
+    { title: 'CSV and Excel import', description: 'Paste data or upload CSV and XLSX files through the shared GraphEditor workflow.' },
+    { title: 'Local save and export', description: 'Save the project on this device and export the finished graph as PNG, SVG, or CSV.' },
+  ],
+  h1: 'Supply and Demand Graph Maker',
+  howTo: [
+    { title: 'Add quantity and curve values', description: 'Enter three columns, paste a spreadsheet table, or import a CSV or Excel file.' },
+    { title: 'Confirm the column mapping', description: 'Open Customize to select the quantity axis, demand series, and supply series when headers differ.' },
+    { title: 'Review equilibrium and export', description: 'Check the in-range intersection, adjust axis titles, and download the graph as PNG or SVG.' },
+  ],
+  intro: 'Create supply and demand curves on a true numeric quantity axis, map your columns, and estimate an in-range equilibrium with this online supply and demand graph maker.',
+  metaDescription: 'Create a supply and demand graph online. Map quantity, demand, and supply, detect in-range equilibrium, import Excel or CSV, and export free.',
+  relatedHeading: 'Related economics and graph tools',
+  relatedTools: [
+    { name: 'Line Graph Maker', description: 'Compare multiple connected series across categories or dates.', href: '/line-graph-maker/' },
+    { name: 'XY Graph Maker', description: 'Plot paired values on true numeric X and Y axes.', href: '/xy-graph-maker/' },
+    { name: 'Scatter Plot Maker', description: 'Explore relationships between paired numeric observations.', href: '/scatter-plot-maker/' },
+  ],
+  sectionHeadings: {
+    definition: 'What is a supply and demand graph?',
+    example: 'Example supply and demand data',
+    faq: 'Supply and demand graph maker FAQ',
+    faqIntro: 'Answers about curve mapping, equilibrium, imports, and non-crossing data.',
+    features: 'Supply and demand graph maker features',
+    howTo: 'How to make a supply and demand graph',
+  },
+  slug: '/supply-and-demand-graph-maker/',
+  title: 'Supply and Demand Graph Maker — Economics Graph Online | GraphMaker',
+  useCases: {
+    intro: 'Use this online supply and demand graph maker when two value curves need to be compared against a shared quantity scale.',
+    items: [
+      { title: 'Economics assignments', description: 'Turn a classroom table into readable supply and demand curves with a clearly reported equilibrium.' },
+      { title: 'Scenario comparisons', description: 'Visualize how buyer and seller values change across regular or irregular quantity levels.' },
+      { title: 'Reports and presentations', description: 'Export a clean economics graph for documents, slides, worksheets, or teaching material.' },
+    ],
+    title: 'When to use this tool',
   },
 } satisfies ToolPageConfig;

@@ -3,6 +3,7 @@ import { GraphEditor } from '../components/graph/GraphEditor';
 import SiteFooter from '../components/navigation/SiteFooter.astro';
 import SiteHeader from '../components/navigation/SiteHeader.astro';
 import ChartGlyph from '../components/ui/ChartGlyph.astro';
+import ProductBenefitChecks from '../components/ui/ProductBenefitChecks.astro';
 import { graphTools } from '../content/graphTools';
 import { homepageGraphConfig } from '../graph/configs/homepage';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -52,12 +53,7 @@ const websiteSchema = {
       <div class="page-shell pt-7 text-center sm:pt-9">
         <h1 class="text-3xl font-bold tracking-tight sm:text-4xl lg:text-[2.75rem]">Free Online Graph Maker</h1>
         <p class="text-text-muted mx-auto mt-2 max-w-2xl text-base sm:text-lg">Turn your data into a beautiful graph in seconds — no signup required.</p>
-        <ul aria-label="Product benefits" class="text-text-muted mt-4 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-medium">
-          <li class="flex items-center gap-1.5"><span aria-hidden="true" class="bg-success grid h-4 w-4 place-items-center rounded-full text-[10px] text-white">✓</span>Free to use</li>
-          <li class="flex items-center gap-1.5"><span aria-hidden="true" class="bg-success grid h-4 w-4 place-items-center rounded-full text-[10px] text-white">✓</span>No watermark</li>
-          <li class="flex items-center gap-1.5"><span aria-hidden="true" class="bg-success grid h-4 w-4 place-items-center rounded-full text-[10px] text-white">✓</span>No signup</li>
-          <li class="flex items-center gap-1.5"><span aria-hidden="true" class="bg-success grid h-4 w-4 place-items-center rounded-full text-[10px] text-white">✓</span>Data stays in your browser</li>
-        </ul>
+        <ProductBenefitChecks />
       </div>
 
       <div class="page-shell mt-6 text-left" id="editor">

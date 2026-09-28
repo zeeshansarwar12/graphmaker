@@ -10,6 +10,8 @@
 - `/box-plot-maker/`
 - `/radar-chart-maker/`
 - `/histogram-maker/`
+- `/dot-plot-maker/`
+- `/supply-and-demand-graph-maker/`
 - `/tools/`
 - `/about/`
 - `/privacy/`
@@ -73,14 +75,24 @@
 - sensible automatic bins
 - manual bin settings may be progressive/advanced
 
+### Dot Plot Maker
+- one selected numeric column of raw observations
+- repeated values stack vertically by frequency
+- true numeric X-axis spacing
+- minimal series and dot-size controls
+
+### Supply and Demand Graph Maker
+- explicit quantity, demand, and supply column mapping
+- true numeric quantity axis with two connected curves
+- exact or interpolated equilibrium detection within the supplied range
+- no fabricated out-of-range equilibrium
+
 ## Phase 2 targets
-- `/dot-plot-maker/`
 - `/multiple-line-graph-maker/`
 - `/error-bar-graph-maker/`
 - `/standard-deviation-graph-maker/`
 - `/normal-distribution-graph-maker/`
 - `/line-of-best-fit-graph-maker/`
-- `/supply-and-demand-graph-maker/`
 
 ## Explicitly out of V1
 - user accounts

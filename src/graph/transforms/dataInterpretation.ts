@@ -234,6 +234,7 @@ export function createAdaptiveSettings(
   return {
     ...current,
     ...createSuggestedLabels(data, interpretation),
+    dotPlotSeriesColumnId: null,
     hiddenSeriesIds: [],
     histogramBinCount: null,
     histogramSeriesColumnId: null,
@@ -241,6 +242,9 @@ export function createAdaptiveSettings(
     pieSeriesColumnId: null,
     scatterXColumnId: null,
     scatterYColumnId: null,
+    supplyDemandDemandColumnId: null,
+    supplyDemandSupplyColumnId: null,
+    supplyDemandXColumnId: null,
     showValueLabels: interpretation.pointCount <= 15,
   };
 }

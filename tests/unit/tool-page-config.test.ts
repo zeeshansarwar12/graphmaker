@@ -3,18 +3,22 @@ import { describe, expect, it } from 'vitest';
 import {
   barToolPageConfig,
   boxPlotToolPageConfig,
+  dotPlotToolPageConfig,
   histogramToolPageConfig,
   lineToolPageConfig,
   pieToolPageConfig,
   radarToolPageConfig,
   scatterToolPageConfig,
+  supplyDemandToolPageConfig,
   xyToolPageConfig,
 } from '../../src/content/toolPages';
 import { createBoxPlotChartView } from '../../src/graph/configs/boxPlotChart';
+import { createDotPlotChartView } from '../../src/graph/configs/dotPlotChart';
 import { createHistogramChartView } from '../../src/graph/configs/histogramChart';
 import { createLineChartView } from '../../src/graph/configs/lineChart';
 import { createPieChartView } from '../../src/graph/configs/pieChart';
 import { createRadarChartView } from '../../src/graph/configs/radarChart';
+import { createSupplyDemandChartView } from '../../src/graph/configs/supplyDemandChart';
 import { createDefaultGraphSettings } from '../../src/graph/configs/graphSettings';
 import { detectDataShape } from '../../src/graph/transforms/dataInterpretation';
 
@@ -47,6 +51,7 @@ describe('XY tool page configuration', () => {
     expect(xyToolPageConfig.relatedTools.map((tool) => tool.href)).toEqual([
       '/scatter-plot-maker/',
       '/line-graph-maker/',
+      '/supply-and-demand-graph-maker/',
       '/bar-graph-maker/',
     ]);
   });
@@ -173,6 +178,7 @@ describe('Line tool page configuration', () => {
     expect(lineToolPageConfig.relatedTools.map((tool) => tool.href)).toEqual([
       '/bar-graph-maker/',
       '/xy-graph-maker/',
+      '/supply-and-demand-graph-maker/',
       '/scatter-plot-maker/',
     ]);
   });
@@ -267,6 +273,7 @@ describe('Box Plot tool page configuration', () => {
     ]);
     expect(boxPlotToolPageConfig.relatedTools.map((tool) => tool.href)).toEqual([
       '/histogram-maker/',
+      '/dot-plot-maker/',
       '/scatter-plot-maker/',
       '/bar-graph-maker/',
     ]);
@@ -359,7 +366,86 @@ describe('Histogram tool page configuration', () => {
     expect(view.series[0].name).toBe('Score');
     expect(histogramToolPageConfig.relatedTools.map((tool) => tool.href)).toEqual([
       '/box-plot-maker/',
+      '/dot-plot-maker/',
       '/bar-graph-maker/',
+      '/scatter-plot-maker/',
+    ]);
+  });
+});
+
+describe('Dot Plot tool page configuration', () => {
+  it('provides unique content and a raw-observation dot plot preset', () => {
+    expect(dotPlotToolPageConfig).toMatchObject({
+      canonical: '/dot-plot-maker/',
+      h1: 'Dot Plot Maker',
+      editor: {
+        graphType: 'dotplot',
+        slug: '/dot-plot-maker/',
+        initialSettings: {
+          dotSize: 10,
+          title: 'Dot Plot of Value',
+          xAxisTitle: 'Value',
+          yAxisTitle: 'Frequency',
+        },
+      },
+      sectionHeadings: {
+        definition: 'What is a dot plot?',
+        example: 'Example dot plot data',
+        howTo: 'How to make a dot plot',
+      },
+    });
+    expect(dotPlotToolPageConfig.editor.sampleData?.rows).toHaveLength(20);
+
+    const view = createDotPlotChartView(dotPlotToolPageConfig.editor.sampleData!, {
+      ...createDefaultGraphSettings(),
+      ...dotPlotToolPageConfig.editor.initialSettings,
+    });
+    expect(view.status).toBe('ready');
+    if (view.status !== 'ready') throw new Error('Expected a ready dot plot');
+    expect(view.frequencies.find((item) => item.value === 15)?.count).toBe(3);
+    expect(view.frequencies.find((item) => item.value === 18)?.count).toBe(4);
+    expect(dotPlotToolPageConfig.relatedTools.map((tool) => tool.href)).toEqual([
+      '/histogram-maker/',
+      '/box-plot-maker/',
+      '/scatter-plot-maker/',
+    ]);
+  });
+});
+
+describe('Supply and Demand tool page configuration', () => {
+  it('provides unique economics content and a mapped equilibrium preset', () => {
+    expect(supplyDemandToolPageConfig).toMatchObject({
+      canonical: '/supply-and-demand-graph-maker/',
+      h1: 'Supply and Demand Graph Maker',
+      editor: {
+        graphType: 'supplydemand',
+        slug: '/supply-and-demand-graph-maker/',
+        initialSettings: {
+          showEquilibrium: true,
+          title: 'Supply and Demand Graph',
+          xAxisTitle: 'Quantity',
+          yAxisTitle: 'Price / Value',
+        },
+      },
+      sectionHeadings: {
+        definition: 'What is a supply and demand graph?',
+        example: 'Example supply and demand data',
+        howTo: 'How to make a supply and demand graph',
+      },
+    });
+    expect(supplyDemandToolPageConfig.editor.sampleData?.rows).toHaveLength(7);
+
+    const view = createSupplyDemandChartView(supplyDemandToolPageConfig.editor.sampleData!, {
+      ...createDefaultGraphSettings(),
+      ...supplyDemandToolPageConfig.editor.initialSettings,
+    });
+    expect(view.status).toBe('ready');
+    if (view.status !== 'ready') throw new Error('Expected a ready supply and demand chart');
+    expect(view.equilibrium).toEqual({ quantity: 45, value: 55 });
+    expect(view.series.map((series) => series.name)).toEqual(['Demand', 'Supply']);
+    expect(supplyDemandToolPageConfig.relatedTools.map((tool) => tool.href)).toEqual([
+      '/line-graph-maker/',
+      '/xy-graph-maker/',
       '/scatter-plot-maker/',
     ]);
   });

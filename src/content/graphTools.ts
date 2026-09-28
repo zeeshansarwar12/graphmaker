@@ -9,9 +9,16 @@ export const graphTools = [
   { name: 'Radar Chart Maker', description: 'Compare several metrics across profiles.', href: '/radar-chart-maker/', type: 'radar' },
 ] as const;
 
+export const specialistGraphTools = [
+  { name: 'Dot Plot Maker', description: 'Stack repeated observations on a true numeric scale.', href: '/dot-plot-maker/', type: 'dotplot' },
+  { name: 'Supply and Demand Graph Maker', description: 'Plot economics curves and estimate equilibrium.', href: '/supply-and-demand-graph-maker/', type: 'supplydemand' },
+] as const;
+
+export const allGraphTools = [...graphTools, ...specialistGraphTools] as const;
+
 export const indexableRoutes = [
   '/',
   '/tools/',
   '/about/',
-  ...graphTools.map((tool) => tool.href),
+  ...allGraphTools.map((tool) => tool.href),
 ] as const;

@@ -28,6 +28,8 @@ Do not create separate pages for:
 - `/box-plot-maker/`
 - `/radar-chart-maker/`
 - `/histogram-maker/`
+- `/dot-plot-maker/`
+- `/supply-and-demand-graph-maker/`
 
 ## Directory/hubs
 - `/tools/` — complete graph-tools directory
@@ -39,13 +41,11 @@ Do not create empty hubs just to complete a hierarchy. A hub should contain enou
 
 ## Phase 2 specialist URLs
 Candidates:
-- `/dot-plot-maker/`
 - `/multiple-line-graph-maker/`
 - `/error-bar-graph-maker/`
 - `/standard-deviation-graph-maker/`
 - `/normal-distribution-graph-maker/`
 - `/line-of-best-fit-graph-maker/`
-- `/supply-and-demand-graph-maker/`
 
 ## Later content/use cases
 Potential pages only after validation:

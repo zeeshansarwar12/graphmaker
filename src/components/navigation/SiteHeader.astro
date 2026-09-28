@@ -28,7 +28,7 @@ const { hasEditor = true, hasFaq = true } = Astro.props;
       <a class="text-text-muted hover:text-text inline-flex min-h-10 items-center gap-2 px-2 text-sm font-medium" href="#editor">
         <span aria-hidden="true">♡</span> Saved
       </a>
-      <a class="button-primary" href="#editor">Create graph</a>
+      <a class="button-primary" href="#data-editor">Create graph</a>
     </div>}
 
     <details class="relative md:hidden">
@@ -37,7 +37,7 @@ const { hasEditor = true, hasFaq = true } = Astro.props;
         <a class="hover:bg-surface-subtle rounded px-3 py-2" href="/tools/">Graph Tools</a>
         <a class="hover:bg-surface-subtle rounded px-3 py-2" href="/about/">About</a>
         {hasFaq && <a class="hover:bg-surface-subtle rounded px-3 py-2" href="#faq">FAQ</a>}
-        {hasEditor && <a class="bg-brand text-surface mt-1 rounded px-3 py-2 text-center" href="#editor">Create graph</a>}
+        {hasEditor && <a class="bg-brand text-surface mt-1 rounded px-3 py-2 text-center" href="#data-editor">Create graph</a>}
       </nav>
     </details>
   </div>

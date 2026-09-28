@@ -61,6 +61,14 @@ const graphFixtures: GraphFixture[] = [
     table: 'Score\n61\n68\n72\n75\n81\n84\n89\n94',
   },
   {
+    button: 'Dot Plot',
+    expectedTitle: 'Dot Plot of Score',
+    fileBase: 'dot-plot-of-score',
+    renderedType: 'dotplot',
+    summary: 'Dot plot with 8 observations',
+    table: 'Score\n12\n14\n14\n15\n15\n15\n18\n24',
+  },
+  {
     button: 'Box Plot',
     expectedTitle: 'Distribution of Score',
     fileBase: 'distribution-of-score',

@@ -21,13 +21,15 @@ describe('homepage graph configuration', () => {
       'histogram',
       'boxplot',
       'radar',
+      'dotplot',
+      'supplydemand',
     ];
     const specialistConfigs: GraphEditorConfig[] = graphTypes.map((graphType) => ({
       graphType,
       slug: `/${graphType}-maker/`,
     }));
 
-    expect(specialistConfigs).toHaveLength(8);
+    expect(specialistConfigs).toHaveLength(10);
     expect(homepageGraphConfig).toEqual({ graphType: 'bar', slug: '/' });
   });
 });

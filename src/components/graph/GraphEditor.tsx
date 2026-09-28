@@ -21,6 +21,11 @@ import {
 } from '../../graph/transforms/dataInterpretation';
 import { createPieData, createScatterData } from '../../graph/transforms/chartData';
 import { createHistogramData } from '../../graph/transforms/histogram';
+import { createDotPlotData, createDotPlotSuggestedLabels } from '../../graph/transforms/dotPlot';
+import {
+  createSupplyDemandData,
+  createSupplyDemandSuggestedLabels,
+} from '../../graph/transforms/supplyDemand';
 import {
   createBoxPlotData,
   createBoxPlotSuggestedLabels,
@@ -55,9 +60,11 @@ const chartTypes = [
   { label: 'Box Plot', glyph: '▣' },
   { label: 'Radar', glyph: '⬡' },
   { label: 'Histogram', glyph: '▥' },
+  { label: 'Dot Plot', glyph: '⠿' },
+  { label: 'Supply & Demand', glyph: '⇄' },
 ] as const;
 
-type RenderedChartType = 'bar' | 'boxplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'xy';
+type RenderedChartType = 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy';
 
 function ButtonIcon({ children }: { children: ReactNode }) {
   return <span aria-hidden="true" className="text-brand text-base leading-none">{children}</span>;
@@ -82,7 +89,9 @@ function createConfiguredSettings(config: GraphEditorConfig) {
 }
 
 export function GraphEditor({ config }: GraphEditorProps) {
+  const dataSectionRef = useRef<HTMLElement>(null);
   const graphCanvasRef = useRef<GraphCanvasHandle>(null);
+  const previewSectionRef = useRef<HTMLElement>(null);
   const projectInputRef = useRef<HTMLInputElement>(null);
   const createdAtRef = useRef(new Date().toISOString());
   const [data, setData] = useState(() => createConfiguredData(config));
@@ -100,6 +109,20 @@ export function GraphEditor({ config }: GraphEditorProps) {
     config,
     createConfiguredSettings,
   );
+
+  function scrollToEditorSection(section: 'customize' | 'data' | 'preview') {
+    if (section === 'customize') {
+      setIsCustomizeOpen(true);
+      window.requestAnimationFrame(() => {
+        document.getElementById('customize-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      return;
+    }
+
+    const target = section === 'data' ? dataSectionRef.current : previewSectionRef.current;
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   const interpretation = useMemo(() => detectDataShape(data), [data]);
   const scatterData = useMemo(
     () => createScatterData(data, settings.scatterXColumnId, settings.scatterYColumnId),
@@ -113,11 +136,33 @@ export function GraphEditor({ config }: GraphEditorProps) {
     () => createHistogramData(data, settings.histogramSeriesColumnId, settings.histogramBinCount),
     [data, settings.histogramBinCount, settings.histogramSeriesColumnId],
   );
+  const dotPlotData = useMemo(
+    () => createDotPlotData(data, settings.dotPlotSeriesColumnId),
+    [data, settings.dotPlotSeriesColumnId],
+  );
+  const supplyDemandData = useMemo(
+    () => createSupplyDemandData(data, {
+      demandColumnId: settings.supplyDemandDemandColumnId,
+      supplyColumnId: settings.supplyDemandSupplyColumnId,
+      xColumnId: settings.supplyDemandXColumnId,
+    }),
+    [
+      data,
+      settings.supplyDemandDemandColumnId,
+      settings.supplyDemandSupplyColumnId,
+      settings.supplyDemandXColumnId,
+    ],
+  );
   const boxPlotData = useMemo(() => createBoxPlotData(data), [data]);
   const activeSeriesColumnIndexes = selectedChartType === 'boxplot'
     ? boxPlotData.groups.map((group) => group.columnIndex)
     : selectedChartType === 'histogram'
     ? histogramData.numericColumnIndexes
+    : selectedChartType === 'dotplot'
+    ? dotPlotData.numericColumnIndexes
+    : selectedChartType === 'supplydemand'
+    ? [supplyDemandData.demandColumnIndex, supplyDemandData.supplyColumnIndex]
+      .filter((index): index is number => index !== null)
     : (selectedChartType === 'scatter' || selectedChartType === 'xy') && scatterData.yColumnIndex !== null
       ? [scatterData.yColumnIndex]
       : interpretation.seriesColumnIndexes;
@@ -131,7 +176,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
   const visibleSeriesIndexes = getVisibleSeriesIndexes(settings, seriesColumnIds);
   const visibleSeriesColumnIndexes = visibleSeriesIndexes
     .map((index) => seriesDefinitions[index].columnIndex);
-  const hasVisibleMixedScale = selectedChartType !== 'boxplot' && selectedChartType !== 'histogram'
+  const hasVisibleMixedScale = selectedChartType !== 'boxplot' && selectedChartType !== 'dotplot' && selectedChartType !== 'histogram' && selectedChartType !== 'supplydemand'
     && hasMixedSeriesScale(data, visibleSeriesColumnIndexes);
   const dimensionName = interpretation.dimensionColumnIndex === null
     ? 'None'
@@ -142,10 +187,14 @@ export function GraphEditor({ config }: GraphEditorProps) {
       ? 'Box Plot'
     : selectedChartType === 'histogram'
       ? 'Histogram'
+    : selectedChartType === 'dotplot'
+      ? 'Dot Plot'
     : selectedChartType === 'pie'
       ? 'Pie'
     : selectedChartType === 'radar'
       ? 'Radar'
+    : selectedChartType === 'supplydemand'
+      ? 'Supply & Demand'
       : selectedChartType === 'scatter' ? 'Scatter' : selectedChartType === 'xy' ? 'XY' : 'Bar';
   const recommendedRenderedType = interpretation.recommendation === 'Line'
     ? 'line'
@@ -164,6 +213,8 @@ export function GraphEditor({ config }: GraphEditorProps) {
   const hasUsableScatterColumns = scatterData.xColumnIndex !== null && scatterData.yColumnIndex !== null;
   const suppressRecommendation = (selectedChartType === 'xy' && interpretation.shape === 'numeric-xy')
     || (selectedChartType === 'scatter' && hasUsableScatterColumns)
+    || (selectedChartType === 'dotplot' && dotPlotData.isCompatible)
+    || (selectedChartType === 'supplydemand' && supplyDemandData.isCompatible)
     || (selectedChartType === 'radar' && interpretation.columns[0]?.type === 'text/category');
   const hasDifferentRecommendation = selectedChartLabel !== interpretation.recommendation
     && !suppressRecommendation;
@@ -171,10 +222,14 @@ export function GraphEditor({ config }: GraphEditorProps) {
     ((selectedChartType === 'scatter' || selectedChartType === 'xy') && !hasUsableScatterColumns)
     || (selectedChartType === 'pie' && !pieData.isCompatible)
     || (selectedChartType === 'histogram' && !histogramData.isCompatible)
+    || (selectedChartType === 'dotplot' && !dotPlotData.isCompatible)
+    || (selectedChartType === 'supplydemand' && !supplyDemandData.isCompatible)
     || (selectedChartType === 'boxplot' && !boxPlotData.isCompatible)
     || (selectedChartType === 'radar' && interpretation.columns[0]?.type !== 'text/category')
   );
-  const detectedRelationship = scatterData.xColumnIndex !== null && scatterData.yColumnIndex !== null
+  const detectedRelationship = selectedChartType === 'supplydemand'
+    ? `${supplyDemandData.xName || 'Quantity'} → ${[supplyDemandData.demandName, supplyDemandData.supplyName].filter(Boolean).join(', ') || 'Demand, Supply'}`
+    : scatterData.xColumnIndex !== null && scatterData.yColumnIndex !== null
     && (interpretation.shape === 'numeric-xy' || selectedChartType === 'scatter' || selectedChartType === 'xy')
     ? `${scatterData.xName || 'X'} → ${scatterData.yName || 'Y'}`
     : [dimensionName !== 'None' ? dimensionName : '', seriesNames.join(', ')].filter(Boolean).join(' → ') || 'No usable columns';
@@ -184,7 +239,48 @@ export function GraphEditor({ config }: GraphEditorProps) {
       const labels = createBoxPlotSuggestedLabels(data);
       if (labels) dispatchSettings({ type: 'replace-settings', value: { ...settings, ...labels } });
     }
+    if (chartType === 'dotplot') {
+      const labels = createDotPlotSuggestedLabels(data, settings.dotPlotSeriesColumnId);
+      if (labels) dispatchSettings({ type: 'replace-settings', value: { ...settings, ...labels } });
+    }
+    if (chartType === 'supplydemand') {
+      dispatchSettings({
+        type: 'replace-settings',
+        value: { ...settings, ...createSupplyDemandSuggestedLabels(data) },
+      });
+    }
     setSelectedChartType(chartType);
+  }
+
+  function setDotPlotSeries(columnId: string) {
+    const labels = createDotPlotSuggestedLabels(data, columnId);
+    dispatchSettings({
+      type: 'replace-settings',
+      value: {
+        ...settings,
+        ...(labels ?? {}),
+        dotPlotSeriesColumnId: columnId,
+      },
+    });
+  }
+
+  function setSupplyDemandColumn(role: 'demand' | 'supply' | 'x', columnId: string) {
+    const actionType = role === 'x'
+      ? 'set-supply-demand-x-column'
+      : role === 'demand'
+        ? 'set-supply-demand-demand-column'
+        : 'set-supply-demand-supply-column';
+    const selectedColumn = data.columns.find((column) => column.id === columnId);
+    dispatchSettings({
+      type: 'replace-settings',
+      value: {
+        ...settings,
+        ...(role === 'x' && selectedColumn ? { xAxisTitle: selectedColumn.name || 'Quantity' } : {}),
+        ...(actionType === 'set-supply-demand-x-column' ? { supplyDemandXColumnId: columnId } : {}),
+        ...(actionType === 'set-supply-demand-demand-column' ? { supplyDemandDemandColumnId: columnId } : {}),
+        ...(actionType === 'set-supply-demand-supply-column' ? { supplyDemandSupplyColumnId: columnId } : {}),
+      },
+    });
   }
 
   function toggleSeriesVisibility(columnId: string): boolean {
@@ -305,12 +401,23 @@ export function GraphEditor({ config }: GraphEditorProps) {
       const boxPlotLabels = selectedChartType === 'boxplot'
         ? createBoxPlotSuggestedLabels(nextData)
         : null;
+      const dotPlotLabels = selectedChartType === 'dotplot'
+        ? createDotPlotSuggestedLabels(nextData)
+        : null;
+      const supplyDemandLabels = selectedChartType === 'supplydemand'
+        ? createSupplyDemandSuggestedLabels(nextData)
+        : null;
       dispatchSettings({
         type: 'replace-settings',
-        value: { ...adaptiveSettings, ...boxPlotLabels },
+        value: { ...adaptiveSettings, ...boxPlotLabels, ...dotPlotLabels, ...supplyDemandLabels },
       });
     } else {
-      const suggested = createSuggestedLabels(data, interpretation);
+      const suggested = selectedChartType === 'supplydemand'
+        ? createSupplyDemandSuggestedLabels(data)
+        : selectedChartType === 'dotplot'
+        ? createDotPlotSuggestedLabels(data, settings.dotPlotSeriesColumnId)
+          ?? createSuggestedLabels(data, interpretation)
+        : createSuggestedLabels(data, interpretation);
       const defaults = createDefaultGraphSettings();
       const labelsAreAutomatic = isSampleData || (
         settings.title === suggested.title
@@ -322,9 +429,14 @@ export function GraphEditor({ config }: GraphEditorProps) {
         && settings.yAxisTitle === defaults.yAxisTitle
       );
       if (labelsAreAutomatic) {
+        const nextLabels = selectedChartType === 'supplydemand'
+          ? createSupplyDemandSuggestedLabels(nextData)
+          : selectedChartType === 'dotplot'
+          ? createDotPlotSuggestedLabels(nextData, settings.dotPlotSeriesColumnId)
+          : createSuggestedLabels(nextData);
         dispatchSettings({
           type: 'replace-settings',
-          value: { ...settings, ...createSuggestedLabels(nextData) },
+          value: { ...settings, ...(nextLabels ?? {}) },
         });
       }
     }
@@ -445,7 +557,11 @@ export function GraphEditor({ config }: GraphEditorProps) {
       <fieldset className="contents" disabled={!isProjectReady}>
 
       <div aria-label="Choose a graph type" className="border-border flex min-w-0 gap-2 overflow-x-auto border-b p-3" role="group">
-        {chartTypes.map(({ label, glyph }) => {
+        {chartTypes.filter(({ label }) => (
+          label !== 'Supply & Demand'
+          || config.graphType === 'supplydemand'
+          || selectedChartType === 'supplydemand'
+        )).map(({ label, glyph }) => {
           const renderedType = label === 'Bar'
             ? 'bar'
             : label === 'Line'
@@ -460,7 +576,11 @@ export function GraphEditor({ config }: GraphEditorProps) {
                   ? 'xy'
                 : label === 'Scatter'
                   ? 'scatter'
-                  : label === 'Histogram' ? 'histogram' : null;
+                  : label === 'Histogram'
+                    ? 'histogram'
+                    : label === 'Dot Plot'
+                      ? 'dotplot'
+                      : label === 'Supply & Demand' ? 'supplydemand' : null;
           const isSelected = renderedType === selectedChartType;
 
           return (
@@ -480,12 +600,24 @@ export function GraphEditor({ config }: GraphEditorProps) {
         })}
       </div>
 
+      <nav aria-label="Editor sections" className="border-border bg-surface sticky top-0 z-10 grid grid-cols-3 border-b p-2 lg:hidden">
+        <button className="text-text hover:bg-surface-subtle min-h-10 rounded-md px-2 text-sm font-semibold" onClick={() => scrollToEditorSection('preview')} type="button">
+          Preview
+        </button>
+        <button className="text-text hover:bg-surface-subtle min-h-10 rounded-md px-2 text-sm font-semibold" onClick={() => scrollToEditorSection('data')} type="button">
+          Edit data
+        </button>
+        <button aria-label="Open customization" className="text-text hover:bg-surface-subtle min-h-10 rounded-md px-2 text-sm font-semibold" onClick={() => scrollToEditorSection('customize')} type="button">
+          Customize
+        </button>
+      </nav>
+
       <div className="grid min-w-0 lg:grid-cols-[2fr_3fr]">
-        <section aria-labelledby="data-heading" className="border-border order-2 min-w-0 border-t p-4 sm:p-5 lg:order-1 lg:border-t-0 lg:border-r">
+        <section aria-labelledby="data-heading" className="border-border order-2 min-w-0 scroll-mt-14 border-t p-4 sm:p-5 lg:order-1 lg:border-t-0 lg:border-r" id="data-editor" ref={dataSectionRef}>
           <DataGrid data={data} isSampleData={isSampleData} onChange={updateData} />
         </section>
 
-        <section aria-labelledby="preview-heading" className="order-1 min-w-0 p-4 sm:p-5 lg:order-2">
+        <section aria-labelledby="preview-heading" className="order-1 min-w-0 scroll-mt-14 p-4 sm:p-5 lg:order-2" ref={previewSectionRef}>
           <h3 className="sr-only" id="preview-heading">Graph preview</h3>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="min-w-0 flex-1 truncate text-lg font-bold">
@@ -522,7 +654,9 @@ export function GraphEditor({ config }: GraphEditorProps) {
             <CustomizePanel
               chartType={selectedChartType}
               dispatch={dispatchSettings}
+              onDotPlotSeriesChange={setDotPlotSeries}
               onScatterColumnChange={setScatterColumn}
+              onSupplyDemandColumnChange={setSupplyDemandColumn}
               scatterMapping={selectedChartType === 'scatter' && hasUsableScatterColumns ? {
                 columns: scatterData.numericColumnIndexes.map((index) => ({
                   id: data.columns[index].id,
@@ -533,6 +667,21 @@ export function GraphEditor({ config }: GraphEditorProps) {
               } : undefined}
               series={seriesDefinitions}
               settings={settings}
+              supplyDemandMapping={selectedChartType === 'supplydemand' ? {
+                columns: data.columns.map((column, index) => ({
+                  id: column.id,
+                  name: column.name || `Column ${index + 1}`,
+                })),
+                demandColumnId: supplyDemandData.demandColumnIndex === null
+                  ? ''
+                  : data.columns[supplyDemandData.demandColumnIndex].id,
+                supplyColumnId: supplyDemandData.supplyColumnIndex === null
+                  ? ''
+                  : data.columns[supplyDemandData.supplyColumnIndex].id,
+                xColumnId: supplyDemandData.xColumnIndex === null
+                  ? ''
+                  : data.columns[supplyDemandData.xColumnIndex].id,
+              } : undefined}
             />
           )}
 
@@ -557,6 +706,9 @@ export function GraphEditor({ config }: GraphEditorProps) {
             )}
             {selectedChartType === 'histogram' && histogramData.isCompatible && histogramData.numericColumnIndexes.length > 1 && (
               <p className="text-text-muted mt-1">Histogram uses {histogramData.seriesName || 'the first numeric series'}. Change series in Customize.</p>
+            )}
+            {selectedChartType === 'dotplot' && dotPlotData.isCompatible && dotPlotData.numericColumnIndexes.length > 1 && (
+              <p className="text-text-muted mt-1">Dot plot uses {dotPlotData.seriesName || 'the first numeric series'}. Change the selected series in Customize.</p>
             )}
             {selectedChartType === 'boxplot' && boxPlotData.isCompatible && (
               <p className="text-text-muted mt-1">Box plot groups: {boxPlotData.groups.map((group) => group.name).join(', ') || 'None'}.</p>

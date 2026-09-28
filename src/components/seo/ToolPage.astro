@@ -4,6 +4,7 @@ import SiteFooter from '../navigation/SiteFooter.astro';
 import SiteHeader from '../navigation/SiteHeader.astro';
 import type { ToolPageConfig } from '../../content/toolPages';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProductBenefitChecks from '../ui/ProductBenefitChecks.astro';
 
 interface Props {
   config: ToolPageConfig;
@@ -41,12 +42,7 @@ const breadcrumbSchema = {
         <div class="mx-auto mt-5 max-w-3xl text-center">
           <h1 class="text-3xl font-bold tracking-tight sm:text-4xl lg:text-[2.75rem]">{config.h1}</h1>
           <p class="text-text-muted mx-auto mt-3 max-w-2xl text-base leading-7 sm:text-lg">{config.intro}</p>
-          <ul aria-label="Product benefits" class="text-text-muted mt-4 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-medium">
-            <li>✓ Free</li>
-            <li>✓ No signup</li>
-            <li>✓ No watermark</li>
-            <li>✓ Data stays in your browser</li>
-          </ul>
+          <ProductBenefitChecks />
         </div>
       </div>
 

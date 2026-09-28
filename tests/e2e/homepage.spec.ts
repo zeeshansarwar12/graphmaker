@@ -28,8 +28,15 @@ test('uses the mobile editor order without horizontal page overflow', async ({ p
   await expect(preview).toBeVisible();
   await expect(data).toBeVisible();
 
-  await page.getByRole('button', { name: 'Customize' }).click();
+  const editorNavigation = page.getByRole('navigation', { name: 'Editor sections' });
+  await expect(editorNavigation).toBeVisible();
+
+  await editorNavigation.getByRole('button', { name: 'Edit data' }).click();
+  await expect(page.locator('#data-editor')).toBeInViewport();
+
+  await editorNavigation.getByRole('button', { name: 'Open customization' }).click();
   await expect(page.getByLabel('Customize graph')).toBeVisible();
+  await expect(page.getByLabel('Customize graph')).toBeInViewport();
 
   const [previewBox, dataBox] = await Promise.all([preview.boundingBox(), data.boundingBox()]);
   expect(previewBox?.y).toBeLessThan(dataBox?.y ?? 0);
@@ -38,6 +45,17 @@ test('uses the mobile editor order without horizontal page overflow', async ({ p
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
   );
   expect(hasHorizontalOverflow).toBe(false);
+});
+
+test('Create graph links directly to the data editor', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+
+  await page.getByText('Menu', { exact: true }).click();
+  const createGraph = page.getByRole('navigation', { name: 'Mobile navigation' }).getByRole('link', { name: 'Create graph' });
+  await expect(createGraph).toHaveAttribute('href', '#data-editor');
+  await createGraph.click();
+  await expect(page.locator('#data-editor')).toBeInViewport();
 });
 
 test('edits, navigates, validates, and pastes spreadsheet data', async ({ page }) => {

@@ -16,7 +16,7 @@ export function graphProjectStorageId(slug = '/'): string {
 export interface GraphProject {
   createdAt: string;
   data: TabularData;
-  graphType: 'bar' | 'boxplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'xy';
+  graphType: 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy';
   id: typeof currentProjectId;
   name: string;
   schemaVersion: typeof graphProjectSchemaVersion;
@@ -68,6 +68,11 @@ function isTabularData(value: unknown): value is TabularData {
 
 function isGraphSettings(value: unknown): value is GraphSettings {
   return isRecord(value)
+    && (value.dotPlotSeriesColumnId === undefined
+      || value.dotPlotSeriesColumnId === null
+      || typeof value.dotPlotSeriesColumnId === 'string')
+    && (value.dotSize === undefined
+      || (typeof value.dotSize === 'number' && value.dotSize >= 4 && value.dotSize <= 24))
     && (value.hiddenSeriesIds === undefined || (
       Array.isArray(value.hiddenSeriesIds)
       && value.hiddenSeriesIds.every((id) => typeof id === 'string')
@@ -91,11 +96,21 @@ function isGraphSettings(value: unknown): value is GraphSettings {
     && (value.scatterYColumnId === undefined
       || value.scatterYColumnId === null
       || typeof value.scatterYColumnId === 'string')
+    && (value.supplyDemandDemandColumnId === undefined
+      || value.supplyDemandDemandColumnId === null
+      || typeof value.supplyDemandDemandColumnId === 'string')
+    && (value.supplyDemandSupplyColumnId === undefined
+      || value.supplyDemandSupplyColumnId === null
+      || typeof value.supplyDemandSupplyColumnId === 'string')
+    && (value.supplyDemandXColumnId === undefined
+      || value.supplyDemandXColumnId === null
+      || typeof value.supplyDemandXColumnId === 'string')
     && (value.orientation === 'horizontal' || value.orientation === 'vertical')
     && Array.isArray(value.seriesColors)
     && value.seriesColors.every((color) => typeof color === 'string')
     && typeof value.showGrid === 'boolean'
     && typeof value.showLegend === 'boolean'
+    && (value.showEquilibrium === undefined || typeof value.showEquilibrium === 'boolean')
     && (value.showOutliers === undefined || typeof value.showOutliers === 'boolean')
     && typeof value.showValueLabels === 'boolean'
     && typeof value.title === 'string'
@@ -140,7 +155,7 @@ export function parseGraphProject(value: unknown): ProjectParseResult {
 
   if (
     value.id !== currentProjectId
-    || (value.graphType !== 'bar' && value.graphType !== 'boxplot' && value.graphType !== 'histogram' && value.graphType !== 'line' && value.graphType !== 'pie' && value.graphType !== 'radar' && value.graphType !== 'scatter' && value.graphType !== 'xy')
+    || (value.graphType !== 'bar' && value.graphType !== 'boxplot' && value.graphType !== 'dotplot' && value.graphType !== 'histogram' && value.graphType !== 'line' && value.graphType !== 'pie' && value.graphType !== 'radar' && value.graphType !== 'scatter' && value.graphType !== 'supplydemand' && value.graphType !== 'xy')
     || typeof value.name !== 'string'
     || !isIsoDate(value.createdAt)
     || !isIsoDate(value.updatedAt)
@@ -157,6 +172,8 @@ export function parseGraphProject(value: unknown): ProjectParseResult {
       ...project,
       settings: {
         ...project.settings,
+        dotPlotSeriesColumnId: project.settings.dotPlotSeriesColumnId ?? null,
+        dotSize: project.settings.dotSize ?? 10,
         hiddenSeriesIds: project.settings.hiddenSeriesIds ?? [],
         histogramBinCount: project.settings.histogramBinCount ?? null,
         histogramSeriesColumnId: project.settings.histogramSeriesColumnId ?? null,
@@ -164,7 +181,11 @@ export function parseGraphProject(value: unknown): ProjectParseResult {
         radarFilled: project.settings.radarFilled ?? true,
         scatterXColumnId: project.settings.scatterXColumnId ?? null,
         scatterYColumnId: project.settings.scatterYColumnId ?? null,
+        showEquilibrium: project.settings.showEquilibrium ?? true,
         showOutliers: project.settings.showOutliers ?? true,
+        supplyDemandDemandColumnId: project.settings.supplyDemandDemandColumnId ?? null,
+        supplyDemandSupplyColumnId: project.settings.supplyDemandSupplyColumnId ?? null,
+        supplyDemandXColumnId: project.settings.supplyDemandXColumnId ?? null,
         xyConnectPoints: project.settings.xyConnectPoints ?? true,
       },
     },

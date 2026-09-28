@@ -1,0 +1,21 @@
+---
+const benefits = [
+  'Free to use',
+  'No watermark',
+  'No signup',
+  'Data stays in your browser',
+] as const;
+---
+
+<ul
+  aria-label="Product benefits"
+  class="text-text-muted mt-4 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-medium"
+  data-product-benefits
+>
+  {benefits.map((benefit) => (
+    <li class="flex items-center gap-1.5">
+      <span aria-hidden="true" class="bg-success grid h-4 w-4 shrink-0 place-items-center rounded-full text-[10px] text-white">✓</span>
+      {benefit}
+    </li>
+  ))}
+</ul>

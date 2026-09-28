@@ -11,7 +11,9 @@ const coreToolRoutes = [
   '/radar-chart-maker/',
 ] as const;
 
-const indexableRoutes = ['/', '/tools/', '/about/', ...coreToolRoutes] as const;
+const specialistToolRoutes = ['/dot-plot-maker/', '/supply-and-demand-graph-maker/'] as const;
+const toolRoutes = [...coreToolRoutes, ...specialistToolRoutes] as const;
+const indexableRoutes = ['/', '/tools/', '/about/', ...toolRoutes] as const;
 const allLinkedRoutes = [...indexableRoutes, '/privacy/', '/terms/'] as const;
 const productionOrigin = 'https://graphmaker.site';
 
@@ -61,18 +63,37 @@ test('every indexable page has unique production metadata and one logical H1', a
   }
 });
 
-test('homepage and tools hub expose all core tools as crawlable links', async ({ page }) => {
-  for (const route of ['/', '/tools/']) {
-    await page.goto(route);
-    for (const toolRoute of coreToolRoutes) {
-      await expect(page.locator(`a[href="${toolRoute}"]`).first(), `${route} -> ${toolRoute}`).toBeVisible();
-    }
+test('homepage keeps the core eight while the tools hub exposes every graph tool', async ({ page }) => {
+  await page.goto('/');
+  for (const toolRoute of coreToolRoutes) {
+    await expect(page.locator(`a[href="${toolRoute}"]`).first(), `/ -> ${toolRoute}`).toBeVisible();
+  }
+  await expect(page.locator('a[href="/dot-plot-maker/"]')).toHaveCount(0);
+  await expect(page.locator('a[href="/supply-and-demand-graph-maker/"]')).toHaveCount(0);
+
+  await page.goto('/tools/');
+  for (const toolRoute of toolRoutes) {
+    await expect(page.locator(`a[href="${toolRoute}"]`).first(), `/tools/ -> ${toolRoute}`).toBeVisible();
   }
   await expect(page.locator('a[href="/tools/"]').first()).toBeVisible();
 });
 
+test('every graph-maker hero uses the shared green benefit checks', async ({ page }) => {
+  for (const route of ['/', ...toolRoutes]) {
+    await page.goto(route);
+    const benefits = page.locator('[data-product-benefits]');
+    await expect(benefits, route).toBeVisible();
+    await expect(benefits.locator('li'), route).toHaveCount(4);
+    await expect(benefits.locator('li > span.bg-success'), route).toHaveCount(4);
+    await expect(benefits).toContainText('Free to use');
+    await expect(benefits).toContainText('No watermark');
+    await expect(benefits).toContainText('No signup');
+    await expect(benefits).toContainText('Data stays in your browser');
+  }
+});
+
 test('tool pages have distinct related-tool links and valid breadcrumb schema', async ({ page }) => {
-  for (const route of coreToolRoutes) {
+  for (const route of toolRoutes) {
     await page.goto(route);
     const related = page.locator('section[aria-labelledby="related-heading"] a[href]');
     const hrefs = await related.evaluateAll((links) => links.map((link) => link.getAttribute('href')));

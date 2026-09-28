@@ -137,6 +137,38 @@ describe('graph project persistence model', () => {
     expect(deserializeGraphProject(serializeGraphProject(project))).toEqual({ ok: true, project });
   });
 
+  it('persists dot plot series and dot size', () => {
+    const project = createProjectSnapshot({
+      data: createSampleData(),
+      graphType: 'dotplot',
+      now: timestamp,
+      settings: {
+        ...createDefaultGraphSettings(),
+        dotPlotSeriesColumnId: 'column-2',
+        dotSize: 14,
+      },
+    });
+
+    expect(deserializeGraphProject(serializeGraphProject(project))).toEqual({ ok: true, project });
+  });
+
+  it('persists supply and demand mapping and equilibrium visibility', () => {
+    const project = createProjectSnapshot({
+      data: createSampleData(),
+      graphType: 'supplydemand',
+      now: timestamp,
+      settings: {
+        ...createDefaultGraphSettings(),
+        showEquilibrium: false,
+        supplyDemandDemandColumnId: 'column-2',
+        supplyDemandSupplyColumnId: 'column-3',
+        supplyDemandXColumnId: 'column-1',
+      },
+    });
+
+    expect(deserializeGraphProject(serializeGraphProject(project))).toEqual({ ok: true, project });
+  });
+
   it('persists the box plot selection and outlier visibility', () => {
     const project = createProjectSnapshot({
       data: createSampleData(),
@@ -159,25 +191,37 @@ describe('graph project persistence model', () => {
 
     const legacy = structuredClone(project) as unknown as { settings: Record<string, unknown> };
     delete legacy.settings.hiddenSeriesIds;
+    delete legacy.settings.dotPlotSeriesColumnId;
+    delete legacy.settings.dotSize;
     delete legacy.settings.histogramBinCount;
     delete legacy.settings.histogramSeriesColumnId;
     delete legacy.settings.pieSeriesColumnId;
     delete legacy.settings.radarFilled;
     delete legacy.settings.scatterXColumnId;
     delete legacy.settings.scatterYColumnId;
+    delete legacy.settings.showEquilibrium;
     delete legacy.settings.showOutliers;
+    delete legacy.settings.supplyDemandDemandColumnId;
+    delete legacy.settings.supplyDemandSupplyColumnId;
+    delete legacy.settings.supplyDemandXColumnId;
     delete legacy.settings.xyConnectPoints;
     const restored = parseGraphProject(legacy);
     expect(restored.ok).toBe(true);
     if (!restored.ok) throw new Error('Expected a valid legacy project');
     expect(restored.project.settings.hiddenSeriesIds).toEqual([]);
+    expect(restored.project.settings.dotPlotSeriesColumnId).toBeNull();
+    expect(restored.project.settings.dotSize).toBe(10);
     expect(restored.project.settings.histogramBinCount).toBeNull();
     expect(restored.project.settings.histogramSeriesColumnId).toBeNull();
     expect(restored.project.settings.pieSeriesColumnId).toBeNull();
     expect(restored.project.settings.radarFilled).toBe(true);
     expect(restored.project.settings.scatterXColumnId).toBeNull();
     expect(restored.project.settings.scatterYColumnId).toBeNull();
+    expect(restored.project.settings.showEquilibrium).toBe(true);
     expect(restored.project.settings.showOutliers).toBe(true);
+    expect(restored.project.settings.supplyDemandDemandColumnId).toBeNull();
+    expect(restored.project.settings.supplyDemandSupplyColumnId).toBeNull();
+    expect(restored.project.settings.supplyDemandXColumnId).toBeNull();
     expect(restored.project.settings.xyConnectPoints).toBe(true);
   });
 

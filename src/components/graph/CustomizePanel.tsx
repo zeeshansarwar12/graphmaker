@@ -9,13 +9,21 @@ export interface CustomizableSeries {
 }
 
 interface CustomizePanelProps {
-  chartType: 'bar' | 'boxplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'xy';
+  chartType: 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy';
   dispatch: Dispatch<GraphSettingsAction>;
+  onDotPlotSeriesChange?: (columnId: string) => void;
   onScatterColumnChange?: (axis: 'x' | 'y', columnId: string) => void;
+  onSupplyDemandColumnChange?: (role: 'demand' | 'supply' | 'x', columnId: string) => void;
   scatterMapping?: {
     columns: Array<{ id: string; name: string }>;
     xColumnId: string;
     yColumnId: string;
+  };
+  supplyDemandMapping?: {
+    columns: Array<{ id: string; name: string }>;
+    demandColumnId: string;
+    supplyColumnId: string;
+    xColumnId: string;
   };
   series: CustomizableSeries[];
   settings: GraphSettings;
@@ -26,19 +34,22 @@ const fieldClassName = 'border-border focus:border-brand mt-1 min-h-10 w-full ro
 export function CustomizePanel({
   chartType,
   dispatch,
+  onDotPlotSeriesChange,
   onScatterColumnChange,
+  onSupplyDemandColumnChange,
   scatterMapping,
   series,
   settings,
+  supplyDemandMapping,
 }: CustomizePanelProps) {
   const seriesColumnIds = series.map((item) => item.columnId);
   const visibleSeriesIndexes = getVisibleSeriesIndexes(settings, seriesColumnIds);
   const visibleSeriesIndexSet = new Set(visibleSeriesIndexes);
 
   return (
-    <aside aria-label="Customize graph" className="border-border bg-surface-subtle mt-4 rounded-lg border p-4" id="customize-panel">
+    <aside aria-label="Customize graph" className="border-border bg-surface-subtle mt-4 scroll-mt-14 rounded-lg border p-4" id="customize-panel">
       <div className="grid gap-4 sm:grid-cols-3">
-        {chartType !== 'radar' && <label className="text-sm font-semibold">
+        {chartType !== 'radar' && chartType !== 'supplydemand' && <label className="text-sm font-semibold">
           Graph title
           <input
             className={fieldClassName}
@@ -67,10 +78,10 @@ export function CustomizePanel({
         </label>
       </div>
 
-      <fieldset className="border-border mt-4 border-t pt-4">
+      {chartType !== 'supplydemand' && <fieldset className="border-border mt-4 border-t pt-4">
         <legend className="sr-only">Graph visibility</legend>
         <div className="flex flex-wrap gap-x-6 gap-y-3">
-          {chartType !== 'boxplot' && <label className="flex items-center gap-2 text-sm font-medium">
+          {chartType !== 'boxplot' && chartType !== 'dotplot' && <label className="flex items-center gap-2 text-sm font-medium">
             <input
               checked={settings.showLegend}
               className="accent-brand h-4 w-4"
@@ -106,7 +117,7 @@ export function CustomizePanel({
             />
             Show outliers
           </label>}
-          {chartType !== 'boxplot' && <label className="flex items-center gap-2 text-sm font-medium">
+          {chartType !== 'boxplot' && chartType !== 'dotplot' && <label className="flex items-center gap-2 text-sm font-medium">
             <input
               checked={settings.showValueLabels}
               className="accent-brand h-4 w-4"
@@ -116,7 +127,22 @@ export function CustomizePanel({
             Show value labels
           </label>}
         </div>
-      </fieldset>
+      </fieldset>}
+
+      {chartType === 'supplydemand' && (
+        <fieldset className="border-border mt-4 border-t pt-4">
+          <legend className="sr-only">Equilibrium display</legend>
+          <label className="flex items-center gap-2 text-sm font-medium">
+            <input
+              checked={settings.showEquilibrium}
+              className="accent-brand h-4 w-4"
+              onChange={(event) => dispatch({ type: 'set-show-equilibrium', value: event.target.checked })}
+              type="checkbox"
+            />
+            Show equilibrium marker
+          </label>
+        </fieldset>
+      )}
 
       {chartType === 'scatter' && scatterMapping && onScatterColumnChange && (
         <fieldset className="border-border mt-4 border-t pt-4">
@@ -146,6 +172,33 @@ export function CustomizePanel({
                 ))}
               </select>
             </label>
+          </div>
+        </fieldset>
+      )}
+
+      {chartType === 'supplydemand' && supplyDemandMapping && onSupplyDemandColumnChange && (
+        <fieldset className="border-border mt-4 border-t pt-4">
+          <legend className="text-sm font-semibold">Supply and demand columns</legend>
+          <div className="mt-3 grid gap-4 sm:grid-cols-3">
+            {([
+              ['x', 'Quantity / X column', supplyDemandMapping.xColumnId],
+              ['demand', 'Demand series', supplyDemandMapping.demandColumnId],
+              ['supply', 'Supply series', supplyDemandMapping.supplyColumnId],
+            ] as const).map(([role, label, selectedId]) => (
+              <label className="text-sm font-semibold" key={role}>
+                {label}
+                <select
+                  className={fieldClassName}
+                  onChange={(event) => onSupplyDemandColumnChange(role, event.target.value)}
+                  value={selectedId}
+                >
+                  <option value="">Select a column</option>
+                  {supplyDemandMapping.columns.map((column) => (
+                    <option key={column.id} value={column.id}>{column.name}</option>
+                  ))}
+                </select>
+              </label>
+            ))}
           </div>
         </fieldset>
       )}
@@ -196,7 +249,35 @@ export function CustomizePanel({
         </div>
       )}
 
-      {chartType !== 'histogram' && chartType !== 'pie' && series.length > 0 && (
+      {chartType === 'dotplot' && (
+        <div className="border-border mt-4 grid gap-4 border-t pt-4 sm:grid-cols-2">
+          {series.length > 1 && (
+            <label className="text-sm font-semibold">
+              Selected series
+              <select
+                className={fieldClassName}
+                onChange={(event) => onDotPlotSeriesChange?.(event.target.value)}
+                value={settings.dotPlotSeriesColumnId ?? series[0].columnId}
+              >
+                {series.map((item) => <option key={item.columnId} value={item.columnId}>{item.name}</option>)}
+              </select>
+            </label>
+          )}
+          <label className="text-sm font-semibold">
+            Dot size
+            <input
+              className={fieldClassName}
+              max="24"
+              min="4"
+              onChange={(event) => dispatch({ type: 'set-dot-size', value: Number(event.target.value) })}
+              type="range"
+              value={settings.dotSize}
+            />
+          </label>
+        </div>
+      )}
+
+      {chartType !== 'dotplot' && chartType !== 'histogram' && chartType !== 'pie' && chartType !== 'supplydemand' && series.length > 0 && (
         <fieldset className="border-border mt-4 border-t pt-4">
           <legend className="text-sm font-semibold">Series</legend>
           <div className="mt-3 flex flex-wrap gap-x-5 gap-y-3">
@@ -224,7 +305,7 @@ export function CustomizePanel({
         </fieldset>
       )}
 
-      {chartType !== 'boxplot' && chartType !== 'histogram' && chartType !== 'pie' && <fieldset className="border-border mt-4 border-t pt-4">
+      {chartType !== 'boxplot' && chartType !== 'dotplot' && chartType !== 'histogram' && chartType !== 'pie' && chartType !== 'supplydemand' && <fieldset className="border-border mt-4 border-t pt-4">
         <legend className="text-sm font-semibold">Series colors</legend>
         <div className="mt-3 flex flex-wrap gap-3">
           {series.map(({ columnId, name }, index) => (
@@ -242,7 +323,7 @@ export function CustomizePanel({
         </div>
       </fieldset>}
 
-      {chartType !== 'radar' && <details className="border-border mt-4 border-t pt-4">
+      {chartType !== 'dotplot' && chartType !== 'radar' && chartType !== 'supplydemand' && <details className="border-border mt-4 border-t pt-4">
         <summary className="text-text-muted hover:text-text cursor-pointer text-sm font-semibold">Advanced controls</summary>
         <label className="mt-4 block max-w-xs text-sm font-semibold">
           Orientation
