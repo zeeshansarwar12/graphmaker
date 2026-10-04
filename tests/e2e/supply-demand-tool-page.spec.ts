@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test('serves a complete Supply and Demand page with equilibrium on numeric axes', async ({ page }) => {
   await page.goto('/supply-and-demand-graph-maker/');
 
-  await expect(page).toHaveTitle('Supply and Demand Graph Maker — Economics Graph Online | GraphMaker');
+  await expect(page).toHaveTitle('Supply and Demand Graph Maker — Free Online | GraphMaker');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /detect in-range equilibrium/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/supply-and-demand-graph-maker\/$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Supply and Demand Graph Maker' })).toBeVisible();
@@ -30,7 +30,7 @@ test('serves a complete Supply and Demand page with equilibrium on numeric axes'
     'How to read supply and demand curves',
     'When to use this tool',
     'Supply and demand graph maker features',
-    'Related economics and graph tools',
+    'Related graph makers',
     'Supply and demand graph maker FAQ',
   ]) {
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();

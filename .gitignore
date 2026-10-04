@@ -4,6 +4,7 @@ dist/
 playwright-report/
 test-results/
 coverage/
+verification-logs/
 dev.log
 dev.err
 .env

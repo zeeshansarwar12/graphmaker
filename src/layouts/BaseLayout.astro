@@ -1,6 +1,8 @@
 ---
 import '../styles/global.css';
 import { normalizeGoogleAnalyticsId } from '../lib/analytics/googleAnalytics';
+import { breadcrumbSchema } from '../content/seo';
+import type { Breadcrumb } from '../content/seo';
 
 interface Props {
   canonical?: string;
@@ -8,6 +10,7 @@ interface Props {
   description: string;
   robots?: string;
   structuredData?: Record<string, unknown> | Array<Record<string, unknown>>;
+  breadcrumbs?: Breadcrumb[];
 }
 
 const {
@@ -16,8 +19,14 @@ const {
   description,
   robots = 'index,follow',
   structuredData,
+  breadcrumbs,
 } = Astro.props;
 const canonicalUrl = canonical ? new URL(canonical, Astro.site ?? Astro.url).href : undefined;
+const socialImageUrl = new URL('/images/graphmaker-social.png', Astro.site ?? Astro.url).href;
+const schemas = [
+  ...(Array.isArray(structuredData) ? structuredData : structuredData ? [structuredData] : []),
+  ...(breadcrumbs ? [breadcrumbSchema(breadcrumbs, Astro.site ?? Astro.url)] : []),
+];
 const googleAnalyticsId = normalizeGoogleAnalyticsId(import.meta.env.PUBLIC_GOOGLE_ANALYTICS_ID)
   ?? 'G-JM5S5JGFJJ';
 const googleAnalyticsBootstrap = googleAnalyticsId
@@ -38,18 +47,25 @@ gtag('config', ${JSON.stringify(googleAnalyticsId)}, {
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
     <meta name="robots" content={robots} />
-    <meta name="google-site-verification" content="r9NYNACi391MLcXqqUd0w48ayLHu3l1TZ4zuUJO6dEY" />
-    <meta name="msvalidate.01" content="ADA32A2FC73ADC93B80B1231531C0854" />
+    {canonical === '/' && <meta name="google-site-verification" content="r9NYNACi391MLcXqqUd0w48ayLHu3l1TZ4zuUJO6dEY" />}
+    {canonical === '/' && <meta name="msvalidate.01" content="ADA32A2FC73ADC93B80B1231531C0854" />}
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GraphMaker" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={socialImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="GraphMaker — turn your data into a clear graph" />
     {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={socialImageUrl} />
+    <meta name="twitter:image:alt" content="GraphMaker — turn your data into a clear graph" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text y=%2214%22>📊</text></svg>" />
-    <meta name="generator" content={Astro.generator} />
-    {structuredData && <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />}
+    {schemas.length > 0 && <script is:inline type="application/ld+json" set:html={JSON.stringify(schemas).replaceAll('<', '\\u003c')} />}
     {googleAnalyticsId && <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(googleAnalyticsId)}`}></script>}
     {googleAnalyticsBootstrap && <script is:inline set:html={googleAnalyticsBootstrap}></script>}
     <title>{title}</title>

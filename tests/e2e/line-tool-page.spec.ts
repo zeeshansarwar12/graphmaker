@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test('serves a complete crawlable Line tool page with a true time-axis preset', async ({ page }) => {
   await page.goto('/line-graph-maker/');
 
-  await expect(page).toHaveTitle('Line Graph Maker — Create Multiple Line Charts Online | GraphMaker');
+  await expect(page).toHaveTitle('Line Graph Maker — Multiple Line Charts Online | GraphMaker');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /true time axis/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/line-graph-maker\/$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Line Graph Maker' })).toBeVisible();
@@ -11,8 +11,9 @@ test('serves a complete crawlable Line tool page with a true time-axis preset', 
 
   await expect(page.getByRole('button', { exact: true, name: 'Line' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByLabel('Date, row 1')).toHaveValue('2026-01-01');
-  await expect(page.getByLabel('Visitors, row 7')).toHaveValue('940');
-  await expect(page.getByLabel('Orders, row 7')).toHaveValue('33');
+  await expect(page.getByLabel('Product A Sales, row 7')).toHaveValue('940');
+  await expect(page.getByLabel('Product B Sales, row 7')).toHaveValue('880');
+  await expect(page.getByText('series use very different scales', { exact: false })).toHaveCount(0);
   await expect(page.locator('[data-rendered-chart-type="line"] [data-chart-status="ready"]')).toHaveAttribute('data-axis-type', 'time');
   await expect(page.locator('[data-chart-status="ready"]')).toHaveAttribute('data-series-count', '2');
   await expect(page.locator('[data-chart-status="ready"]')).toContainText('Line graph with 7 points and 2 series');
@@ -34,9 +35,9 @@ test('serves a complete crawlable Line tool page with a true time-axis preset', 
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();
   }
 
-  await expect(page.getByRole('link', { name: /Bar Graph Maker/ })).toHaveAttribute('href', '/bar-graph-maker/');
-  await expect(page.getByRole('link', { name: /XY Graph Maker/ })).toHaveAttribute('href', '/xy-graph-maker/');
-  await expect(page.getByRole('link', { name: /Scatter Plot Maker/ })).toHaveAttribute('href', '/scatter-plot-maker/');
+  await expect(page.getByRole('link', { name: /Bar Graph Maker/ }).first()).toHaveAttribute('href', '/bar-graph-maker/');
+  await expect(page.getByRole('link', { name: /XY Graph Maker/ }).first()).toHaveAttribute('href', '/xy-graph-maker/');
+  await expect(page.getByRole('link', { name: /Scatter Plot Maker/ }).first()).toHaveAttribute('href', '/scatter-plot-maker/');
 });
 
 test('updates pasted category data live and remains usable on mobile', async ({ page }) => {

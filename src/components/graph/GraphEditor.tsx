@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { graphTools } from '../../content/graphTools';
 import type { ChangeEvent, ReactNode } from 'react';
 
 import {
@@ -50,19 +51,6 @@ import type { GraphCanvasHandle } from './GraphCanvas';
 interface GraphEditorProps {
   config: GraphEditorConfig;
 }
-
-const chartTypes = [
-  { label: 'Bar', glyph: '▥' },
-  { label: 'Line', glyph: '⌁' },
-  { label: 'Pie', glyph: '◕' },
-  { label: 'XY', glyph: '⌗' },
-  { label: 'Scatter', glyph: '⠿' },
-  { label: 'Box Plot', glyph: '▣' },
-  { label: 'Radar', glyph: '⬡' },
-  { label: 'Histogram', glyph: '▥' },
-  { label: 'Dot Plot', glyph: '⠿' },
-  { label: 'Supply & Demand', glyph: '⇄' },
-] as const;
 
 type RenderedChartType = 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy';
 
@@ -557,30 +545,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
       <fieldset className="contents" disabled={!isProjectReady}>
 
       <div aria-label="Choose a graph type" className="border-border flex min-w-0 gap-2 overflow-x-auto border-b p-3" role="group">
-        {chartTypes.filter(({ label }) => (
-          label !== 'Supply & Demand'
-          || config.graphType === 'supplydemand'
-          || selectedChartType === 'supplydemand'
-        )).map(({ label, glyph }) => {
-          const renderedType = label === 'Bar'
-            ? 'bar'
-            : label === 'Line'
-              ? 'line'
-                : label === 'Pie'
-                  ? 'pie'
-                : label === 'Radar'
-                  ? 'radar'
-                : label === 'Box Plot'
-                  ? 'boxplot'
-                : label === 'XY'
-                  ? 'xy'
-                : label === 'Scatter'
-                  ? 'scatter'
-                  : label === 'Histogram'
-                    ? 'histogram'
-                    : label === 'Dot Plot'
-                      ? 'dotplot'
-                      : label === 'Supply & Demand' ? 'supplydemand' : null;
+        {graphTools.map(({ label, icon, type: renderedType }) => {
           const isSelected = renderedType === selectedChartType;
 
           return (
@@ -591,206 +556,407 @@ export function GraphEditor({ config }: GraphEditorProps) {
                 : 'border-border text-text hover:border-slate-300 hover:bg-surface-subtle shrink-0 rounded-md border bg-white px-3.5 py-2 text-sm font-medium'}
               key={label}
               onClick={() => renderedType && selectChartType(renderedType)}
-              type="button"
-            >
-              <span aria-hidden="true" className="mr-2">{glyph}</span>
-              {label}
-            </button>
-          );
-        })}
-      </div>
+              type="b…20971 tokens truncated…       { title: 'Percentage-like values', description: 'When every value falls between 0 and 100, the chart uses a consistent 0–100 scale.' },
+        { title: 'Other numeric ranges', description: 'For larger values, the radar chart generator chooses a rounded maximum above the highest observation.' },
+        { title: 'Comparable units matter', description: 'Use metrics with compatible meanings or normalize them first; otherwise the polygon shape can give a misleading comparison.' },
+      ],
+      title: 'How radar scales work',
+    },
+  ],
+  canonical: '/radar-chart-maker/',
+  comparison: {
+    first: {
+      body: 'Use a radar chart to compare the overall profile of one or more series across the same set of metrics. The polygon shape makes relative strengths and weaknesses easy to scan.',
+      title: 'Use a radar chart',
+    },
+    intro: 'Radar and bar charts can compare the same measurements, but they emphasize different aspects of the data.',
+    second: {
+      body: 'Use a bar chart when precise value comparison and straightforward ranking matter most, especially when there are many categories or readers need to judge small differences.',
+      title: 'Use a bar chart',
+    },
+    title: 'Radar Chart vs Bar Chart',
+  },
+  definition: [
+    'A radar chart places each metric on an axis radiating from a shared center. Values are connected into a polygon, making the overall profile of each series visible at a glance. Radar charts are also called spider charts or web charts.',
+    'This radar graph maker uses the first text column for axis labels and turns every numeric column into a separate series. Real column headers appear in the legend, so teams, products, candidates, or scenarios remain clearly identified.',
+    'Use the online radar chart maker to paste data or import CSV and Excel files, then customize and export the chart directly in your browser.',
+  ],
+  editor: {
+    graphType: 'radar',
+    initialSettings: {
+      radarFilled: true,
+      showGrid: true,
+      showLegend: true,
+      showValueLabels: false,
+      title: 'Team Comparison by Metric',
+      yAxisTitle: '',
+    },
+    sampleData: {
+      columns: radarSampleData.columns.map((column) => ({ ...column })),
+      rows: radarSampleData.rows.map((row) => ({ ...row, cells: [...row.cells] })),
+    },
+    slug: '/radar-chart-maker/',
+  },
+  example: {
+    caption: 'Put metric names in the first column and one comparable numeric series in each following column.',
+    headers: ['Metric', 'Team A', 'Team B'],
+    rows: radarSampleData.rows.map((row) => [...row.cells]),
+  },
+  faqs: [
+    {
+      answer: 'Yes. The free radar chart maker requires no signup and exports clean PNG or SVG files without a watermark.',
+      question: 'Is this radar chart maker free?',
+    },
+    {
+      answer: 'Use a text column first for metric names. Add one or more numeric columns after it; each numeric header becomes a legend label and radar series.',
+      question: 'How should I arrange radar chart data?',
+    },
+    {
+      answer: 'Yes. The spider chart maker supports multiple numeric series, which are drawn on the same metric axes for profile comparison.',
+      question: 'Can I compare multiple series?',
+    },
+    {
+      answer: 'Values between 0 and 100 use a shared 0–100 scale. Other ranges use a sensible rounded maximum based on the largest value in the dataset.',
+      question: 'How does the chart choose its scale?',
+    },
+    {
+      answer: 'The editor shows an actionable message identifying the missing or invalid cell instead of drawing a misleading chart.',
+      question: 'What happens when a value is missing or invalid?',
+    },
+    {
+      answer: 'The chart still renders, but the editor warns when there are more than 12 metrics because labels and polygons can become difficult to read.',
+      question: 'How many metrics should a radar chart contain?',
+    },
+    {
+      answer: 'Yes. Paste a spreadsheet table or upload CSV and XLSX files. Your data remains in the browser.',
+      question: 'Can I import radar data from Excel or CSV?',
+    },
+  ],
+  features: [
+    { title: 'Multiple series', description: 'Compare several teams, products, or options across one shared set of metrics.' },
+    { title: 'Real legend labels', description: 'Use the original numeric column headers as series names in the chart legend.' },
+    { title: 'Automatic scaling', description: 'Use 0–100 for percentage-like values and rounded maxima for other numeric ranges.' },
+    { title: 'Readable metric guidance', description: 'Warn when too many axes may make the radar chart hard to interpret.' },
+    { title: 'Spreadsheet imports', description: 'Paste tables or upload CSV and Excel files through the shared data grid.' },
+    { title: 'Local save and export', description: 'Save on this device and download the finished chart as PNG, SVG, or CSV.' },
+  ],
+  h1: 'Radar Chart Maker',
+  howTo: [
+    { title: 'Add metrics and series', description: 'Enter metric names in the first column, then add one or more numeric series with clear headers.' },
+    { title: 'Review the shared scale', description: 'Check that the metrics use comparable units and confirm the automatically selected range.' },
+    { title: 'Customize and export', description: 'Adjust the fill, grid, legend, labels, and colors, then download the finished radar chart.' },
+  ],
+  intro: 'Compare strengths and patterns across multiple metrics with this online radar chart maker. Paste or upload data and create a polished spider chart for free.',
+  metaDescription: 'Create radar and spider charts online from one or multiple data series. Import CSV or Excel data, use automatic scales, and export free with no signup.',
+  relatedHeading: 'Related tools',
+  relatedTools: [
+    { name: 'Bar Graph Maker', description: 'Compare metric values precisely with familiar rectangular bars.', href: '/bar-graph-maker/' },
+    { name: 'Pie Chart Maker', description: 'Show how categories contribute to one whole.', href: '/pie-chart-maker/' },
+    { name: 'Line Graph Maker', description: 'Track one or more numeric series across ordered categories or time.', href: '/line-graph-maker/' },
+  ],
+  sectionHeadings: {
+    definition: 'What is a radar chart?',
+    example: 'Example radar chart data',
+    faq: 'Radar chart maker FAQ',
+    faqIntro: 'Answers about arranging metrics, comparing series, and choosing a readable scale.',
+    features: 'Radar chart maker features',
+    howTo: 'How to make a radar chart',
+  },
+  slug: '/radar-chart-maker/',
+  title: 'Radar Chart Maker — Create Spider Charts Online | GraphMaker',
+  useCases: {
+    intro: 'Radar charts work best when a small set of comparable metrics describes an overall profile.',
+    items: [
+      { title: 'Team or candidate profiles', description: 'Compare strengths across skills, competencies, or performance measures.' },
+      { title: 'Product comparisons', description: 'Contrast products or plans across shared attributes such as quality, cost, and support.' },
+      { title: 'Before-and-after reviews', description: 'Show how a profile changes across the same assessment criteria.' },
+    ],
+    title: 'When to use a radar chart',
+  },
+} satisfies ToolPageConfig;
 
-      <nav aria-label="Editor sections" className="border-border bg-surface sticky top-0 z-10 grid grid-cols-3 border-b p-2 lg:hidden">
-        <button className="text-text hover:bg-surface-subtle min-h-10 rounded-md px-2 text-sm font-semibold" onClick={() => scrollToEditorSection('preview')} type="button">
-          Preview
-        </button>
-        <button className="text-text hover:bg-surface-subtle min-h-10 rounded-md px-2 text-sm font-semibold" onClick={() => scrollToEditorSection('data')} type="button">
-          Edit data
-        </button>
-        <button aria-label="Open customization" className="text-text hover:bg-surface-subtle min-h-10 rounded-md px-2 text-sm font-semibold" onClick={() => scrollToEditorSection('customize')} type="button">
-          Customize
-        </button>
-      </nav>
+export const histogramToolPageConfig = {
+  additionalSections: [
+    {
+      id: 'histogram-bins',
+      intro: 'A histogram groups nearby observations into intervals so the overall distribution is easier to see.',
+      items: [
+        { title: 'Automatic bin count', description: 'The editor chooses a practical number of bins from the number of valid observations.' },
+        { title: 'Manual adjustment', description: 'Open Customize when you need to compare the same data with fewer or more intervals.' },
+        { title: 'Frequency counts', description: 'Each bar reports how many observations fall inside its displayed numeric range.' },
+      ],
+      title: 'How histogram bins work',
+    },
+  ],
+  canonical: '/histogram-maker/',
+  comparison: {
+    first: {
+      body: 'Use a histogram when the shape of one numeric distribution matters. Touching bars reveal concentrations, gaps, skew, and the frequency of value ranges.',
+      title: 'Use a histogram',
+    },
+    intro: 'Both charts summarize raw numeric observations, but they answer different questions about a distribution.',
+    second: {
+      body: 'Use a box plot when you need a compact summary of median, quartiles, spread, and outliers, especially when comparing several groups.',
+      title: 'Use a box plot',
+    },
+    title: 'Histogram vs Box Plot',
+  },
+  definition: [
+    'A histogram displays the frequency distribution of numeric observations. Values are grouped into continuous intervals called bins, and the height of each touching bar shows how many observations fall in that range.',
+    'Unlike a bar graph, a histogram uses numeric ranges rather than separate named categories. The order and width of the intervals carry meaning, so the bars touch instead of appearing as independent columns.',
+    'This online histogram maker accepts pasted data plus CSV and Excel files, safely excludes invalid observations, and lets you review or adjust the automatic bin count before exporting.',
+  ],
+  editor: {
+    graphType: 'histogram',
+    initialSettings: {
+      histogramBinCount: null,
+      showGrid: true,
+      showLegend: false,
+      showValueLabels: true,
+      title: 'Distribution of Scores',
+      xAxisTitle: 'Score',
+      yAxisTitle: 'Frequency',
+    },
+    sampleData: histogramSampleData,
+    slug: '/histogram-maker/',
+  },
+  example: {
+    caption: `These ${histogramSampleData.rows.length} sample observations each represent one measured score.`,
+    headers: histogramSampleData.columns.map((column) => column.name),
+    rows: histogramSampleData.rows.map((row) => [...row.cells]),
+  },
+  faqs: [
+    { question: 'Is this histogram maker free?', answer: 'Yes. You can create and export a histogram without signing up or adding a watermark.' },
+    { question: 'What data should I enter?', answer: 'Enter raw numeric observations in a column. Do not enter pre-counted categories unless you want a bar graph instead.' },
+    { question: 'How are histogram bins selected?', answer: 'The automatic setting uses the number of valid observations to choose a readable bin count. You can select a different count inside Customize.' },
+    { question: 'What happens to blank or invalid cells?', answer: 'Blank cells are ignored. Invalid non-numeric values are excluded and reported beside the chart so the source data can be corrected.' },
+    { question: 'Can I import values from Excel or CSV?', answer: 'Yes. Paste a spreadsheet column or upload CSV and XLSX files. Processing remains in your browser.' },
+  ],
+  features: [
+    { title: 'Automatic bins', description: 'Generate a practical interval count based on the size of the dataset.' },
+    { title: 'Adjustable intervals', description: 'Choose a manual bin count from Customize when a different level of detail is useful.' },
+    { title: 'Safe data cleanup', description: 'Ignore blanks and clearly report non-numeric observations that were excluded.' },
+    { title: 'Frequency tooltips', description: 'Inspect the numeric range and observation count represented by each bar.' },
+    { title: 'Spreadsheet imports', description: 'Paste raw values or import them from CSV and Excel files through the shared editor.' },
+    { title: 'Local save and export', description: 'Save the project on this device and export the finished histogram as PNG, SVG, or CSV.' },
+  ],
+  h1: 'Histogram Maker',
+  howTo: [
+    { title: 'Add raw observations', description: 'Enter one numeric value per row, or paste and import a spreadsheet column.' },
+    { title: 'Review the bins', description: 'Use the automatic intervals or open Customize to select a different bin count.' },
+    { title: 'Customize and export', description: 'Adjust labels, color, and grid visibility, then download the completed histogram.' },
+  ],
+  intro: 'Create a histogram from raw numeric data and inspect the shape of its distribution. Paste values or import CSV and Excel files, then export the result for free.',
+  metaDescription: 'Create a histogram online from raw numeric data. Use automatic or adjustable bins, import CSV or Excel values, and export free with no signup.',
+  relatedTools: [
+    { name: 'Box Plot Maker', description: 'Summarize median, quartiles, spread, and outliers from raw numeric data.', href: '/box-plot-maker/' },
+    { name: 'Dot Plot Maker', description: 'Show every raw observation and stack repeated values by frequency.', href: '/dot-plot-maker/' },
+    { name: 'Bar Graph Maker', description: 'Compare values across separate named categories instead of continuous ranges.', href: '/bar-graph-maker/' },
+    { name: 'Scatter Plot Maker', description: 'Explore the relationship between two numeric measurements.', href: '/scatter-plot-maker/' },
+  ],
+  sectionHeadings: {
+    definition: 'What is a histogram?',
+    example: 'Example histogram data',
+    faq: 'Histogram maker FAQ',
+    faqIntro: 'Answers about raw observations, intervals, imports, and excluded values.',
+    features: 'Histogram maker features',
+    howTo: 'How to make a histogram',
+  },
+  slug: '/histogram-maker/',
+  title: 'Histogram Maker — Frequency Charts Online | GraphMaker',
+  useCases: {
+    intro: 'Histograms are useful when you want to understand how numeric observations are distributed across a continuous range.',
+    items: [
+      { title: 'Inspect score distributions', description: 'See where test results or ratings are concentrated and whether the values are balanced or skewed.' },
+      { title: 'Review measurements', description: 'Study variation in laboratory results, dimensions, durations, or other repeated measurements.' },
+      { title: 'Spot gaps and unusual ranges', description: 'Find empty intervals, multiple peaks, or thin tails that deserve closer investigation.' },
+    ],
+    title: 'When to use a histogram',
+  },
+} satisfies ToolPageConfig;
 
-      <div className="grid min-w-0 lg:grid-cols-[2fr_3fr]">
-        <section aria-labelledby="data-heading" className="border-border order-2 min-w-0 scroll-mt-14 border-t p-4 sm:p-5 lg:order-1 lg:border-t-0 lg:border-r" id="data-editor" ref={dataSectionRef}>
-          <DataGrid data={data} isSampleData={isSampleData} onChange={updateData} />
-        </section>
+export const dotPlotToolPageConfig = {
+  canonical: '/dot-plot-maker/',
+  comparison: {
+    first: {
+      body: 'Choose a dot plot when you want readers to see every observation. Repeated values stack vertically, so exact values, small clusters, gaps, and unusual points remain visible.',
+      title: 'Use a dot plot',
+    },
+    intro: 'Both charts show a numeric distribution, but they preserve different levels of detail.',
+    second: {
+      body: 'Choose a histogram for a larger dataset when grouped intervals communicate the overall distribution more clearly than individual observations.',
+      title: 'Use a histogram',
+    },
+    title: 'Dot Plot vs Histogram',
+  },
+  definition: [
+    'A dot plot places each raw numeric observation on a number line. When a value occurs more than once, its dots stack vertically to show the frequency without hiding any observations.',
+    'The horizontal axis uses true numeric spacing, so the visual distance between 12 and 14 is twice the distance between 14 and 15. This makes a dot plot useful for inspecting exact values in a small or medium-sized dataset.',
+  ],
+  editor: {
+    graphType: 'dotplot',
+    initialSettings: {
+      dotPlotSeriesColumnId: null,
+      dotSize: 10,
+      showGrid: true,
+      showLegend: false,
+      showValueLabels: false,
+      title: 'Dot Plot of Value',
+      xAxisTitle: 'Value',
+      yAxisTitle: 'Frequency',
+    },
+    sampleData: dotPlotSampleData,
+    slug: '/dot-plot-maker/',
+  },
+  example: {
+    caption: `These ${dotPlotSampleData.rows.length} sample observations each become one dot. Repeated values stack into visible frequency columns.`,
+    headers: dotPlotSampleData.columns.map((column) => column.name),
+    rows: dotPlotSampleData.rows.map((row) => [...row.cells]),
+  },
+  faqs: [
+    { question: 'Is this dot plot maker free?', answer: 'Yes. This free dot plot maker works online without signup and exports clean PNG and SVG files without a watermark.' },
+    { question: 'What data works best in a dot plot?', answer: 'Use one numeric column of raw observations. Each row becomes one dot, and repeated numbers stack vertically.' },
+    { question: 'How are repeated values displayed?', answer: `Every repeated observation receives the same horizontal position and the next available vertical stack position. In the sample, ${dotPlotSampleData.rows.filter((row) => row.cells[0] === '18').length} occurrences of 18 appear as ${dotPlotSampleData.rows.filter((row) => row.cells[0] === '18').length} dots above 18.` },
+    { question: 'Can I choose between multiple numeric columns?', answer: 'Yes. The dot plot creator uses the first numeric series by default and lets you choose another series inside Customize. Columns are never merged silently.' },
+    { question: 'Can I paste data or upload Excel and CSV files?', answer: 'Yes. Paste a spreadsheet column or upload CSV and Excel files. Your data is processed locally in the browser.' },
+  ],
+  features: [
+    { title: 'Repeated-value stacking', description: 'Display every observation while stacking duplicate numeric values by frequency.' },
+    { title: 'True numeric spacing', description: 'Position dots on a continuous numeric X-axis instead of evenly spaced categories.' },
+    { title: 'Series selection', description: 'Choose one numeric column in Customize when the dataset contains several series.' },
+    { title: 'Compatibility guidance', description: 'Get a clear explanation and a better chart recommendation when the data is categorical, time-based, or paired XY data.' },
+    { title: 'Spreadsheet imports', description: 'Paste values or import CSV and Excel files through the shared graph editor.' },
+    { title: 'Local save and export', description: 'Save on this device and export the finished dot plot as PNG, SVG, or CSV.' },
+  ],
+  h1: 'Dot Plot Maker',
+  howTo: [
+    { title: 'Add raw observations', description: 'Enter one numeric value per row, paste a spreadsheet column, or upload a CSV or Excel file.' },
+    { title: 'Review the stacked dots', description: 'Confirm that repeated values stack vertically and use Customize to choose a series or adjust dot size.' },
+    { title: 'Label and export', description: 'Use the real column header for the title and axis, then download the dot plot as PNG or SVG.' },
+  ],
+  intro: 'Create a dot plot from raw numeric observations in seconds. This online dot plot maker stacks repeated values, supports paste, CSV, and Excel, and requires no signup.',
+  metaDescription: 'Create a dot plot online from raw numeric data. Stack repeated values, import CSV or Excel, customize dot size, and export free with no signup.',
+  relatedTools: [
+    { name: 'Histogram Maker', description: 'Group numeric observations into intervals to see the overall distribution shape.', href: '/histogram-maker/' },
+    { name: 'Box Plot Maker', description: 'Summarize median, quartiles, spread, and outliers from raw observations.', href: '/box-plot-maker/' },
+    { name: 'Scatter Plot Maker', description: 'Plot paired numeric measurements to explore relationships between variables.', href: '/scatter-plot-maker/' },
+  ],
+  sectionHeadings: {
+    definition: 'What is a dot plot?',
+    example: 'Example dot plot data',
+    faq: 'Dot plot maker FAQ',
+    faqIntro: 'Answers about observations, repeated values, imports, and series selection.',
+    features: 'Dot plot maker features',
+    howTo: 'How to make a dot plot',
+  },
+  slug: '/dot-plot-maker/',
+  title: 'Dot Plot Maker — Create a Dot Plot Online | GraphMaker',
+  useCases: {
+    intro: 'A dot plot generator is most useful when exact observations still matter and the dataset is small enough to read point by point.',
+    items: [
+      { title: 'Compare repeated measurements', description: 'See which scores, durations, or measured values occur most often without grouping them into bins.' },
+      { title: 'Find gaps and clusters', description: 'Spot concentrations, empty ranges, and isolated observations along a true numeric scale.' },
+      { title: 'Teach distributions', description: 'Show students how individual observations build a frequency distribution while keeping the raw values visible.' },
+    ],
+    title: 'When to use a dot plot',
+  },
+} satisfies ToolPageConfig;
 
-        <section aria-labelledby="preview-heading" className="order-1 min-w-0 scroll-mt-14 p-4 sm:p-5 lg:order-2" ref={previewSectionRef}>
-          <h3 className="sr-only" id="preview-heading">Graph preview</h3>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 className="min-w-0 flex-1 truncate text-lg font-bold">
-              {settings.title.trim() || 'Untitled graph'}
-            </h3>
-            <div className="flex flex-wrap items-center gap-3">
-              {selectedChartType === 'xy' && (
-                <label className="flex min-h-10 items-center gap-2 text-sm font-semibold">
-                  <input
-                    checked={settings.xyConnectPoints}
-                    className="accent-brand h-4 w-4"
-                    onChange={(event) => dispatchSettings({
-                      type: 'set-xy-connect-points',
-                      value: event.target.checked,
-                    })}
-                    type="checkbox"
-                  />
-                  Connect points
-                </label>
-              )}
-              <button
-                aria-controls="customize-panel"
-                aria-expanded={isCustomizeOpen}
-                className="button-secondary"
-                onClick={() => setIsCustomizeOpen((isOpen) => !isOpen)}
-                type="button"
-              >
-                <ButtonIcon>⚙</ButtonIcon>Customize
-              </button>
-            </div>
-          </div>
-
-          {isCustomizeOpen && (
-            <CustomizePanel
-              chartType={selectedChartType}
-              dispatch={dispatchSettings}
-              onDotPlotSeriesChange={setDotPlotSeries}
-              onScatterColumnChange={setScatterColumn}
-              onSupplyDemandColumnChange={setSupplyDemandColumn}
-              scatterMapping={selectedChartType === 'scatter' && hasUsableScatterColumns ? {
-                columns: scatterData.numericColumnIndexes.map((index) => ({
-                  id: data.columns[index].id,
-                  name: data.columns[index].name || `Column ${index + 1}`,
-                })),
-                xColumnId: data.columns[scatterData.xColumnIndex!].id,
-                yColumnId: data.columns[scatterData.yColumnIndex!].id,
-              } : undefined}
-              series={seriesDefinitions}
-              settings={settings}
-              supplyDemandMapping={selectedChartType === 'supplydemand' ? {
-                columns: data.columns.map((column, index) => ({
-                  id: column.id,
-                  name: column.name || `Column ${index + 1}`,
-                })),
-                demandColumnId: supplyDemandData.demandColumnIndex === null
-                  ? ''
-                  : data.columns[supplyDemandData.demandColumnIndex].id,
-                supplyColumnId: supplyDemandData.supplyColumnIndex === null
-                  ? ''
-                  : data.columns[supplyDemandData.supplyColumnIndex].id,
-                xColumnId: supplyDemandData.xColumnIndex === null
-                  ? ''
-                  : data.columns[supplyDemandData.xColumnIndex].id,
-              } : undefined}
-            />
-          )}
-
-          <section aria-label="Detected data" className="border-border bg-surface-subtle mt-3 rounded-md border px-3 py-2 text-sm">
-            <p className="text-text-muted flex flex-wrap items-center gap-x-1.5 gap-y-1">
-              <span><span className="text-text font-semibold">Detected:</span> {detectedRelationship}</span>
-              <span aria-hidden="true">·</span>
-              {suppressRecommendation
-                ? <span><span className="text-text font-semibold">Chart:</span> {selectedChartLabel}</span>
-                : <span><span className="text-text font-semibold">Recommended:</span> {recommendationLabel}</span>}
-              {hasDifferentRecommendation && recommendedRenderedType && !isSelectedChartIncompatible && (
-                <button className="text-brand font-semibold underline underline-offset-2" onClick={() => selectChartType(recommendedRenderedType)} type="button">
-                  Switch to {interpretation.recommendation}
-                </button>
-              )}
-            </p>
-            {selectedChartType === 'scatter' && scatterData.extraNumericColumnCount > 0 && (
-              <p className="text-text-muted mt-1">{scatterData.extraNumericColumnCount} additional numeric column{scatterData.extraNumericColumnCount === 1 ? ' is' : 's are'} available in Customize.</p>
-            )}
-            {selectedChartType === 'pie' && pieData.isCompatible && pieData.numericColumnIndexes.length > 1 && (
-              <p className="text-text-muted mt-1">Pie chart uses {pieData.seriesName || 'the first numeric series'}. Change series in Customize.</p>
-            )}
-            {selectedChartType === 'histogram' && histogramData.isCompatible && histogramData.numericColumnIndexes.length > 1 && (
-              <p className="text-text-muted mt-1">Histogram uses {histogramData.seriesName || 'the first numeric series'}. Change series in Customize.</p>
-            )}
-            {selectedChartType === 'dotplot' && dotPlotData.isCompatible && dotPlotData.numericColumnIndexes.length > 1 && (
-              <p className="text-text-muted mt-1">Dot plot uses {dotPlotData.seriesName || 'the first numeric series'}. Change the selected series in Customize.</p>
-            )}
-            {selectedChartType === 'boxplot' && boxPlotData.isCompatible && (
-              <p className="text-text-muted mt-1">Box plot groups: {boxPlotData.groups.map((group) => group.name).join(', ') || 'None'}.</p>
-            )}
-          </section>
-          {hasVisibleMixedScale && (
-            <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900" role="status">
-              These series use very different scales. Hide a series for a clearer comparison.
-            </p>
-          )}
-          {selectedChartType === 'pie' && interpretation.pointCount > 8 && (
-            <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900" role="status">
-              Pie charts are harder to read with many categories. Bar chart may be clearer.
-            </p>
-          )}
-
-          <div className="mt-2 w-full overflow-hidden">
-            <GraphCanvas
-              chartType={selectedChartType}
-              data={data}
-              incompatibleAction={isSelectedChartIncompatible && recommendedRenderedType ? {
-                label: `Switch to ${interpretation.recommendation}`,
-                onClick: () => selectChartType(recommendedRenderedType),
-              } : undefined}
-              onToggleSeries={toggleSeriesVisibility}
-              ref={graphCanvasRef}
-              settings={settings}
-            />
-          </div>
-
-          <div className="border-border flex flex-wrap items-center justify-between gap-3 border-t pt-4">
-            <div className="flex flex-wrap gap-2">
-              <button className="button-secondary" onClick={() => exportGraph('png')} type="button"><ButtonIcon>▧</ButtonIcon>PNG</button>
-              <button className="button-secondary" onClick={() => exportGraph('svg')} type="button"><ButtonIcon>⌁</ButtonIcon>SVG</button>
-              <button className="button-secondary" onClick={exportCsv} type="button"><ButtonIcon>▤</ButtonIcon>CSV</button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button className="button-secondary" onClick={saveNow} type="button"><ButtonIcon>♡</ButtonIcon>Save locally</button>
-              <button className="button-primary" onClick={() => exportGraph('png')} type="button"><ButtonIcon>↓</ButtonIcon>Download</button>
-            </div>
-          </div>
-
-          <div className="border-border mt-3 flex flex-wrap items-center justify-between gap-3 border-t pt-3">
-            <p className="text-text-muted text-xs" role="status">
-              {saveStatus === 'checking' && 'Checking this device for a saved project…'}
-              {saveStatus === 'saving' && 'Saving locally…'}
-              {saveStatus === 'saved' && 'Saved locally on this device. No cloud backup.'}
-              {saveStatus === 'error' && 'Local autosave unavailable.'}
-            </p>
-            <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
-              <button className="text-text-muted hover:text-text font-medium" onClick={() => setIsResetConfirming(true)} type="button">New graph</button>
-              <button className="text-text-muted hover:text-text font-medium" onClick={() => projectInputRef.current?.click()} type="button">Import project</button>
-              <button className="text-text-muted hover:text-text font-medium" onClick={exportProject} type="button">Export project</button>
-              <input
-                accept=".json,application/json"
-                aria-label="Choose GraphMaker project file"
-                hidden
-                onChange={importProject}
-                ref={projectInputRef}
-                type="file"
-              />
-            </div>
-          </div>
-
-          {isResetConfirming && (
-            <div className="border-border bg-surface-subtle mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border px-3 py-2" role="alertdialog" aria-labelledby="reset-graph-heading">
-              <div>
-                <p className="font-semibold" id="reset-graph-heading">Start a new graph?</p>
-                <p className="text-text-muted text-sm">This replaces the current data and settings on this device.</p>
-              </div>
-              <div className="flex gap-2">
-                <button className="button-secondary" onClick={() => setIsResetConfirming(false)} type="button">Cancel</button>
-                <button className="button-primary" onClick={resetGraph} type="button">Reset graph</button>
-              </div>
-            </div>
-          )}
-
-          {projectError && <p className="mt-3 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800" role="alert">{projectError}</p>}
-          {projectNotice && <p className="text-success mt-3 text-sm font-medium" role="status">{projectNotice}</p>}
-        </section>
-      </div>
-      </fieldset>
-    </section>
-  );
-}
+export const supplyDemandToolPageConfig = {
+  beforeComparisonSections: [
+    {
+      id: 'equilibrium',
+      intro: 'The editor compares the vertical difference between demand and supply at each quantity and interpolates only across adjacent supplied points when that difference changes sign.',
+      items: [
+        { title: 'Exact match', description: 'When demand and supply have the same value in a row, that quantity and value are reported directly as equilibrium.' },
+        { title: 'Between two rows', description: 'When the curves cross between adjacent quantities, the tool estimates the intersection using straight-line interpolation.' },
+        { title: 'No in-range crossing', description: 'If the supplied curves never meet or cross, the graph reports that no equilibrium appears in the entered range.' },
+      ],
+      title: 'How equilibrium works',
+    },
+  ],
+  canonical: '/supply-and-demand-graph-maker/',
+  comparison: {
+    first: {
+      body: 'The demand curve shows the value buyers associate with each quantity. A downward-sloping curve means demand values decrease as quantity increases.',
+      title: 'Read the demand curve',
+    },
+    intro: 'Read both curves against the numeric quantity axis, then compare their vertical positions and intersection.',
+    second: {
+      body: 'The supply curve shows the value sellers associate with each quantity. An upward-sloping curve means supply values increase as quantity increases. Their intersection is the estimated equilibrium.',
+      title: 'Read the supply curve',
+    },
+    title: 'How to read supply and demand curves',
+  },
+  definition: [
+    'A supply and demand graph plots quantity on the horizontal axis and price or value on the vertical axis. Demand commonly slopes downward while supply slopes upward, making their relationship easy to compare.',
+    'This economics graph maker keeps quantity on a true numeric scale, so irregular gaps between entered quantities remain proportional. It also identifies an approximate equilibrium only when the supplied curves meet or cross inside the entered range.',
+  ],
+  editor: {
+    graphType: 'supplydemand',
+    initialSettings: {
+      showEquilibrium: true,
+      showGrid: true,
+      showLegend: true,
+      showValueLabels: false,
+      title: 'Supply and Demand Graph',
+      xAxisTitle: 'Quantity',
+      yAxisTitle: 'Price / Value',
+    },
+    sampleData: supplyDemandSampleData,
+    slug: '/supply-and-demand-graph-maker/',
+  },
+  example: {
+    caption: 'Use one numeric quantity column followed by demand and supply values. Equivalent headers can be remapped inside Customize.',
+    headers: ['Quantity', 'Demand', 'Supply'],
+    rows: supplyDemandSampleData.rows.map((row) => [...row.cells]),
+  },
+  faqs: [
+    { question: 'Is this supply and demand graph maker free?', answer: 'Yes. The free supply and demand graph maker works online without signup or a watermark.' },
+    { question: 'How should I arrange my data?', answer: 'Use three numeric columns for quantity, demand, and supply. Headers such as Q, Buyers, and Sellers are detected, and you can change every mapping in Customize.' },
+    { question: 'How is equilibrium calculated?', answer: 'An exact matching row is used directly. If demand and supply cross between adjacent quantities, the supply demand graph generator uses straight-line interpolation between those supplied points.' },
+    { question: 'What if the curves never cross?', answer: 'No equilibrium is displayed outside your data. The editor reports that no equilibrium appears within the supplied quantity range.' },
+    { question: 'Can I paste or upload economics data?', answer: 'Yes. Paste a spreadsheet table or upload CSV and Excel files. Processing and local saving remain in your browser.' },
+  ],
+  features: [
+    { title: 'Explicit curve mapping', description: 'Choose the quantity, demand, and supply columns without silently merging numeric series.' },
+    { title: 'True numeric quantity axis', description: 'Preserve proportional spacing for regular or irregular quantity values.' },
+    { title: 'Equilibrium detection', description: 'Report exact or interpolated intersections only when they occur inside the entered range.' },
+    { title: 'Focused validation', description: 'Handle missing columns, blank cells, non-numeric values, and non-crossing curves without crashing.' },
+    { title: 'CSV and Excel import', description: 'Paste data or upload CSV and XLSX files through the same data editor used on every graph page.' },
+    { title: 'Local save and export', description: 'Save the project on this device and export the finished graph as PNG, SVG, or CSV.' },
+  ],
+  h1: 'Supply and Demand Graph Maker',
+  howTo: [
+    { title: 'Add quantity and curve values', description: 'Enter three columns, paste a spreadsheet table, or import a CSV or Excel file.' },
+    { title: 'Confirm the column mapping', description: 'Open Customize to select the quantity axis, demand series, and supply series when headers differ.' },
+    { title: 'Review equilibrium and export', description: 'Check the in-range intersection, adjust axis titles, and download the graph as PNG or SVG.' },
+  ],
+  intro: 'Create supply and demand curves on a true numeric quantity axis, map your columns, and estimate an in-range equilibrium with this online supply and demand graph maker.',
+  metaDescription: 'Create a supply and demand graph online. Map quantity, demand, and supply, detect in-range equilibrium, import Excel or CSV, and export free.',
+  relatedHeading: 'Related economics and graph tools',
+  relatedTools: [
+    { name: 'Line Graph Maker', description: 'Compare multiple connected series across categories or dates.', href: '/line-graph-maker/' },
+    { name: 'XY Graph Maker', description: 'Plot paired values on true numeric X and Y axes.', href: '/xy-graph-maker/' },
+    { name: 'Scatter Plot Maker', description: 'Explore relationships between paired numeric observations.', href: '/scatter-plot-maker/' },
+  ],
+  sectionHeadings: {
+    definition: 'What is a supply and demand graph?',
+    example: 'Example supply and demand data',
+    faq: 'Supply and demand graph maker FAQ',
+    faqIntro: 'Answers about curve mapping, equilibrium, imports, and non-crossing data.',
+    features: 'Supply and demand graph maker features',
+    howTo: 'How to make a supply and demand graph',
+  },
+  slug: '/supply-and-demand-graph-maker/',
+  title: 'Supply and Demand Graph Maker — Free Online | GraphMaker',
+  useCases: {
+    intro: 'Use this online supply and demand graph maker when two value curves need to be compared against a shared quantity scale.',
+    items: [
+      { title: 'Economics assignments', description: 'Turn a classroom table into readable supply and demand curves with a clearly reported equilibrium.' },
+      { title: 'Scenario comparisons', description: 'Visualize how buyer and seller values change across regular or irregular quantity levels.' },
+      { title: 'Reports and presentations', description: 'Export a clean economics graph for documents, slides, worksheets, or teaching material.' },
+    ],
+    title: 'When to use this tool',
+  },
+} satisfies ToolPageConfig;

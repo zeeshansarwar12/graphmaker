@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="112" viewBox="0 0 28 28">
+  <title>GraphMaker</title>
+  <rect width="28" height="28" rx="4" fill="white"/>
+  <g fill="#2563eb"><rect height="9" rx="1" width="5" x="2" y="17"/><rect height="16" opacity=".72" rx="1" width="5" x="10" y="10"/><rect height="23" rx="1" width="5" x="18" y="3"/></g>
+</svg>

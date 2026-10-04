@@ -39,9 +39,9 @@ test('serves a complete scatter page with a points-only shared-editor preset', a
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();
   }
 
-  await expect(page.getByRole('link', { name: /XY Graph Maker/ })).toHaveAttribute('href', '/xy-graph-maker/');
-  await expect(page.getByRole('link', { name: /Line Graph Maker/ })).toHaveAttribute('href', '/line-graph-maker/');
-  await expect(page.getByRole('link', { name: /Bar Graph Maker/ })).toHaveAttribute('href', '/bar-graph-maker/');
+  await expect(page.getByRole('link', { name: /XY Graph Maker/ }).first()).toHaveAttribute('href', '/xy-graph-maker/');
+  await expect(page.getByRole('link', { name: /Line Graph Maker/ }).first()).toHaveAttribute('href', '/line-graph-maker/');
+  await expect(page.getByRole('link', { name: /Bar Graph Maker/ }).first()).toHaveAttribute('href', '/bar-graph-maker/');
 });
 
 test('remaps imported numeric columns and stays responsive on mobile', async ({ page }) => {

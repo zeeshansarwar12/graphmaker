@@ -2,15 +2,23 @@
 import SiteFooter from '../components/navigation/SiteFooter.astro';
 import SiteHeader from '../components/navigation/SiteHeader.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ContactLine from '../components/ui/ContactLine.astro';
+import { legalLastUpdated } from '../content/site';
+import Breadcrumbs from '../components/navigation/Breadcrumbs.astro';
+import { pageBreadcrumbs } from '../content/seo';
+const breadcrumbs = pageBreadcrumbs('Terms', '/terms/');
 ---
 
-<BaseLayout canonical="/terms/" title="Terms | GraphMaker" description="Basic terms for using the GraphMaker browser-based graphing tools." robots="noindex,follow">
+<BaseLayout canonical="/terms/" title="Terms | GraphMaker" description="Basic terms for using the GraphMaker browser-based graphing tools." robots="noindex,follow" breadcrumbs={breadcrumbs}>
   <SiteHeader hasEditor={false} hasFaq={false} />
   <main class="page-shell max-w-4xl py-10 sm:py-14" id="main-content">
+    <Breadcrumbs items={breadcrumbs} />
     <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">Terms</h1>
+    {legalLastUpdated && <p class="text-text-muted mt-3 text-sm">Last updated: {legalLastUpdated}</p>}
     <p class="text-text-muted mt-4 leading-7">GraphMaker provides browser-based tools for creating, saving, and exporting graphs. You are responsible for the accuracy of the data you enter and for reviewing exported results before using them.</p>
     <h2 class="section-heading mt-9">Local storage</h2><p class="text-text-muted mt-3 leading-7">Projects saved locally depend on browser storage and may be lost if that storage is cleared. Export a project file when you need a separate backup.</p>
     <h2 class="section-heading mt-9">Appropriate use</h2><p class="text-text-muted mt-3 leading-7">Do not use the service to violate applicable law or the rights of others. GraphMaker does not provide professional statistical, legal, medical, or financial advice.</p>
+    <ContactLine />
   </main>
   <SiteFooter />
 </BaseLayout>

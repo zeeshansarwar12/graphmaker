@@ -38,9 +38,9 @@ test('serves a complete crawlable XY tool page with the shared editor preset', a
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();
   }
 
-  await expect(page.getByRole('link', { name: /Scatter Plot Maker/ })).toHaveAttribute('href', '/scatter-plot-maker/');
-  await expect(page.getByRole('link', { name: /Line Graph Maker/ })).toHaveAttribute('href', '/line-graph-maker/');
-  await expect(page.getByRole('link', { name: /Bar Graph Maker/ })).toHaveAttribute('href', '/bar-graph-maker/');
+  await expect(page.getByRole('link', { name: /Scatter Plot Maker/ }).first()).toHaveAttribute('href', '/scatter-plot-maker/');
+  await expect(page.getByRole('link', { name: /Line Graph Maker/ }).first()).toHaveAttribute('href', '/line-graph-maker/');
+  await expect(page.getByRole('link', { name: /Bar Graph Maker/ }).first()).toHaveAttribute('href', '/bar-graph-maker/');
 });
 
 test('accepts pasted XY data and remains usable on mobile', async ({ page }) => {

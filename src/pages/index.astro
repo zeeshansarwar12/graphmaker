@@ -1,5 +1,5 @@
 ---
-import { GraphEditor } from '../components/graph/GraphEditor';
+import { GraphWorkspace } from '../components/graph/GraphWorkspace';
 import SiteFooter from '../components/navigation/SiteFooter.astro';
 import SiteHeader from '../components/navigation/SiteHeader.astro';
 import ChartGlyph from '../components/ui/ChartGlyph.astro';
@@ -16,19 +16,19 @@ const benefits = [
 ] as const;
 
 const useCases = [
-  { icon: '🎓', title: 'For students', copy: 'Assignments, projects, and clear classwork visuals.', color: 'bg-emerald-50' },
-  { icon: '▤', title: 'For research papers', copy: 'Publication-ready graphs for findings and reports.', color: 'bg-blue-50' },
-  { icon: '▣', title: 'For business', copy: 'Reports, presentations, and practical analysis.', color: 'bg-rose-50' },
-  { icon: '⚗', title: 'For science', copy: 'Lab results, experiments, and measurements.', color: 'bg-amber-50' },
-  { icon: '●', title: 'For teachers', copy: 'Teaching materials, examples, and worksheets.', color: 'bg-violet-50' },
+  { icon: '🎓', title: 'For students', copy: 'Assignments, projects, and clear classwork visuals.', color: 'bg-emerald-50', href: '/bar-graph-maker/' },
+  { icon: '▤', title: 'For research papers', copy: 'Clear graphs for findings and reports.', color: 'bg-blue-50', href: '/box-plot-maker/' },
+  { icon: '▣', title: 'For business', copy: 'Reports, presentations, and practical analysis.', color: 'bg-rose-50', href: '/line-graph-maker/' },
+  { icon: '⚗', title: 'For science', copy: 'Lab results, experiments, and measurements.', color: 'bg-amber-50', href: '/scatter-plot-maker/' },
+  { icon: '●', title: 'For teachers', copy: 'Teaching materials, examples, and worksheets.', color: 'bg-violet-50', href: '/dot-plot-maker/' },
 ] as const;
 
 const faqs = [
   { question: 'Is this graph maker free to use?', answer: 'Yes. The core graph-making workflow is free and does not require an account.' },
   { question: 'Do I need to sign up before creating a graph?', answer: 'No. You can begin with the sample data, enter your own values, and create a graph without signing up.' },
-  { question: 'Does my data leave my browser?', answer: 'V1 is designed to process and save graph projects locally in your browser. Uploaded or pasted datasets are not sent to a GraphMaker server.' },
-  { question: 'Which graph types will be supported?', answer: 'The planned V1 tools are bar, line, pie, XY, scatter, box plot, radar, and histogram graphs.' },
-  { question: 'Can I use a graph in a report or presentation?', answer: 'Yes. The planned export workflow provides clean PNG and SVG files suitable for documents, slides, assignments, and reports.' },
+  { question: 'Does my data leave my browser?', answer: 'No. Pasted and uploaded data is processed and saved locally in your browser, and your graph data is never sent to a GraphMaker server. Basic page-visit analytics are collected separately; see the Privacy page.' },
+  { question: 'Which graph types are available?', answer: 'GraphMaker includes bar, line, pie, XY, scatter, histogram, box plot, radar, dot plot, and supply and demand graph makers.' },
+  { question: 'Can I use a graph in a report or presentation?', answer: 'Yes. Export clean PNG or SVG files, or CSV data, suitable for documents, slides, assignments, and reports.' },
 ] as const;
 
 const siteUrl = new URL('/', Astro.site ?? Astro.url).href;
@@ -38,13 +38,17 @@ const websiteSchema = {
   name: 'GraphMaker',
   url: siteUrl,
 };
+const organizationSchema = {
+  '@context': 'https://schema.org', '@type': 'Organization', name: 'GraphMaker', url: siteUrl,
+  logo: new URL('/images/graphmaker-logo.svg', siteUrl).href,
+};
 ---
 
 <BaseLayout
   canonical="/"
   title="Free Online Graph Maker — No Signup | GraphMaker"
   description="Turn your data into a clear graph in seconds. Free to use, no signup, no watermark, and your data stays in your browser."
-  structuredData={websiteSchema}
+  structuredData={[websiteSchema, organizationSchema]}
 >
   <SiteHeader />
 
@@ -57,7 +61,7 @@ const websiteSchema = {
       </div>
 
       <div class="page-shell mt-6 text-left" id="editor">
-        <GraphEditor client:load config={homepageGraphConfig} />
+        <GraphWorkspace client:load config={homepageGraphConfig} />
       </div>
     </section>
 
@@ -121,11 +125,11 @@ const websiteSchema = {
       </div>
       <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {useCases.map((item) => (
-          <article class:list={['rounded-lg p-5', item.color]}>
+          <a href={item.href} class:list={['rounded-lg p-5 hover:shadow-editor', item.color]}>
             <span aria-hidden="true" class="text-brand text-2xl">{item.icon}</span>
             <h3 class="mt-3 font-bold">{item.title}</h3>
             <p class="text-text-muted mt-1 text-sm leading-6">{item.copy}</p>
-          </article>
+          </a>
         ))}
       </div>
     </section>
@@ -148,7 +152,7 @@ const websiteSchema = {
             <summary class="flex cursor-pointer list-none items-center justify-between gap-5 py-5 font-bold">
               {faq.question}<span aria-hidden="true" class="text-brand text-xl group-open:rotate-45">＋</span>
             </summary>
-            <p class="text-text-muted max-w-3xl pb-5 text-sm leading-6">{faq.answer}</p>
+            <p class="text-text-muted max-w-3xl pb-5 text-sm leading-6">{faq.question === 'Does my data leave my browser?' ? <>{faq.answer.replace('Privacy page.', '')}<a class="text-brand underline" href="/privacy/">Privacy page</a>.</> : faq.answer}</p>
           </details>
         ))}
       </div>

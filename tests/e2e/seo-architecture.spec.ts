@@ -38,10 +38,18 @@ test('every indexable page has unique production metadata and one logical H1', a
     expect(canonical, route).toBeTruthy();
     expect(canonical, route).toBe(new URL(route, productionOrigin).href);
     expect(await page.locator('meta[name="robots"]').getAttribute('content'), route).toBe('index,follow');
-    expect(await page.locator('meta[name="google-site-verification"]').getAttribute('content'), route)
-      .toBe('r9NYNACi391MLcXqqUd0w48ayLHu3l1TZ4zuUJO6dEY');
-    expect(await page.locator('meta[name="msvalidate.01"]').getAttribute('content'), route)
-      .toBe('ADA32A2FC73ADC93B80B1231531C0854');
+    if (route === '/') {
+      await expect(page.locator('meta[name="google-site-verification"]')).toHaveAttribute('content', 'r9NYNACi391MLcXqqUd0w48ayLHu3l1TZ4zuUJO6dEY');
+      await expect(page.locator('meta[name="msvalidate.01"]')).toHaveAttribute('content', 'ADA32A2FC73ADC93B80B1231531C0854');
+    } else {
+      await expect(page.locator('meta[name="google-site-verification"],meta[name="msvalidate.01"]')).toHaveCount(0);
+    }
+    expect(title.length, route).toBeLessThanOrEqual(60);
+    expect(description!.length, route).toBeGreaterThanOrEqual(70);
+    expect(description!.length, route).toBeLessThanOrEqual(160);
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image');
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', `${productionOrigin}/images/graphmaker-social.png`);
+    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute('content', `${productionOrigin}/images/graphmaker-social.png`);
     expect(await page.locator('meta[property="og:title"]').getAttribute('content'), route).toBe(title);
     expect(await page.locator('meta[property="og:description"]').getAttribute('content'), route).toBe(description);
     expect(await page.locator('meta[property="og:url"]').getAttribute('content'), route).toBe(canonical);
@@ -63,13 +71,11 @@ test('every indexable page has unique production metadata and one logical H1', a
   }
 });
 
-test('homepage keeps the core eight while the tools hub exposes every graph tool', async ({ page }) => {
+test('homepage and tools hub expose every graph tool', async ({ page }) => {
   await page.goto('/');
-  for (const toolRoute of coreToolRoutes) {
+  for (const toolRoute of toolRoutes) {
     await expect(page.locator(`a[href="${toolRoute}"]`).first(), `/ -> ${toolRoute}`).toBeVisible();
   }
-  await expect(page.locator('a[href="/dot-plot-maker/"]')).toHaveCount(0);
-  await expect(page.locator('a[href="/supply-and-demand-graph-maker/"]')).toHaveCount(0);
 
   await page.goto('/tools/');
   for (const toolRoute of toolRoutes) {
@@ -102,10 +108,29 @@ test('tool pages have distinct related-tool links and valid breadcrumb schema', 
     expect(new Set(hrefs).size, `${route} duplicate related links`).toBe(hrefs.length);
     expect(hrefs).not.toContain(route);
 
-    const schema = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent() ?? '{}');
+    const schemas = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent() ?? '[]');
+    const schema = schemas.find((item: Record<string, unknown>) => item['@type'] === 'BreadcrumbList');
+    const app = schemas.find((item: Record<string, unknown>) => item['@type'] === 'WebApplication');
+    expect(app.name, route).toBe(await page.locator('h1').innerText());
+    expect(app.url, route).toBe(productionOrigin + route);
+    expect(app.offers).toMatchObject({ price: 0, priceCurrency: 'USD' });
     expect(schema['@type'], route).toBe('BreadcrumbList');
     expect(schema.itemListElement).toHaveLength(3);
     expect(new URL(schema.itemListElement[2].item).pathname).toBe(route);
+  }
+});
+
+test('every editor has ten distinct icons and every footer links all tools', async ({ page }) => {
+  for (const route of allLinkedRoutes) {
+    await page.goto(route);
+    for (const toolRoute of toolRoutes) await expect(page.locator(`footer a[href="${toolRoute}"]`)).toHaveCount(1);
+    if (route === '/' || toolRoutes.includes(route as typeof toolRoutes[number])) {
+      const tabs = page.getByRole('group', { name: 'Choose a graph type' });
+      await expect(tabs.locator('button')).toHaveCount(10);
+      const icons = await tabs.locator('[data-chart-icon]').allTextContents();
+      expect(new Set(icons).size, route).toBe(10);
+      await expect(tabs.getByRole('button', { name: 'Supply & Demand', exact: true })).toBeVisible();
+    }
   }
 });
 
@@ -169,7 +194,7 @@ test('custom 404 is noindex and offers crawlable recovery links', async ({ page 
   expect(response?.status()).toBe(404);
   await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible();
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex,follow');
-  await expect(page.getByRole('link', { name: 'Browse graph tools' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Browse graph tools' }).first()).toBeVisible();
 });
 
 test('editor controls are semantic and static information pages do not hydrate JavaScript', async ({ page }) => {

@@ -35,15 +35,15 @@ test('serves a complete Radar page with a percentage-scaled multi-series preset'
     'When to use a radar chart',
     'How radar scales work',
     'Radar chart maker features',
-    'Related tools',
+    'Related graph makers',
     'Radar chart maker FAQ',
   ]) {
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();
   }
 
-  await expect(page.getByRole('link', { name: /Bar Graph Maker/ })).toHaveAttribute('href', '/bar-graph-maker/');
-  await expect(page.getByRole('link', { name: /Pie Chart Maker/ })).toHaveAttribute('href', '/pie-chart-maker/');
-  await expect(page.getByRole('link', { name: /Line Graph Maker/ })).toHaveAttribute('href', '/line-graph-maker/');
+  await expect(page.getByRole('link', { name: /Bar Graph Maker/ }).first()).toHaveAttribute('href', '/bar-graph-maker/');
+  await expect(page.getByRole('link', { name: /Pie Chart Maker/ }).first()).toHaveAttribute('href', '/pie-chart-maker/');
+  await expect(page.getByRole('link', { name: /Line Graph Maker/ }).first()).toHaveAttribute('href', '/line-graph-maker/');
 });
 
 test('handles pasted, CSV, and Excel radar data on mobile', async ({ page }) => {
