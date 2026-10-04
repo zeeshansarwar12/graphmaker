@@ -1,10 +1,11 @@
+import { openPage } from './navigation';
 import { expect, test } from '@playwright/test';
 import * as XLSX from 'xlsx';
 
 test('serves a complete Box Plot page with the shared grouped-data preset', async ({ page }) => {
-  await page.goto('/box-plot-maker/');
+  await openPage(page, '/box-plot-maker/');
 
-  await expect(page).toHaveTitle('Box Plot Maker — Create Box and Whisker Plots Online | GraphMaker');
+  await expect(page).toHaveTitle('Box Plot Maker — Box and Whisker Plots Online | GraphMaker');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /quartiles and outliers/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/box-plot-maker\/$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Box Plot Maker' })).toBeVisible();
@@ -31,20 +32,20 @@ test('serves a complete Box Plot page with the shared grouped-data preset', asyn
     'Box Plot vs Histogram',
     'Quartiles and outliers',
     'Box plot maker features',
-    'Related tools',
+    'Related graph makers',
     'Box plot maker FAQ',
   ]) {
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();
   }
 
-  await expect(page.getByRole('link', { name: /Histogram Maker/ })).toHaveAttribute('href', '/histogram-maker/');
-  await expect(page.getByRole('link', { name: /Scatter Plot Maker/ })).toHaveAttribute('href', '/scatter-plot-maker/');
-  await expect(page.getByRole('link', { name: /Bar Graph Maker/ })).toHaveAttribute('href', '/bar-graph-maker/');
+  await expect(page.getByRole('link', { name: /Histogram Maker/ }).first()).toHaveAttribute('href', '/histogram-maker/');
+  await expect(page.getByRole('link', { name: /Scatter Plot Maker/ }).first()).toHaveAttribute('href', '/scatter-plot-maker/');
+  await expect(page.getByRole('link', { name: /Bar Graph Maker/ }).first()).toHaveAttribute('href', '/bar-graph-maker/');
 });
 
 test('handles pasted, CSV, and Excel box-plot data on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/box-plot-maker/');
+  await openPage(page, '/box-plot-maker/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
 
   await page.getByLabel('Class A, row 1', { exact: true }).evaluate((element) => {
@@ -102,7 +103,7 @@ test('handles pasted, CSV, and Excel box-plot data on mobile', async ({ page }) 
 });
 
 test('warns clearly when a box-plot group has too few values', async ({ page }) => {
-  await page.goto('/box-plot-maker/');
+  await openPage(page, '/box-plot-maker/');
   await page.getByLabel('Class A, row 1', { exact: true }).evaluate((element) => {
     const clipboardData = new DataTransfer();
     clipboardData.setData('text/plain', 'Score\n1\n2\n3');

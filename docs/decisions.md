@@ -86,3 +86,14 @@ First implementation milestone: homepage shell + shared editor + functional bar-
 Google Analytics 4 is enabled with the production Measurement ID and may be overridden for alternate deployments through `PUBLIC_GOOGLE_ANALYTICS_ID`. It is limited to standard page-view analytics with advertising personalization and Google signals disabled.
 
 Graph datasets, uploaded-file contents, project names, graph titles, cell values, and other editor state must never be included in analytics events.
+
+## DEC-016 — Complete ten-tool navigation and trailing-slash audit
+**Status:** Accepted (owner audit request, 2026-10-04)
+
+All ten existing graph makers appear in the homepage grid, tools hub, About list,
+footer, and editor selector, from one shared catalog. This supersedes the older
+eight-tool homepage guidance. Related links remain curated for each tool.
+Trailing-slash URLs remain canonical: the live slash URL returned 200 and the
+slashless URL redirected to it with 308. Static output uses directory format.
+No graph algorithms, storage boundary, analytics loading, or consent behavior
+change in this audit.

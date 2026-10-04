@@ -66,7 +66,7 @@ Do not mix these into the V1 IA automatically:
 
 ## Internal linking
 Homepage directly links to:
-- all 8 core launch graph tools
+- all 10 existing graph tools
 - `/tools/`
 - major hubs once they exist
 

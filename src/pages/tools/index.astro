@@ -4,18 +4,28 @@ import SiteHeader from '../../components/navigation/SiteHeader.astro';
 import ChartGlyph from '../../components/ui/ChartGlyph.astro';
 import { allGraphTools } from '../../content/graphTools';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/navigation/Breadcrumbs.astro';
+import { pageBreadcrumbs } from '../../content/seo';
+const breadcrumbs = pageBreadcrumbs('Graph tools', '/tools/');
+const toolListSchema = {
+  '@context': 'https://schema.org', '@type': 'ItemList',
+  itemListElement: allGraphTools.map((tool, index) => ({
+    '@type': 'ListItem', position: index + 1, name: tool.name,
+    url: new URL(tool.href, Astro.site ?? Astro.url).href,
+  })),
+};
 ---
 
 <BaseLayout
   canonical="/tools/"
+  breadcrumbs={breadcrumbs}
+  structuredData={toolListSchema}
   title="Graph Making Tools — Choose the Right Chart | GraphMaker"
   description="Browse GraphMaker tools for bar, line, pie, XY, scatter, dot plot, histogram, box plot, radar, and supply and demand graphs."
 >
   <SiteHeader hasEditor={false} hasFaq={false} />
   <main class="page-shell py-10 sm:py-14" id="main-content">
-    <nav aria-label="Breadcrumb" class="text-text-muted text-sm">
-      <ol class="flex items-center gap-2"><li><a class="hover:text-brand" href="/">Home</a></li><li aria-hidden="true">/</li><li aria-current="page">Graph tools</li></ol>
-    </nav>
+    <Breadcrumbs items={breadcrumbs} />
     <div class="mx-auto mt-7 max-w-3xl text-center">
       <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">Graph Making Tools</h1>
       <p class="text-text-muted mt-3 text-base leading-7 sm:text-lg">Choose a focused graph maker for the structure of your data and the comparison you need to communicate.</p>
@@ -34,10 +44,15 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     </section>
     <section aria-labelledby="choose-heading" class="bg-surface-blue mt-12 rounded-xl p-6 sm:p-8">
       <h2 class="section-heading" id="choose-heading">How to choose a graph</h2>
-      <div class="mt-5 grid gap-5 md:grid-cols-3">
-        <article><h3 class="font-bold">Compare categories</h3><p class="text-text-muted mt-2 text-sm leading-6">Use bar or pie charts for separate groups and parts of a whole.</p></article>
-        <article><h3 class="font-bold">Show change or relationships</h3><p class="text-text-muted mt-2 text-sm leading-6">Use line, XY, scatter, or supply and demand graphs for ordered values and paired measurements.</p></article>
-        <article><h3 class="font-bold">Understand distributions</h3><p class="text-text-muted mt-2 text-sm leading-6">Use dot plots, histograms, and box plots for raw observations, or radar charts for multi-metric profiles.</p></article>
+      <p class="text-text-muted mt-3">What do you want to show? Pick the comparison that matches your data.</p>
+      <div class="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from(new Set(allGraphTools.map((tool) => tool.category))).map((category) => (
+          <article><h3 class="font-bold">{category}</h3><ul class="mt-3 grid gap-3">
+            {allGraphTools.filter((tool) => tool.category === category).map((tool) => (
+              <li><a class="text-brand font-semibold hover:underline" href={tool.href}>{tool.name}</a><p class="text-text-muted mt-1 text-sm leading-6">{tool.description}</p></li>
+            ))}
+          </ul></article>
+        ))}
       </div>
     </section>
   </main>

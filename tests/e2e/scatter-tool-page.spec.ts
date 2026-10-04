@@ -1,7 +1,8 @@
+import { openPage } from './navigation';
 import { expect, test } from '@playwright/test';
 
 test('serves a complete scatter page with a points-only shared-editor preset', async ({ page }) => {
-  await page.goto('/scatter-plot-maker/');
+  await openPage(page, '/scatter-plot-maker/');
 
   await expect(page).toHaveTitle('Scatter Plot Maker — Plot X and Y Data Online | GraphMaker');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /numeric X and Y data/);
@@ -39,14 +40,14 @@ test('serves a complete scatter page with a points-only shared-editor preset', a
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();
   }
 
-  await expect(page.getByRole('link', { name: /XY Graph Maker/ })).toHaveAttribute('href', '/xy-graph-maker/');
-  await expect(page.getByRole('link', { name: /Line Graph Maker/ })).toHaveAttribute('href', '/line-graph-maker/');
-  await expect(page.getByRole('link', { name: /Bar Graph Maker/ })).toHaveAttribute('href', '/bar-graph-maker/');
+  await expect(page.getByRole('link', { name: /XY Graph Maker/ }).first()).toHaveAttribute('href', '/xy-graph-maker/');
+  await expect(page.getByRole('link', { name: /Line Graph Maker/ }).first()).toHaveAttribute('href', '/line-graph-maker/');
+  await expect(page.getByRole('link', { name: /Bar Graph Maker/ }).first()).toHaveAttribute('href', '/bar-graph-maker/');
 });
 
 test('remaps imported numeric columns and stays responsive on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/scatter-plot-maker/');
+  await openPage(page, '/scatter-plot-maker/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
 
   await page.getByLabel('Hours Studied, row 1').evaluate((element) => {

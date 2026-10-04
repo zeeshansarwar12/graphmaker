@@ -17,6 +17,8 @@ const mimeTypes: Record<string, string> = {
 };
 
 export default async function startTestServer() {
+  // Refuse missing homepage output before running browser assertions.
+  await stat(join(distRoot, 'index.html'));
   const server = createServer(async (request, response) => {
     try {
       const pathname = decodeURIComponent(new URL(request.url ?? '/', 'http://127.0.0.1').pathname);

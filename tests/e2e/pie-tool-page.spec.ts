@@ -1,3 +1,4 @@
+import { openPage } from './navigation';
 import { expect, test } from '@playwright/test';
 
 async function pasteIntoFirstCell(page: import('@playwright/test').Page, text: string) {
@@ -9,9 +10,9 @@ async function pasteIntoFirstCell(page: import('@playwright/test').Page, text: s
 }
 
 test('serves a complete crawlable Pie tool page with accurate percentages', async ({ page }) => {
-  await page.goto('/pie-chart-maker/');
+  await openPage(page, '/pie-chart-maker/');
 
-  await expect(page).toHaveTitle('Pie Chart Maker — Create Percentage Charts Online | GraphMaker');
+  await expect(page).toHaveTitle('Pie Chart Maker — Create Percentage Charts | GraphMaker');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /percentages automatically/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/pie-chart-maker\/$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Pie Chart Maker' })).toBeVisible();
@@ -42,14 +43,14 @@ test('serves a complete crawlable Pie tool page with accurate percentages', asyn
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();
   }
 
-  await expect(page.getByRole('link', { name: /Bar Graph Maker/ })).toHaveAttribute('href', '/bar-graph-maker/');
-  await expect(page.getByRole('link', { name: /Line Graph Maker/ })).toHaveAttribute('href', '/line-graph-maker/');
-  await expect(page.getByRole('link', { name: /Radar Chart Maker/ })).toHaveAttribute('href', '/radar-chart-maker/');
+  await expect(page.getByRole('link', { name: /Bar Graph Maker/ }).first()).toHaveAttribute('href', '/bar-graph-maker/');
+  await expect(page.getByRole('link', { name: /Line Graph Maker/ }).first()).toHaveAttribute('href', '/line-graph-maker/');
+  await expect(page.getByRole('link', { name: /Radar Chart Maker/ }).first()).toHaveAttribute('href', '/radar-chart-maker/');
 });
 
 test('selects one numeric series deliberately and updates live on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/pie-chart-maker/');
+  await openPage(page, '/pie-chart-maker/');
 
   await pasteIntoFirstCell(page, 'Category\tSales\tProfit\nProduct A\t100\t30\nProduct B\t50\t20');
   await expect(page.locator('[data-chart-status="ready"]')).toContainText(
@@ -69,7 +70,7 @@ test('selects one numeric series deliberately and updates live on mobile', async
 });
 
 test('explains invalid values and redirects numeric X/Y data to Scatter', async ({ page }) => {
-  await page.goto('/pie-chart-maker/');
+  await openPage(page, '/pie-chart-maker/');
 
   await pasteIntoFirstCell(page, 'Category\tValue\nA\t10\nB\t-2');
   await expect(page.locator('[data-chart-status="invalid"]')).toContainText(

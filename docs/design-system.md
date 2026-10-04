@@ -102,7 +102,8 @@ Initial visible options:
 - Box Plot
 - Radar
 - Histogram
-- More only when necessary
+- Dot Plot
+- Supply & Demand
 
 The switcher is a product control. SEO links must also exist as normal HTML links elsewhere on the page.
 
@@ -136,7 +137,7 @@ Keep tokens centralized. Initial direction:
 Do not hard-code arbitrary one-off values throughout components.
 
 ## Popular Graph Makers
-Display crawlable cards/links for the eight launch tools:
+Display crawlable cards/links for all ten existing tools:
 - Bar
 - Line
 - Pie
@@ -145,6 +146,9 @@ Display crawlable cards/links for the eight launch tools:
 - Box Plot
 - Radar
 - Histogram
+
+Also include Dot Plot and Supply & Demand. The shared catalog owns names,
+descriptions, routes, categories, and the ten distinct editor icons.
 
 The cards should explain the job, not only repeat the keyword.
 

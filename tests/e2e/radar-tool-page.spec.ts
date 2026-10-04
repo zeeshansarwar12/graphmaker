@@ -1,8 +1,9 @@
+import { openPage } from './navigation';
 import { expect, test } from '@playwright/test';
 import * as XLSX from 'xlsx';
 
 test('serves a complete Radar page with a percentage-scaled multi-series preset', async ({ page }) => {
-  await page.goto('/radar-chart-maker/');
+  await openPage(page, '/radar-chart-maker/');
 
   await expect(page).toHaveTitle('Radar Chart Maker — Create Spider Charts Online | GraphMaker');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /radar and spider charts online/);
@@ -35,20 +36,20 @@ test('serves a complete Radar page with a percentage-scaled multi-series preset'
     'When to use a radar chart',
     'How radar scales work',
     'Radar chart maker features',
-    'Related tools',
+    'Related graph makers',
     'Radar chart maker FAQ',
   ]) {
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();
   }
 
-  await expect(page.getByRole('link', { name: /Bar Graph Maker/ })).toHaveAttribute('href', '/bar-graph-maker/');
-  await expect(page.getByRole('link', { name: /Pie Chart Maker/ })).toHaveAttribute('href', '/pie-chart-maker/');
-  await expect(page.getByRole('link', { name: /Line Graph Maker/ })).toHaveAttribute('href', '/line-graph-maker/');
+  await expect(page.getByRole('link', { name: /Bar Graph Maker/ }).first()).toHaveAttribute('href', '/bar-graph-maker/');
+  await expect(page.getByRole('link', { name: /Pie Chart Maker/ }).first()).toHaveAttribute('href', '/pie-chart-maker/');
+  await expect(page.getByRole('link', { name: /Line Graph Maker/ }).first()).toHaveAttribute('href', '/line-graph-maker/');
 });
 
 test('handles pasted, CSV, and Excel radar data on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/radar-chart-maker/');
+  await openPage(page, '/radar-chart-maker/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
 
   await page.getByLabel('Metric, row 1', { exact: true }).evaluate((element) => {
@@ -100,7 +101,7 @@ test('handles pasted, CSV, and Excel radar data on mobile', async ({ page }) => 
 });
 
 test('handles invalid values and crowded metrics safely', async ({ page }) => {
-  await page.goto('/radar-chart-maker/');
+  await openPage(page, '/radar-chart-maker/');
   await page.getByLabel('Metric, row 1', { exact: true }).evaluate((element) => {
     const clipboardData = new DataTransfer();
     clipboardData.setData('text/plain', 'Metric\tTeam A\nSpeed\t80\nQuality\tfast\nCost\t65');

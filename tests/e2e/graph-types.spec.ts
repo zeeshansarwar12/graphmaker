@@ -1,3 +1,4 @@
+import { openPage, reloadPage } from './navigation';
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import * as XLSX from 'xlsx';
@@ -96,7 +97,7 @@ async function pasteReplacement(page: Page, table: string) {
 
 for (const fixture of graphFixtures) {
   test(`${fixture.button} completes input, render, mobile, save, restore, and export`, async ({ page }) => {
-    await page.goto('/');
+    await openPage(page, '/');
     await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
     await pasteReplacement(page, fixture.table);
     await page.getByRole('button', { exact: true, name: fixture.button }).click();
@@ -115,7 +116,7 @@ for (const fixture of graphFixtures) {
 
     await page.getByRole('button', { name: 'Save locally' }).click();
     await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
-    await page.reload();
+    await reloadPage(page);
     await expect(page.getByRole('button', { exact: true, name: fixture.button })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator(`[data-rendered-chart-type="${fixture.renderedType}"]`)).toBeVisible();
 
@@ -128,7 +129,7 @@ for (const fixture of graphFixtures) {
 }
 
 test('manual entry replaces sample labels with labels derived from real data', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
   await page.getByRole('button', { name: 'Clear' }).click();
   await page.getByLabel('Rename Month header').fill('Region');
   await page.getByLabel('Rename Sales header').fill('Revenue');
@@ -152,7 +153,7 @@ test('XLSX upload reaches the same normalized editor pipeline', async ({ page })
   ]), 'Data');
   const bytes = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' }) as ArrayBuffer;
 
-  await page.goto('/');
+  await openPage(page, '/');
   await page.getByLabel('Choose XLSX file').setInputFiles({
     buffer: Buffer.from(bytes),
     mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -169,7 +170,7 @@ test('XLSX upload reaches the same normalized editor pipeline', async ({ page })
 });
 
 test('mostly numeric imported data surfaces one actionable warning without rendering stale data', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
   await page.getByLabel('Choose CSV file').setInputFiles({
     buffer: Buffer.from('Month,Revenue\nJan,10\nFeb,invalid\nMar,30'),
     mimeType: 'text/csv',

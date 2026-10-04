@@ -1,0 +1,15 @@
+---
+import type { Breadcrumb } from '../../content/seo';
+interface Props { items: Breadcrumb[] }
+const { items } = Astro.props;
+---
+<nav aria-label="Breadcrumb" class="text-text-muted text-sm">
+  <ol class="flex flex-wrap items-center gap-2">
+    {items.map((item, index) => <>
+      {index > 0 && <li aria-hidden="true">/</li>}
+      <li aria-current={index === items.length - 1 ? 'page' : undefined}>
+        {index === items.length - 1 ? item.name : <a class="hover:text-brand" href={item.href}>{item.name}</a>}
+      </li>
+    </>)}
+  </ol>
+</nav>

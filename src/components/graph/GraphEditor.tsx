@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { graphTools } from '../../content/graphTools';
 import type { ChangeEvent, ReactNode } from 'react';
 
 import {
@@ -50,19 +51,6 @@ import type { GraphCanvasHandle } from './GraphCanvas';
 interface GraphEditorProps {
   config: GraphEditorConfig;
 }
-
-const chartTypes = [
-  { label: 'Bar', glyph: '▥' },
-  { label: 'Line', glyph: '⌁' },
-  { label: 'Pie', glyph: '◕' },
-  { label: 'XY', glyph: '⌗' },
-  { label: 'Scatter', glyph: '⠿' },
-  { label: 'Box Plot', glyph: '▣' },
-  { label: 'Radar', glyph: '⬡' },
-  { label: 'Histogram', glyph: '▥' },
-  { label: 'Dot Plot', glyph: '⠿' },
-  { label: 'Supply & Demand', glyph: '⇄' },
-] as const;
 
 type RenderedChartType = 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy';
 
@@ -543,6 +531,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     <section
       aria-labelledby="editor-heading"
       aria-busy={!isProjectReady}
+      inert={!isProjectReady}
       className="border-border bg-surface shadow-editor overflow-hidden rounded-xl border"
       data-graph-type={config.graphType}
     >
@@ -557,30 +546,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
       <fieldset className="contents" disabled={!isProjectReady}>
 
       <div aria-label="Choose a graph type" className="border-border flex min-w-0 gap-2 overflow-x-auto border-b p-3" role="group">
-        {chartTypes.filter(({ label }) => (
-          label !== 'Supply & Demand'
-          || config.graphType === 'supplydemand'
-          || selectedChartType === 'supplydemand'
-        )).map(({ label, glyph }) => {
-          const renderedType = label === 'Bar'
-            ? 'bar'
-            : label === 'Line'
-              ? 'line'
-                : label === 'Pie'
-                  ? 'pie'
-                : label === 'Radar'
-                  ? 'radar'
-                : label === 'Box Plot'
-                  ? 'boxplot'
-                : label === 'XY'
-                  ? 'xy'
-                : label === 'Scatter'
-                  ? 'scatter'
-                  : label === 'Histogram'
-                    ? 'histogram'
-                    : label === 'Dot Plot'
-                      ? 'dotplot'
-                      : label === 'Supply & Demand' ? 'supplydemand' : null;
+        {graphTools.map(({ label, icon, type: renderedType }) => {
           const isSelected = renderedType === selectedChartType;
 
           return (
@@ -593,7 +559,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
               onClick={() => renderedType && selectChartType(renderedType)}
               type="button"
             >
-              <span aria-hidden="true" className="mr-2">{glyph}</span>
+              <span aria-hidden="true" className="mr-2" data-chart-icon={renderedType}>{icon}</span>
               {label}
             </button>
           );

@@ -1,7 +1,8 @@
+import { openPage } from './navigation';
 import { expect, test } from '@playwright/test';
 
 test('serves a complete Dot Plot page with the shared raw-observation preset', async ({ page }) => {
-  await page.goto('/dot-plot-maker/');
+  await openPage(page, '/dot-plot-maker/');
 
   await expect(page).toHaveTitle('Dot Plot Maker — Create a Dot Plot Online | GraphMaker');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /Stack repeated values/);
@@ -46,7 +47,7 @@ test('serves a complete Dot Plot page with the shared raw-observation preset', a
 });
 
 test('switches numeric series and rejects incompatible structured data', async ({ page }) => {
-  await page.goto('/dot-plot-maker/');
+  await openPage(page, '/dot-plot-maker/');
   await page.getByLabel('Value, row 1', { exact: true }).evaluate((element) => {
     const clipboardData = new DataTransfer();
     clipboardData.setData('text/plain', 'Math\tScience\n12\t20\n12\t21\n14\t21');

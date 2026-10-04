@@ -145,7 +145,7 @@ describe('Line tool page configuration', () => {
         slug: '/line-graph-maker/',
         initialSettings: {
           showLegend: true,
-          title: 'Visitors and Orders Over Time',
+          title: 'Product Sales Over Time',
           xAxisTitle: 'Date',
         },
       },
@@ -167,7 +167,8 @@ describe('Line tool page configuration', () => {
     });
     expect(view.status).toBe('ready');
     if (view.status !== 'ready') throw new Error('Expected a ready line chart');
-    expect(view.series.map((series) => series.name)).toEqual(['Visitors', 'Orders']);
+    expect(view.series.map((series) => series.name)).toEqual(['Product A Sales', 'Product B Sales']);
+    expect(detectDataShape(lineToolPageConfig.editor.sampleData!).mixedScale).toBe(false);
     expect(view.options.xAxis).toMatchObject({
       min: Date.UTC(2026, 0, 1),
       max: Date.UTC(2026, 2, 1),
@@ -355,6 +356,8 @@ describe('Histogram tool page configuration', () => {
       { kind: 'number', name: 'Score' },
     ]);
     expect(histogramToolPageConfig.editor.sampleData?.rows).toHaveLength(15);
+    expect(histogramToolPageConfig.example.headers).toEqual(histogramToolPageConfig.editor.sampleData.columns.map((column) => column.name));
+    expect(histogramToolPageConfig.example.rows).toEqual(histogramToolPageConfig.editor.sampleData.rows.map((row) => row.cells));
 
     const view = createHistogramChartView(histogramToolPageConfig.editor.sampleData!, {
       ...createDefaultGraphSettings(),
@@ -395,6 +398,8 @@ describe('Dot Plot tool page configuration', () => {
       },
     });
     expect(dotPlotToolPageConfig.editor.sampleData?.rows).toHaveLength(20);
+    expect(dotPlotToolPageConfig.example.headers).toEqual(dotPlotToolPageConfig.editor.sampleData.columns.map((column) => column.name));
+    expect(dotPlotToolPageConfig.example.rows).toEqual(dotPlotToolPageConfig.editor.sampleData.rows.map((row) => row.cells));
 
     const view = createDotPlotChartView(dotPlotToolPageConfig.editor.sampleData!, {
       ...createDefaultGraphSettings(),

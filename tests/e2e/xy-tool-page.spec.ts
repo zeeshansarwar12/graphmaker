@@ -1,7 +1,8 @@
+import { openPage } from './navigation';
 import { expect, test } from '@playwright/test';
 
 test('serves a complete crawlable XY tool page with the shared editor preset', async ({ page }) => {
-  await page.goto('/xy-graph-maker/');
+  await openPage(page, '/xy-graph-maker/');
 
   await expect(page).toHaveTitle('XY Graph Maker — Plot X and Y Values Online | GraphMaker');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /paired X and Y values/);
@@ -38,14 +39,14 @@ test('serves a complete crawlable XY tool page with the shared editor preset', a
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();
   }
 
-  await expect(page.getByRole('link', { name: /Scatter Plot Maker/ })).toHaveAttribute('href', '/scatter-plot-maker/');
-  await expect(page.getByRole('link', { name: /Line Graph Maker/ })).toHaveAttribute('href', '/line-graph-maker/');
-  await expect(page.getByRole('link', { name: /Bar Graph Maker/ })).toHaveAttribute('href', '/bar-graph-maker/');
+  await expect(page.getByRole('link', { name: /Scatter Plot Maker/ }).first()).toHaveAttribute('href', '/scatter-plot-maker/');
+  await expect(page.getByRole('link', { name: /Line Graph Maker/ }).first()).toHaveAttribute('href', '/line-graph-maker/');
+  await expect(page.getByRole('link', { name: /Bar Graph Maker/ }).first()).toHaveAttribute('href', '/bar-graph-maker/');
 });
 
 test('accepts pasted XY data and remains usable on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/xy-graph-maker/');
+  await openPage(page, '/xy-graph-maker/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
 
   await page.getByLabel('X, row 1').evaluate((element) => {
@@ -64,7 +65,7 @@ test('accepts pasted XY data and remains usable on mobile', async ({ page }) => 
 });
 
 test('does not restore a project saved on another specialist page', async ({ page }) => {
-  await page.goto('/radar-chart-maker/');
+  await openPage(page, '/radar-chart-maker/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
   await page.getByRole('button', { exact: true, name: 'Line' }).click();
   await page.getByRole('button', { name: 'Save locally' }).click();
@@ -90,13 +91,13 @@ test('does not restore a project saved on another specialist page', async ({ pag
     database.close();
   });
 
-  await page.goto('/xy-graph-maker/');
+  await openPage(page, '/xy-graph-maker/');
   await expect(page.getByRole('button', { exact: true, name: 'XY' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByLabel('X, row 1')).toHaveValue('1');
   await expect(page.getByLabel('Y, row 5')).toHaveValue('7');
   await expect(page.locator('[data-rendered-chart-type="xy"] [data-chart-status="ready"]')).toBeVisible();
 
-  await page.goto('/radar-chart-maker/');
+  await openPage(page, '/radar-chart-maker/');
   await expect(page.getByRole('button', { exact: true, name: 'Radar' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByLabel('Metric, row 1')).toHaveValue('Speed');
 });

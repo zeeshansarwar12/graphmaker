@@ -1,9 +1,10 @@
+import { openPage, reloadPage } from './navigation';
 import { readFile } from 'node:fs/promises';
 
 import { expect, test } from '@playwright/test';
 
 test('renders the Astro shell and shared editor island', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
 
   await expect(page.getByRole('heading', { level: 1, name: 'Free Online Graph Maker' })).toBeVisible();
   await expect(page.getByRole('heading', { level: 2, name: 'Graph editor' })).toBeVisible();
@@ -20,7 +21,7 @@ test('renders the Astro shell and shared editor island', async ({ page }) => {
 
 test('uses the mobile editor order without horizontal page overflow', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
+  await openPage(page, '/');
 
   const preview = page.getByRole('heading', { level: 3, name: 'Monthly Sales' });
   const data = page.getByRole('heading', { exact: true, level: 3, name: 'Data' });
@@ -49,7 +50,7 @@ test('uses the mobile editor order without horizontal page overflow', async ({ p
 
 test('Create graph links directly to the data editor', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
+  await openPage(page, '/');
 
   await page.getByText('Menu', { exact: true }).click();
   const createGraph = page.getByRole('navigation', { name: 'Mobile navigation' }).getByRole('link', { name: 'Create graph' });
@@ -59,7 +60,7 @@ test('Create graph links directly to the data editor', async ({ page }) => {
 });
 
 test('edits, navigates, validates, and pastes spreadsheet data', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
   await expect(page.locator('astro-island[ssr]')).toHaveCount(0);
 
   const firstSalesCell = page.getByLabel('Sales, row 1');
@@ -90,10 +91,10 @@ test('edits, navigates, validates, and pastes spreadsheet data', async ({ page }
 });
 
 test('reads clipboard data through the Paste data button when permission is granted', async ({ context, page }) => {
+  await openPage(page, '/');
   await context.grantPermissions(['clipboard-read', 'clipboard-write'], {
-    origin: 'http://127.0.0.1:4321',
+    origin: new URL(page.url()).origin,
   });
-  await page.goto('/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
   await page.evaluate(async () => {
     await navigator.clipboard.writeText([
@@ -117,7 +118,7 @@ test('reads clipboard data through the Paste data button when permission is gran
 
 test('renders multiple series, supports titles, handles empty data, and resizes', async ({ page }) => {
   await page.setViewportSize({ width: 1400, height: 900 });
-  await page.goto('/');
+  await openPage(page, '/');
   await expect(page.locator('astro-island[ssr]')).toHaveCount(0);
 
   const chart = page.locator('[data-chart-status="ready"]');
@@ -153,7 +154,7 @@ test('renders multiple series, supports titles, handles empty data, and resizes'
 });
 
 test('previews CSV imports and preserves data when a later import fails', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
 
   await expect(page.getByText('Your data is processed in your browser.')).toBeVisible();
   await page.getByLabel('Choose CSV file').setInputFiles({
@@ -186,7 +187,7 @@ test('previews CSV imports and preserves data when a later import fails', async 
 });
 
 test('completes the edit, paste, customize, save, restore, export, and reset journey', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
   await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
 
@@ -206,7 +207,7 @@ test('completes the edit, paste, customize, save, restore, export, and reset jou
   await page.getByRole('button', { name: 'Save locally' }).click();
   await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
 
-  await page.reload();
+  await reloadPage(page);
   await expect(page.getByRole('heading', { level: 3, name: 'Saved Revenue' })).toBeVisible();
   await expect(page.getByLabel('Sales, row 1')).toHaveValue('70');
   await expect(page.getByLabel('Series 2, row 2')).toHaveValue('18');
@@ -223,13 +224,13 @@ test('completes the edit, paste, customize, save, restore, export, and reset jou
   await expect(page.getByLabel('Sales, row 1')).toHaveValue('32');
   await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
 
-  await page.reload();
+  await reloadPage(page);
   await expect(page.getByRole('heading', { level: 3, name: 'Monthly Sales' })).toBeVisible();
   await expect(page.getByLabel('Sales, row 1')).toHaveValue('32');
 });
 
 test('recovers safely from corrupted IndexedDB project state', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
   await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
 
   await page.evaluate(async () => {
@@ -247,14 +248,14 @@ test('recovers safely from corrupted IndexedDB project state', async ({ page }) 
     database.close();
   });
 
-  await page.reload();
+  await reloadPage(page);
   await expect(page.getByRole('alert')).toContainText('saved local project was corrupted');
   await expect(page.getByLabel('Sales, row 1')).toHaveValue('32');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
 });
 
 test('imports and exports portable projects and graph files', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
   const project = {
     createdAt: '2026-09-16T08:00:00.000Z',
     data: {
@@ -319,7 +320,7 @@ test('imports and exports portable projects and graph files', async ({ page }) =
 
 test('keeps long labels and a large dataset contained on a narrow screen', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 780 });
-  await page.goto('/');
+  await openPage(page, '/');
   await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
 
   const header = 'A very long category heading,Revenue from a very long series name,Profit,Cost';
@@ -354,7 +355,7 @@ test('keeps long labels and a large dataset contained on a narrow screen', async
 });
 
 test('interprets a pasted 60-row date dataset and recommends a readable line chart', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
 
   const rows = Array.from({ length: 60 }, (_, index) => {
@@ -391,7 +392,7 @@ test('interprets a pasted 60-row date dataset and recommends a readable line cha
 
 test('toggles mixed-scale series and restores visibility after reload', async ({ page }) => {
   await page.setViewportSize({ width: 1400, height: 900 });
-  await page.goto('/');
+  await openPage(page, '/');
   await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
 
   await page.getByLabel('Choose CSV file').setInputFiles({
@@ -442,7 +443,7 @@ test('toggles mixed-scale series and restores visibility after reload', async ({
 
   await page.getByRole('button', { name: 'Save locally' }).click();
   await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
-  await page.reload();
+  await reloadPage(page);
 
   await expect(page.getByLabel('Show Visitors series')).toHaveCount(0);
   await page.getByRole('button', { name: 'Customize' }).click();
@@ -455,7 +456,7 @@ test('toggles mixed-scale series and restores visibility after reload', async ({
 });
 
 test('detects, renders, and restores numeric X/Y data as a scatter plot', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
 
   const pastedTable = [
@@ -518,7 +519,7 @@ test('detects, renders, and restores numeric X/Y data as a scatter plot', async 
 
   await page.getByRole('button', { name: 'Save locally' }).click();
   await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
-  await page.reload();
+  await reloadPage(page);
 
   await expect(page.getByRole('button', { name: 'Scatter' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('[data-rendered-chart-type="scatter"]')).toBeVisible();
@@ -528,7 +529,7 @@ test('detects, renders, and restores numeric X/Y data as a scatter plot', async 
 });
 
 test('detects, renders, and restores category shares as a pie chart', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
 
   const pastedTable = [
@@ -560,7 +561,7 @@ test('detects, renders, and restores category shares as a pie chart', async ({ p
 
   await page.getByRole('button', { name: 'Save locally' }).click();
   await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
-  await page.reload();
+  await reloadPage(page);
 
   await expect(page.getByRole('button', { name: 'Pie' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('[data-rendered-chart-type="pie"]')).toBeVisible();
@@ -570,7 +571,7 @@ test('detects, renders, and restores category shares as a pie chart', async ({ p
 });
 
 test('bins raw observations and restores histogram settings', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
 
   const pastedTable = [
@@ -619,7 +620,7 @@ test('bins raw observations and restores histogram settings', async ({ page }) =
 
   await page.getByRole('button', { name: 'Save locally' }).click();
   await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
-  await page.reload();
+  await reloadPage(page);
 
   await expect(page.getByRole('button', { name: 'Histogram' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('[data-rendered-chart-type="histogram"]')).toBeVisible();
@@ -632,7 +633,7 @@ test('bins raw observations and restores histogram settings', async ({ page }) =
 });
 
 test('renders a box plot from raw observations and restores outlier visibility', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
 
   const pastedTable = [
@@ -670,7 +671,7 @@ test('renders a box plot from raw observations and restores outlier visibility',
 
   await page.getByRole('button', { name: 'Save locally' }).click();
   await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
-  await page.reload();
+  await reloadPage(page);
 
   await expect(page.getByRole('button', { name: 'Box Plot' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('[data-rendered-chart-type="boxplot"]')).toBeVisible();
@@ -680,7 +681,7 @@ test('renders a box plot from raw observations and restores outlier visibility',
 });
 
 test('renders and restores a multi-series radar chart', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
 
   const pastedTable = [
@@ -717,7 +718,7 @@ test('renders and restores a multi-series radar chart', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Save locally' }).click();
   await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
-  await page.reload();
+  await reloadPage(page);
 
   await expect(page.getByRole('button', { name: 'Radar' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('[data-rendered-chart-type="radar"]')).toBeVisible();

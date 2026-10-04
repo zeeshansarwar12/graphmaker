@@ -1,9 +1,10 @@
+import { openPage, reloadPage } from './navigation';
 import { expect, test } from '@playwright/test';
 
 test('serves a complete Supply and Demand page with equilibrium on numeric axes', async ({ page }) => {
-  await page.goto('/supply-and-demand-graph-maker/');
+  await openPage(page, '/supply-and-demand-graph-maker/');
 
-  await expect(page).toHaveTitle('Supply and Demand Graph Maker — Economics Graph Online | GraphMaker');
+  await expect(page).toHaveTitle('Supply and Demand Graph Maker — Free Online | GraphMaker');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /detect in-range equilibrium/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/supply-and-demand-graph-maker\/$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Supply and Demand Graph Maker' })).toBeVisible();
@@ -30,7 +31,7 @@ test('serves a complete Supply and Demand page with equilibrium on numeric axes'
     'How to read supply and demand curves',
     'When to use this tool',
     'Supply and demand graph maker features',
-    'Related economics and graph tools',
+    'Related graph makers',
     'Supply and demand graph maker FAQ',
   ]) {
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();
@@ -44,7 +45,7 @@ test('serves a complete Supply and Demand page with equilibrium on numeric axes'
   await page.getByLabel('Show equilibrium marker').uncheck();
   await page.getByRole('button', { name: 'Save locally' }).click();
   await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
-  await page.reload();
+  await reloadPage(page);
   await page.getByRole('button', { name: 'Customize' }).click();
   await expect(page.getByLabel('Show equilibrium marker')).not.toBeChecked();
   await expect(page.locator('[data-chart-insight]')).toHaveText('Equilibrium: quantity 45, value 55.');
@@ -57,7 +58,7 @@ test('serves a complete Supply and Demand page with equilibrium on numeric axes'
 });
 
 test('maps equivalent headers and reports when curves never cross', async ({ page }) => {
-  await page.goto('/supply-and-demand-graph-maker/');
+  await openPage(page, '/supply-and-demand-graph-maker/');
   await page.getByLabel('Quantity, row 1', { exact: true }).evaluate((element) => {
     const clipboardData = new DataTransfer();
     clipboardData.setData('text/plain', 'Q\tBuyers\tSellers\n10\t90\t20\n25\t80\t30\n60\t70\t40');

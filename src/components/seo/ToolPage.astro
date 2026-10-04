@@ -1,5 +1,7 @@
 ---
-import { GraphEditor } from '../graph/GraphEditor';
+import { GraphWorkspace } from '../graph/GraphWorkspace';
+import Breadcrumbs from '../navigation/Breadcrumbs.astro';
+import { toolBreadcrumbs } from '../../content/seo';
 import SiteFooter from '../navigation/SiteFooter.astro';
 import SiteHeader from '../navigation/SiteHeader.astro';
 import type { ToolPageConfig } from '../../content/toolPages';
@@ -12,32 +14,22 @@ interface Props {
 
 const { config } = Astro.props;
 const siteBase = Astro.site ?? Astro.url;
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', siteBase).href },
-    { '@type': 'ListItem', position: 2, name: 'Graph tools', item: new URL('/tools/', siteBase).href },
-    { '@type': 'ListItem', position: 3, name: config.h1, item: new URL(config.canonical, siteBase).href },
-  ],
+const breadcrumbs = toolBreadcrumbs(config.h1, config.canonical);
+const applicationSchema = {
+  '@context': 'https://schema.org', '@type': 'WebApplication',
+  name: config.h1, url: new URL(config.canonical, siteBase).href,
+  description: config.intro, applicationCategory: 'BusinessApplication', operatingSystem: 'Any',
+  offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
 };
 ---
 
-<BaseLayout title={config.title} description={config.metaDescription} canonical={config.canonical} structuredData={breadcrumbSchema}>
+<BaseLayout title={config.title} description={config.metaDescription} canonical={config.canonical} structuredData={applicationSchema} breadcrumbs={breadcrumbs}>
   <SiteHeader />
 
   <main id="main-content">
     <section class="bg-surface-blue border-border border-b pb-12">
       <div class="page-shell pt-5 sm:pt-7">
-        <nav aria-label="Breadcrumb" class="text-text-muted text-sm">
-          <ol class="flex flex-wrap items-center gap-2">
-            <li><a class="hover:text-brand" href="/">Home</a></li>
-            <li aria-hidden="true">/</li>
-            <li><a class="hover:text-brand" href="/tools/">Graph tools</a></li>
-            <li aria-hidden="true">/</li>
-            <li aria-current="page" class="text-text font-medium">{config.h1}</li>
-          </ol>
-        </nav>
+        <Breadcrumbs items={breadcrumbs} />
 
         <div class="mx-auto mt-5 max-w-3xl text-center">
           <h1 class="text-3xl font-bold tracking-tight sm:text-4xl lg:text-[2.75rem]">{config.h1}</h1>
@@ -47,7 +39,7 @@ const breadcrumbSchema = {
       </div>
 
       <div class="page-shell mt-6 text-left" id="editor">
-        <GraphEditor client:load config={config.editor} />
+        <GraphWorkspace client:load config={config.editor} />
       </div>
     </section>
 
@@ -178,7 +170,7 @@ const breadcrumbSchema = {
     </section>
 
     <section aria-labelledby="related-heading" class="page-shell py-14 sm:py-16">
-      <h2 class="section-heading text-center" id="related-heading">{config.relatedHeading ?? 'Related graph makers'}</h2>
+      <h2 class="section-heading text-center" id="related-heading">Related graph makers</h2>
       <div class="mx-auto mt-8 grid max-w-5xl gap-4 md:grid-cols-3">
         {config.relatedTools.map((tool) => (
           <a class="border-border hover:border-brand hover:shadow-editor group rounded-lg border p-5 transition" href={tool.href}>

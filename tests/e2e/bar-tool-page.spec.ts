@@ -1,9 +1,10 @@
+import { openPage } from './navigation';
 import { expect, test } from '@playwright/test';
 
 test('serves a complete crawlable Bar tool page with grouped sample series', async ({ page }) => {
-  await page.goto('/bar-graph-maker/');
+  await openPage(page, '/bar-graph-maker/');
 
-  await expect(page).toHaveTitle('Bar Graph Maker — Create Grouped Bar Charts Online | GraphMaker');
+  await expect(page).toHaveTitle('Bar Graph Maker — Free Online Bar Chart Creator | GraphMaker');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /bar graph online for free/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/bar-graph-maker\/$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Bar Graph Maker' })).toBeVisible();
@@ -35,14 +36,14 @@ test('serves a complete crawlable Bar tool page with grouped sample series', asy
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();
   }
 
-  await expect(page.getByRole('link', { name: /Line Graph Maker/ })).toHaveAttribute('href', '/line-graph-maker/');
-  await expect(page.getByRole('link', { name: /Pie Chart Maker/ })).toHaveAttribute('href', '/pie-chart-maker/');
-  await expect(page.getByRole('link', { name: /Histogram Maker/ })).toHaveAttribute('href', '/histogram-maker/');
+  await expect(page.getByRole('link', { name: /Line Graph Maker/ }).first()).toHaveAttribute('href', '/line-graph-maker/');
+  await expect(page.getByRole('link', { name: /Pie Chart Maker/ }).first()).toHaveAttribute('href', '/pie-chart-maker/');
+  await expect(page.getByRole('link', { name: /Histogram Maker/ }).first()).toHaveAttribute('href', '/histogram-maker/');
 });
 
 test('updates grouped pasted data live and remains usable on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/bar-graph-maker/');
+  await openPage(page, '/bar-graph-maker/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
 
   await page.getByLabel('Category, row 1').evaluate((element) => {
