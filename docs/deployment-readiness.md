@@ -1,26 +1,24 @@
 # PASS
 
-- Verified code commit: `d821b71a9e2b7ba676c1d09b9cf8462b94228b67` on `codex/audit-fixes`. [Successful Linux run](https://github.com/zeeshansarwar12/graphmaker/actions/runs/37217197957), [draft PR](https://github.com/zeeshansarwar12/graphmaker/pull/1), and [verification artifacts](https://github.com/zeeshansarwar12/graphmaker/actions/runs/37217197957/artifacts/11309170441).
-- On Ubuntu 24.04 with Node 24 and Python 3.12: `npm ci`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, `python scripts/audit-built-html.py`, `npx playwright install chromium`, and `npx playwright test` all passed. Chromium system dependencies were also installed.
-- 19 unit suites / 150 tests passed. All 65 Playwright tests passed, including artifact HTTP status/indexability and custom 404 checks.
-- Rendered output: 15 pages checked, including all 13 indexable pages; canonical, title/description, Open Graph URL, schema, breadcrumbs, internal links/fragments, ten-tool counts, sitemap consistency, social assets, and placeholder absence passed. 502 internal links checked; zero broken links or audit failures. Actual generated table: [audit-pages.md](audit-pages.md).
-- Artifact server: all 13 indexable routes returned 200 and index,follow; privacy/terms returned 200 and noindex,follow; a missing route returned the custom 404 with HTTP 404 and noindex,follow.
-- `npm audit --audit-level=high` passed with zero reported vulnerabilities. Existing Astro lint packages were updated to astro-eslint-parser 3.2.0 and eslint-plugin-astro 3.2.1; compatible transitive updates fixed devalue and http-cache-semantics. No new application dependencies were added.
-- Live site rechecked 2026-10-04: `/about` returned 308 with Location `/about/`; `/about/` returned 200. These checks cover the existing deployment, not the new artifact.
-- Unconfirmed contact/email/date fields remain hidden; builder identity and unconfirmed export licensing sections remain removed. No invented owner information, new tools, keyword pages, or topical expansion.
-- Readiness changes: `.github/workflows/deployment-check.yml`, `.gitignore`, `package.json`, `package-lock.json`, `docs/testing.md`, `docs/deployment-readiness.md`, `docs/audit-pages.md`, `scripts/audit-built-html.py`, `tests/e2e/global-setup.ts`, `tests/e2e/deployment-output.spec.ts`, `src/content/site.ts`, `src/components/ui/ContactLine.astro`, and the About/Privacy/Terms pages.
+- Verified code commit: `c85f42d977a321f6013261b59563b1aa92b22a4f` on `codex/audit-fixes`. The published tree matches local commit `aa6df46` exactly. [Successful Linux and preview verification](https://github.com/zeeshansarwar12/graphmaker/actions/runs/37229816409), [PR #1](https://github.com/zeeshansarwar12/graphmaker/pull/1).
+- On Ubuntu with Node 24 and Python 3.12, `npm ci`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, `python scripts/audit-built-html.py`, `npx playwright install chromium`, and `npx playwright test` all passed. Chromium system dependencies were also installed.
+- All 19 unit suites / 150 tests and all 66 local browser tests passed. The exact-commit [Cloudflare preview](https://2aec2721.graphmaker-5k0.pages.dev) passed all 66 browser tests with one worker and zero retries.
+- Preview HTTP and rendered HTML verification checked 15 pages, including all 13 intended indexable pages; status, canonical, title/meta description, Open Graph URL, schema, breadcrumbs, internal links, fragments, ten-tool counts, sitemap consistency, robots, custom 404, trailing-slash redirects, and six assets passed. 502 internal links checked; zero HTTP or HTML audit failures. Preview hosting intentionally sets a noindex response header; production page metadata retains its intended indexability.
+- All 14 slashless page URLs returned 308 to the matching trailing-slash URL. Specifically, `/about` returned 308 with Location `/about/`, and `/about/` returned 200. A missing URL returned the custom HTTP 404 with noindex metadata.
+- Clipboard permissions now use the tested origin. The shared GraphEditor remains inert until its existing initialization completes. Browser tests wait for hydration, and a deliberately delayed editor script regression test passed.
+- `npm audit --audit-level=high` passed with zero reported vulnerabilities. Unconfirmed identity, email, date, and licensing fields remain hidden or removed. No new tools, keyword pages, or topical expansion were added.
+- This fix changes `src/components/graph/GraphEditor.tsx`, the existing browser specs, and new `tests/e2e/navigation.ts` and `tests/e2e/hydration.spec.ts`. This report records the tested code commit; documentation-only updates do not change its behavior.
 
 # FAIL
 
-- None in the final Linux verification run. Earlier Windows runs were blocked by Application Control. An initial incomplete API transfer was corrected; the published source tree was subsequently verified against the exact local Git tree before relying on results.
+- None in the successful Linux and exact-commit preview verification. Earlier clipboard-origin and hydration failures are corrected. Windows native binding/browser execution limitations remain local environment limitations; verification was completed on Linux.
 
 # UNVERIFIED
 
-- The new artifact on the actual preview/production host: host-level redirects, trailing slashes across all routes, and custom 404 routing. The repository exposes no configured preview deployment for this branch.
-- Live `/about` behavior is confirmed for the current site; it does not establish the new artifact's deployment behavior. The artifact test server is not a simulation of Cloudflare redirect configuration.
+- Production publication of this fix has not occurred. Its post-deployment production smoke check remains pending. The successful Cloudflare preview is intentionally excluded from indexing.
 
 # BLOCKERS BEFORE DEPLOYMENT
 
-- Publish the verified artifact to a preview using the production hosting configuration and confirm all expected route statuses, slash redirects (specifically `/about` -> 308 -> `/about/` -> 200), custom 404 status/noindex, and deployed assets. Do not merge/deploy to production until this host-level check is complete.
+- None identified by this verification pass. Merge and production publication are separate actions; after publication, recheck production redirects, custom 404, assets, and response-level indexability.
 
-# SAFE TO DEPLOY: NO
+# SAFE TO DEPLOY: YES
