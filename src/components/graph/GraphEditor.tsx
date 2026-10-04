@@ -531,6 +531,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     <section
       aria-labelledby="editor-heading"
       aria-busy={!isProjectReady}
+      inert={!isProjectReady}
       className="border-border bg-surface shadow-editor overflow-hidden rounded-xl border"
       data-graph-type={config.graphType}
     >

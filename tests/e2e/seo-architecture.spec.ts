@@ -1,3 +1,4 @@
+import { openPage } from './navigation';
 import { expect, test } from '@playwright/test';
 
 const coreToolRoutes = [
@@ -24,7 +25,7 @@ test('every indexable page has unique production metadata and one logical H1', a
 
   for (const route of indexableRoutes) {
     expect((await request.get(route)).status(), route).toBe(200);
-    await page.goto(route);
+    await openPage(page, route);
 
     const title = await page.title();
     const description = await page.locator('meta[name="description"]').getAttribute('content');
@@ -72,12 +73,12 @@ test('every indexable page has unique production metadata and one logical H1', a
 });
 
 test('homepage and tools hub expose every graph tool', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
   for (const toolRoute of toolRoutes) {
     await expect(page.locator(`a[href="${toolRoute}"]`).first(), `/ -> ${toolRoute}`).toBeVisible();
   }
 
-  await page.goto('/tools/');
+  await openPage(page, '/tools/');
   for (const toolRoute of toolRoutes) {
     await expect(page.locator(`a[href="${toolRoute}"]`).first(), `/tools/ -> ${toolRoute}`).toBeVisible();
   }
@@ -86,7 +87,7 @@ test('homepage and tools hub expose every graph tool', async ({ page }) => {
 
 test('every graph-maker hero uses the shared green benefit checks', async ({ page }) => {
   for (const route of ['/', ...toolRoutes]) {
-    await page.goto(route);
+    await openPage(page, route);
     const benefits = page.locator('[data-product-benefits]');
     await expect(benefits, route).toBeVisible();
     await expect(benefits.locator('li'), route).toHaveCount(4);
@@ -100,7 +101,7 @@ test('every graph-maker hero uses the shared green benefit checks', async ({ pag
 
 test('tool pages have distinct related-tool links and valid breadcrumb schema', async ({ page }) => {
   for (const route of toolRoutes) {
-    await page.goto(route);
+    await openPage(page, route);
     const related = page.locator('section[aria-labelledby="related-heading"] a[href]');
     const hrefs = await related.evaluateAll((links) => links.map((link) => link.getAttribute('href')));
     expect(hrefs.length, route).toBeGreaterThanOrEqual(3);
@@ -122,7 +123,7 @@ test('tool pages have distinct related-tool links and valid breadcrumb schema', 
 
 test('every editor has ten distinct icons and every footer links all tools', async ({ page }) => {
   for (const route of allLinkedRoutes) {
-    await page.goto(route);
+    await openPage(page, route);
     for (const toolRoute of toolRoutes) await expect(page.locator(`footer a[href="${toolRoute}"]`)).toHaveCount(1);
     if (route === '/' || toolRoutes.includes(route as typeof toolRoutes[number])) {
       const tabs = page.getByRole('group', { name: 'Choose a graph type' });
@@ -155,7 +156,7 @@ test('all internal links resolve and no production page is orphaned', async ({ p
   const linksByRoute = new Map<string, Set<string>>();
 
   for (const route of allLinkedRoutes) {
-    await page.goto(route);
+    await openPage(page, route);
     const hrefs = await page.locator('a[href]').evaluateAll((links) => links.map((link) => link.getAttribute('href') ?? ''));
     const internalPaths = new Set<string>();
     for (const href of hrefs) {
@@ -180,17 +181,17 @@ test('all internal links resolve and no production page is orphaned', async ({ p
 });
 
 test('query strings do not create alternate canonicals and utility routes stay noindex', async ({ page }) => {
-  await page.goto('/radar-chart-maker/?source=test');
+  await openPage(page, '/radar-chart-maker/?source=test');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/radar-chart-maker\/$/);
 
   for (const route of ['/privacy/', '/terms/']) {
-    await page.goto(route);
+    await openPage(page, route);
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex,follow');
   }
 });
 
 test('custom 404 is noindex and offers crawlable recovery links', async ({ page }) => {
-  const response = await page.goto('/missing-page/');
+  const response = await openPage(page, '/missing-page/');
   expect(response?.status()).toBe(404);
   await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible();
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex,follow');
@@ -198,7 +199,7 @@ test('custom 404 is noindex and offers crawlable recovery links', async ({ page 
 });
 
 test('editor controls are semantic and static information pages do not hydrate JavaScript', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
 
   const unnamedControls = await page.locator('input,select,textarea').evaluateAll((controls) => controls
@@ -215,7 +216,7 @@ test('editor controls are semantic and static information pages do not hydrate J
   expect(await page.locator('nav a:not([href])').count()).toBe(0);
 
   for (const route of ['/tools/', '/about/', '/privacy/', '/terms/']) {
-    await page.goto(route);
+    await openPage(page, route);
     expect(
       await page.locator('script[src]:not([src^="https://www.googletagmanager.com/"])').count(),
       route,
@@ -226,7 +227,7 @@ test('editor controls are semantic and static information pages do not hydrate J
 });
 
 test('Google Analytics uses the production GA4 measurement ID with privacy limits', async ({ page }) => {
-  await page.goto('/');
+  await openPage(page, '/');
   const analyticsScript = page.locator('script[src^="https://www.googletagmanager.com/gtag/js?id="]');
   await expect(analyticsScript).toHaveAttribute(
     'src',

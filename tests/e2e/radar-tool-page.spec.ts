@@ -1,8 +1,9 @@
+import { openPage } from './navigation';
 import { expect, test } from '@playwright/test';
 import * as XLSX from 'xlsx';
 
 test('serves a complete Radar page with a percentage-scaled multi-series preset', async ({ page }) => {
-  await page.goto('/radar-chart-maker/');
+  await openPage(page, '/radar-chart-maker/');
 
   await expect(page).toHaveTitle('Radar Chart Maker — Create Spider Charts Online | GraphMaker');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /radar and spider charts online/);
@@ -48,7 +49,7 @@ test('serves a complete Radar page with a percentage-scaled multi-series preset'
 
 test('handles pasted, CSV, and Excel radar data on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/radar-chart-maker/');
+  await openPage(page, '/radar-chart-maker/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
 
   await page.getByLabel('Metric, row 1', { exact: true }).evaluate((element) => {
@@ -100,7 +101,7 @@ test('handles pasted, CSV, and Excel radar data on mobile', async ({ page }) => 
 });
 
 test('handles invalid values and crowded metrics safely', async ({ page }) => {
-  await page.goto('/radar-chart-maker/');
+  await openPage(page, '/radar-chart-maker/');
   await page.getByLabel('Metric, row 1', { exact: true }).evaluate((element) => {
     const clipboardData = new DataTransfer();
     clipboardData.setData('text/plain', 'Metric\tTeam A\nSpeed\t80\nQuality\tfast\nCost\t65');

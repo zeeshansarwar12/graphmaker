@@ -1,7 +1,8 @@
+import { openPage } from './navigation';
 import { expect, test } from '@playwright/test';
 
 test('serves a complete crawlable Bar tool page with grouped sample series', async ({ page }) => {
-  await page.goto('/bar-graph-maker/');
+  await openPage(page, '/bar-graph-maker/');
 
   await expect(page).toHaveTitle('Bar Graph Maker — Free Online Bar Chart Creator | GraphMaker');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /bar graph online for free/);
@@ -42,7 +43,7 @@ test('serves a complete crawlable Bar tool page with grouped sample series', asy
 
 test('updates grouped pasted data live and remains usable on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/bar-graph-maker/');
+  await openPage(page, '/bar-graph-maker/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
 
   await page.getByLabel('Category, row 1').evaluate((element) => {

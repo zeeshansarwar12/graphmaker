@@ -1,7 +1,8 @@
+import { openPage } from './navigation';
 import { expect, test } from '@playwright/test';
 
 test('serves a complete crawlable Line tool page with a true time-axis preset', async ({ page }) => {
-  await page.goto('/line-graph-maker/');
+  await openPage(page, '/line-graph-maker/');
 
   await expect(page).toHaveTitle('Line Graph Maker — Multiple Line Charts Online | GraphMaker');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /true time axis/);
@@ -42,7 +43,7 @@ test('serves a complete crawlable Line tool page with a true time-axis preset', 
 
 test('updates pasted category data live and remains usable on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/line-graph-maker/');
+  await openPage(page, '/line-graph-maker/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
 
   await page.getByLabel('Date, row 1').evaluate((element) => {
