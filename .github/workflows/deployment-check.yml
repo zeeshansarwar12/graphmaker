@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  checks: read
 
 concurrency:
   group: deployment-check-${{ github.workflow }}-${{ github.ref }}
@@ -78,6 +79,54 @@ jobs:
           path: |
             verification-logs/
             dist/
+            docs/audit-pages.md
+            playwright-report/
+            test-results/
+
+  verify-preview:
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CI: 'true'
+      PLAYWRIGHT_HTML_OPEN: never
+      COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      GH_TOKEN: ${{ github.token }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Prepare logs
+        run: mkdir -p verification-logs
+      - name: Clean install
+        run: npm ci 2>&1 | tee verification-logs/preview-install.log
+      - name: Find matching Cloudflare preview
+        run: python scripts/resolve-preview-url.py
+      - name: Verify deployed HTTP and HTML
+        run: python scripts/audit-deployed-site.py "$PLAYWRIGHT_BASE_URL" 2>&1 | tee verification-logs/preview-http.log
+      - name: Install Chromium and Linux dependencies
+        run: npx playwright install --with-deps chromium 2>&1 | tee verification-logs/preview-browser-install.log
+      - name: Test deployed preview
+        run: npx playwright test 2>&1 | tee verification-logs/preview-playwright.log
+      - name: Preserve preview verification
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: preview-verification-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            verification-logs/
             docs/audit-pages.md
             playwright-report/
             test-results/
