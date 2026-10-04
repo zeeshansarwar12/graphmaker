@@ -90,10 +90,10 @@ test('edits, navigates, validates, and pastes spreadsheet data', async ({ page }
 });
 
 test('reads clipboard data through the Paste data button when permission is granted', async ({ context, page }) => {
-  await context.grantPermissions(['clipboard-read', 'clipboard-write'], {
-    origin: 'http://127.0.0.1:4321',
-  });
   await page.goto('/');
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'], {
+    origin: new URL(page.url()).origin,
+  });
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
   await page.evaluate(async () => {
     await navigator.clipboard.writeText([
