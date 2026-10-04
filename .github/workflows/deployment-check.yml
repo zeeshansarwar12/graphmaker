@@ -117,7 +117,7 @@ jobs:
       - name: Install Chromium and Linux dependencies
         run: npx playwright install --with-deps chromium 2>&1 | tee verification-logs/preview-browser-install.log
       - name: Test deployed preview
-        run: npx playwright test 2>&1 | tee verification-logs/preview-playwright.log
+        run: npx playwright test --workers=1 --retries=0 2>&1 | tee verification-logs/preview-playwright.log
       - name: Preserve preview verification
         if: ${{ always() }}
         uses: actions/upload-artifact@v6
