@@ -116,17 +116,17 @@ const barSampleData = {
 const lineSampleData = {
   columns: [
     { id: 'column-1', kind: 'label', name: 'Date' },
-    { id: 'column-2', kind: 'number', name: 'Visitors' },
-    { id: 'column-3', kind: 'number', name: 'Orders' },
+    { id: 'column-2', kind: 'number', name: 'Product A Sales' },
+    { id: 'column-3', kind: 'number', name: 'Product B Sales' },
   ],
   rows: [
-    { cells: ['2026-01-01', '620', '18'], id: 'row-1' },
-    { cells: ['2026-01-05', '710', '23'], id: 'row-2' },
-    { cells: ['2026-01-10', '760', '24'], id: 'row-3' },
-    { cells: ['2026-01-20', '820', '27'], id: 'row-4' },
-    { cells: ['2026-02-01', '870', '29'], id: 'row-5' },
-    { cells: ['2026-02-10', '840', '26'], id: 'row-6' },
-    { cells: ['2026-03-01', '940', '33'], id: 'row-7' },
+    { cells: ['2026-01-01', '620', '580'], id: 'row-1' },
+    { cells: ['2026-01-05', '710', '640'], id: 'row-2' },
+    { cells: ['2026-01-10', '760', '700'], id: 'row-3' },
+    { cells: ['2026-01-20', '820', '740'], id: 'row-4' },
+    { cells: ['2026-02-01', '870', '810'], id: 'row-5' },
+    { cells: ['2026-02-10', '840', '790'], id: 'row-6' },
+    { cells: ['2026-03-01', '940', '880'], id: 'row-7' },
   ],
 } as const;
 
@@ -286,10 +286,10 @@ export const xyToolPageConfig = {
     },
   ],
   features: [
-    { title: 'Free to use', description: 'Create and download an XY graph without paying.' },
-    { title: 'No signup', description: 'Start plotting immediately without an account or login.' },
-    { title: 'No watermark', description: 'Export a clean graph ready for reports and presentations.' },
-    { title: 'Local processing', description: 'Pasted and uploaded data stays in your browser in V1.' },
+    { title: 'Connect-points toggle', description: 'Turn Connect points on or off above the preview.' },
+    { title: 'Proportional numeric axes', description: 'Preserve true numeric spacing on both X and Y axes.' },
+    { title: 'Ordered paths or separate points', description: 'Connect coordinates in table order or display each pair independently.' },
+    { title: 'Local processing', description: 'Pasted and uploaded data stays in your browser.' },
     { title: 'CSV and Excel import', description: 'Upload CSV or XLSX files, or paste directly from a spreadsheet.' },
     { title: 'PNG and SVG export', description: 'Download a raster image or scalable vector graphic.' },
   ],
@@ -317,6 +317,15 @@ export const xyToolPageConfig = {
   },
   slug: '/xy-graph-maker/',
   title: 'XY Graph Maker — Plot X and Y Values Online | GraphMaker',
+  useCases: {
+    title: 'When to use an XY graph',
+    intro: 'Use XY graphs when the numeric coordinates and the order of measurements matter.',
+    items: [
+      { title: 'Trace an ordered path', description: 'Connect coordinates in table order to show a measured sequence.' },
+      { title: 'Plot irregular intervals', description: 'Keep unequal numeric X intervals proportional instead of treating them as categories.' },
+      { title: 'Show separate coordinates', description: 'Turn off Connect points when each numeric pair should stand alone.' },
+    ],
+  },
 } satisfies ToolPageConfig;
 
 export const scatterToolPageConfig = {
@@ -383,7 +392,7 @@ export const scatterToolPageConfig = {
     { title: 'Explicit X/Y mapping', description: 'Choose which numeric columns appear on the horizontal and vertical axes.' },
     { title: 'Header-aware tooltips', description: 'Point tooltips use the actual column names from your data.' },
     { title: 'Many observations', description: 'Plot multiple coordinate pairs with adaptive point sizing for larger datasets.' },
-    { title: 'Local processing', description: 'Pasted and uploaded data stays in your browser in V1.' },
+    { title: 'Local processing', description: 'Pasted and uploaded data stays in your browser.' },
     { title: 'CSV and Excel import', description: 'Upload CSV or XLSX files, or paste directly from a spreadsheet.' },
     { title: 'PNG and SVG export', description: 'Download a clean image for reports, slides, and assignments.' },
   ],
@@ -462,7 +471,7 @@ export const barToolPageConfig = {
   },
   faqs: [
     {
-      answer: 'Yes. This free bar graph maker works in your browser without signup and exports graphs without a watermark.',
+      answer: 'Yes. This free bar chart maker works in your browser without signup and exports graphs without a watermark.',
       question: 'Is this bar graph maker free?',
     },
     {
@@ -496,7 +505,7 @@ export const barToolPageConfig = {
     { title: 'Compare one or more series', description: 'Keep category names in the first column and add a numeric column for each measure you want to compare.' },
     { title: 'Customize and export', description: 'Edit the title, axes, colors, labels, and orientation, then download the graph as PNG or SVG.' },
   ],
-  intro: 'Create a bar graph online for free with no signup. Enter, paste, or upload category data and compare multiple numeric series in a clear grouped chart.',
+  intro: 'Use this free bar chart maker to compare categories with no signup. Enter, paste, or upload data and display multiple numeric series in a clear grouped bar chart.',
   metaDescription: 'Create a bar graph online for free. Paste data or import CSV and Excel files, compare multiple series, and export PNG or SVG with no signup.',
   relatedTools: [
     { name: 'Line Graph Maker', description: 'Show changes and trends across categories or dates.', href: '/line-graph-maker/' },
@@ -512,7 +521,7 @@ export const barToolPageConfig = {
     howTo: 'How to make a bar graph',
   },
   slug: '/bar-graph-maker/',
-  title: 'Bar Graph Maker — Create Grouped Bar Charts Online | GraphMaker',
+  title: 'Bar Graph Maker — Free Online Bar Chart Creator | GraphMaker',
   useCases: {
     intro: 'Bar graphs work best when you need to compare amounts across separate names, groups, or time periods.',
     items: [
@@ -531,7 +540,7 @@ export const lineToolPageConfig = {
       intro: 'A multiple line graph uses the same horizontal scale for two or more numeric series, making differences in direction, timing, and magnitude easier to compare.',
       items: [
         { title: 'One column per line', description: 'Keep dates or categories in the first column, then add one numeric column for every line you want to plot.' },
-        { title: 'Headers become legend labels', description: 'Names such as Visitors and Orders appear in the legend and tooltips, so each line stays identifiable.' },
+        { title: 'Headers become legend labels', description: 'Names such as Product A Sales and Product B Sales appear in the legend and tooltips, so each line stays identifiable.' },
         { title: 'Control visible series', description: 'Use the shared customization controls or legend to focus on the lines that matter without changing your source table.' },
       ],
       title: 'Multiple line graphs',
@@ -559,7 +568,7 @@ export const lineToolPageConfig = {
     initialSettings: {
       showLegend: true,
       showValueLabels: true,
-      title: 'Visitors and Orders Over Time',
+      title: 'Product Sales Over Time',
       xAxisTitle: 'Date',
       yAxisTitle: 'Count',
     },
@@ -570,8 +579,8 @@ export const lineToolPageConfig = {
     slug: '/line-graph-maker/',
   },
   example: {
-    caption: 'The first column contains dates. Visitors and Orders are plotted as two lines on the same true time axis.',
-    headers: ['Date', 'Visitors', 'Orders'],
+    caption: 'The first column contains dates. Product A Sales and Product B Sales use comparable units and scales on the same true time axis.',
+    headers: lineSampleData.columns.map((column) => column.name),
     rows: lineSampleData.rows.map((row) => [...row.cells]),
   },
   faqs: [
@@ -584,7 +593,7 @@ export const lineToolPageConfig = {
       question: 'How should I arrange line graph data?',
     },
     {
-      answer: 'Yes. Add a numeric column for each line. This multiple line graph maker uses column headers for legend labels and tooltips.',
+      answer: 'Yes. Add a numeric column for each line. The sample compares Product A Sales and Product B Sales in the same units on one shared Y axis. Column headers become legend labels and tooltips; use comparable scales for a readable comparison.',
       question: 'Can I create a graph with multiple lines?',
     },
     {
@@ -627,7 +636,7 @@ export const lineToolPageConfig = {
     howTo: 'How to make a line graph',
   },
   slug: '/line-graph-maker/',
-  title: 'Line Graph Maker — Create Multiple Line Charts Online | GraphMaker',
+  title: 'Line Graph Maker — Multiple Line Charts Online | GraphMaker',
   useCases: {
     intro: 'Line graphs work best for ordered observations where the path between values helps explain change.',
     items: [
@@ -729,7 +738,7 @@ export const pieToolPageConfig = {
     howTo: 'How to make a pie chart',
   },
   slug: '/pie-chart-maker/',
-  title: 'Pie Chart Maker — Create Percentage Charts Online | GraphMaker',
+  title: 'Pie Chart Maker — Create Percentage Charts | GraphMaker',
   useCases: {
     intro: 'Pie charts are most effective when a small set of categories represents every part of one meaningful total.',
     items: [
@@ -743,6 +752,16 @@ export const pieToolPageConfig = {
 
 export const boxPlotToolPageConfig = {
   additionalSections: [
+    {
+      id: 'quartile-method',
+      title: 'Quartile method',
+      intro: 'GraphMaker uses median-of-halves quartiles. Results can differ slightly from Excel and Google Sheets defaults.',
+      items: [
+        { title: 'Sort and split', description: 'Sort the observations and split them into lower and upper halves. For an odd count, exclude the overall median from both halves.' },
+        { title: 'Take each half’s median', description: 'Q1 is the median of the lower half; Q3 is the median of the upper half.' },
+        { title: 'Compare methods carefully', description: 'The Class A sample gives Q1 = 72 and Q3 = 88. Inclusive percentile interpolation, such as QUARTILE.INC, gives 73 and 87 instead.' },
+      ],
+    },
     {
       id: 'quartiles-and-outliers',
       intro: 'The editor calculates quartiles from each numeric group and uses the standard 1.5×IQR rule to separate whiskers from potential outliers.',
@@ -819,6 +838,10 @@ export const boxPlotToolPageConfig = {
       question: 'How are quartiles, whiskers, and outliers calculated?',
     },
     {
+      question: 'Which quartile method is used?',
+      answer: 'GraphMaker uses median-of-halves: Q1 and Q3 are the medians of the lower and upper sorted halves, excluding the overall median when the count is odd. Results can differ slightly from Excel and Google Sheets defaults, including QUARTILE.INC, which uses inclusive percentile interpolation.',
+    },
+    {
       answer: 'Blank cells are skipped. Invalid non-numeric values are ignored and reported beside the graph so you can correct the source data if needed.',
       question: 'What happens to blanks or invalid values?',
     },
@@ -863,7 +886,7 @@ export const boxPlotToolPageConfig = {
     howTo: 'How to make a box plot',
   },
   slug: '/box-plot-maker/',
-  title: 'Box Plot Maker — Create Box and Whisker Plots Online | GraphMaker',
+  title: 'Box Plot Maker — Box and Whisker Plots Online | GraphMaker',
 } satisfies ToolPageConfig;
 
 export const radarToolPageConfig = {
@@ -1037,9 +1060,9 @@ export const histogramToolPageConfig = {
     slug: '/histogram-maker/',
   },
   example: {
-    caption: 'Place raw numeric observations in a column. Each row represents one measured value.',
-    headers: ['Score'],
-    rows: [['72'], ['84'], ['67'], ['91'], ['76'], ['88'], ['94'], ['71']],
+    caption: `These ${histogramSampleData.rows.length} sample observations each represent one measured score.`,
+    headers: histogramSampleData.columns.map((column) => column.name),
+    rows: histogramSampleData.rows.map((row) => [...row.cells]),
   },
   faqs: [
     { question: 'Is this histogram maker free?', answer: 'Yes. You can create and export a histogram without signing up or adding a watermark.' },
@@ -1079,7 +1102,7 @@ export const histogramToolPageConfig = {
     howTo: 'How to make a histogram',
   },
   slug: '/histogram-maker/',
-  title: 'Histogram Maker — Create Frequency Distributions Online | GraphMaker',
+  title: 'Histogram Maker — Frequency Charts Online | GraphMaker',
   useCases: {
     intro: 'Histograms are useful when you want to understand how numeric observations are distributed across a continuous range.',
     items: [
@@ -1125,14 +1148,14 @@ export const dotPlotToolPageConfig = {
     slug: '/dot-plot-maker/',
   },
   example: {
-    caption: 'Enter one raw numeric observation per row. Repeated values, such as 15 and 18, stack into visible frequency columns.',
-    headers: ['Value'],
-    rows: dotPlotSampleData.rows.slice(0, 12).map((row) => [...row.cells]),
+    caption: `These ${dotPlotSampleData.rows.length} sample observations each become one dot. Repeated values stack into visible frequency columns.`,
+    headers: dotPlotSampleData.columns.map((column) => column.name),
+    rows: dotPlotSampleData.rows.map((row) => [...row.cells]),
   },
   faqs: [
     { question: 'Is this dot plot maker free?', answer: 'Yes. This free dot plot maker works online without signup and exports clean PNG and SVG files without a watermark.' },
     { question: 'What data works best in a dot plot?', answer: 'Use one numeric column of raw observations. Each row becomes one dot, and repeated numbers stack vertically.' },
-    { question: 'How are repeated values displayed?', answer: 'Every repeated observation receives the same horizontal position and the next available vertical stack position. Four occurrences of 18 therefore appear as four dots above 18.' },
+    { question: 'How are repeated values displayed?', answer: `Every repeated observation receives the same horizontal position and the next available vertical stack position. In the sample, ${dotPlotSampleData.rows.filter((row) => row.cells[0] === '18').length} occurrences of 18 appear as ${dotPlotSampleData.rows.filter((row) => row.cells[0] === '18').length} dots above 18.` },
     { question: 'Can I choose between multiple numeric columns?', answer: 'Yes. The dot plot creator uses the first numeric series by default and lets you choose another series inside Customize. Columns are never merged silently.' },
     { question: 'Can I paste data or upload Excel and CSV files?', answer: 'Yes. Paste a spreadsheet column or upload CSV and Excel files. Your data is processed locally in the browser.' },
   ],
@@ -1239,7 +1262,7 @@ export const supplyDemandToolPageConfig = {
     { title: 'True numeric quantity axis', description: 'Preserve proportional spacing for regular or irregular quantity values.' },
     { title: 'Equilibrium detection', description: 'Report exact or interpolated intersections only when they occur inside the entered range.' },
     { title: 'Focused validation', description: 'Handle missing columns, blank cells, non-numeric values, and non-crossing curves without crashing.' },
-    { title: 'CSV and Excel import', description: 'Paste data or upload CSV and XLSX files through the shared GraphEditor workflow.' },
+    { title: 'CSV and Excel import', description: 'Paste data or upload CSV and XLSX files through the same data editor used on every graph page.' },
     { title: 'Local save and export', description: 'Save the project on this device and export the finished graph as PNG, SVG, or CSV.' },
   ],
   h1: 'Supply and Demand Graph Maker',
@@ -1265,7 +1288,7 @@ export const supplyDemandToolPageConfig = {
     howTo: 'How to make a supply and demand graph',
   },
   slug: '/supply-and-demand-graph-maker/',
-  title: 'Supply and Demand Graph Maker — Economics Graph Online | GraphMaker',
+  title: 'Supply and Demand Graph Maker — Free Online | GraphMaker',
   useCases: {
     intro: 'Use this online supply and demand graph maker when two value curves need to be compared against a shared quantity scale.',
     items: [

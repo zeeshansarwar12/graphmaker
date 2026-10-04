@@ -1,3 +1,7 @@
+---
+import { allGraphTools } from '../../content/graphTools';
+import ContactLine from '../ui/ContactLine.astro';
+---
 <footer class="border-border bg-surface border-t py-10">
   <div class="page-shell grid gap-9 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
     <div>
@@ -8,14 +12,14 @@
         <span>Graph<span class="text-brand">Maker</span></span>
       </a>
       <p class="text-text-muted mt-3 max-w-xs text-sm leading-6">Turn your data into a clear, polished graph. Free to use, with no signup required.</p>
+      <ContactLine />
     </div>
 
     <nav aria-label="Graph tools">
       <h2 class="text-sm font-bold">Tools</h2>
       <ul class="text-text-muted mt-3 grid gap-2 text-sm">
         <li><a class="hover:text-brand" href="/tools/">All graph tools</a></li>
-        <li><a class="hover:text-brand" href="/scatter-plot-maker/">Scatter plot maker</a></li>
-        <li><a class="hover:text-brand" href="/histogram-maker/">Histogram maker</a></li>
+        {allGraphTools.map((tool) => <li><a class="hover:text-brand" href={tool.href}>{tool.name}</a></li>)}
       </ul>
     </nav>
 

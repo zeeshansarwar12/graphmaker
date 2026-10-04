@@ -1,20 +1,21 @@
-export const graphTools = [
-  { name: 'Bar Graph Maker', description: 'Compare values clearly across categories.', href: '/bar-graph-maker/', type: 'bar' },
-  { name: 'Line Graph Maker', description: 'Show trends and changes over time.', href: '/line-graph-maker/', type: 'line' },
-  { name: 'Pie Chart Maker', description: 'Show how values make up a whole.', href: '/pie-chart-maker/', type: 'pie' },
-  { name: 'XY Graph Maker', description: 'Plot paired X and Y values precisely.', href: '/xy-graph-maker/', type: 'xy' },
-  { name: 'Scatter Plot Maker', description: 'Explore relationships and trends.', href: '/scatter-plot-maker/', type: 'scatter' },
-  { name: 'Histogram Maker', description: 'See the shape of a numeric distribution.', href: '/histogram-maker/', type: 'histogram' },
-  { name: 'Box Plot Maker', description: 'Summarize spread, quartiles, and outliers.', href: '/box-plot-maker/', type: 'box' },
-  { name: 'Radar Chart Maker', description: 'Compare several metrics across profiles.', href: '/radar-chart-maker/', type: 'radar' },
-] as const;
+import type { GraphType } from '../graph/configs/editor';
 
-export const specialistGraphTools = [
-  { name: 'Dot Plot Maker', description: 'Stack repeated observations on a true numeric scale.', href: '/dot-plot-maker/', type: 'dotplot' },
-  { name: 'Supply and Demand Graph Maker', description: 'Plot economics curves and estimate equilibrium.', href: '/supply-and-demand-graph-maker/', type: 'supplydemand' },
-] as const;
+// Single catalog for navigation, cards, and the editor type selector.
+const tools = [
+  { name: 'Bar Graph Maker', label: 'Bar', slug: 'bar-graph-maker', description: 'Compare values clearly across categories.', type: 'bar', icon: '▥', category: 'Compare categories' },
+  { name: 'Line Graph Maker', label: 'Line', slug: 'line-graph-maker', description: 'Show trends and changes over time.', type: 'line', icon: '⌁', category: 'Show change' },
+  { name: 'Pie Chart Maker', label: 'Pie', slug: 'pie-chart-maker', description: 'Show how values make up a whole.', type: 'pie', icon: '◕', category: 'Show composition' },
+  { name: 'XY Graph Maker', label: 'XY', slug: 'xy-graph-maker', description: 'Plot paired X and Y values precisely.', type: 'xy', icon: '⌗', category: 'Explore relationships' },
+  { name: 'Scatter Plot Maker', label: 'Scatter', slug: 'scatter-plot-maker', description: 'Explore relationships and trends.', type: 'scatter', icon: '⠿', category: 'Explore relationships' },
+  { name: 'Histogram Maker', label: 'Histogram', slug: 'histogram-maker', description: 'See the shape of a numeric distribution.', type: 'histogram', icon: '▟', category: 'Understand distributions' },
+  { name: 'Box Plot Maker', label: 'Box Plot', slug: 'box-plot-maker', description: 'Summarize spread, quartiles, and outliers.', type: 'boxplot', icon: '▣', category: 'Understand distributions' },
+  { name: 'Radar Chart Maker', label: 'Radar', slug: 'radar-chart-maker', description: 'Compare several metrics across profiles.', type: 'radar', icon: '⬡', category: 'Compare profiles' },
+  { name: 'Dot Plot Maker', label: 'Dot Plot', slug: 'dot-plot-maker', description: 'Stack repeated observations on a true numeric scale.', type: 'dotplot', icon: '⠇', category: 'Understand distributions' },
+  { name: 'Supply and Demand Graph Maker', label: 'Supply & Demand', slug: 'supply-and-demand-graph-maker', description: 'Plot economics curves and estimate equilibrium.', type: 'supplydemand', icon: '⇄', category: 'Explore economics' },
+] as const satisfies ReadonlyArray<{ name: string; label: string; slug: string; description: string; type: GraphType; icon: string; category: string }>;
 
-export const allGraphTools = [...graphTools, ...specialistGraphTools] as const;
+export const graphTools = tools.map((tool) => ({ ...tool, href: `/${tool.slug}/` }));
+export const allGraphTools = graphTools;
 
 export const indexableRoutes = [
   '/',

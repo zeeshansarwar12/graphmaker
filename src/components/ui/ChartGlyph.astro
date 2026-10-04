@@ -1,6 +1,6 @@
 ---
 interface Props {
-  type: 'bar' | 'line' | 'pie' | 'xy' | 'scatter' | 'box' | 'radar' | 'histogram' | 'dotplot' | 'supplydemand';
+  type: 'bar' | 'line' | 'pie' | 'xy' | 'scatter' | 'boxplot' | 'radar' | 'histogram' | 'dotplot' | 'supplydemand';
 }
 
 const { type } = Astro.props;
@@ -28,7 +28,7 @@ const { type } = Astro.props;
   {type === 'scatter' && <>
     <circle cx="7" cy="23" fill="currentColor" r="3"></circle><circle cx="12" cy="12" fill="currentColor" r="3"></circle><circle cx="18" cy="20" fill="currentColor" r="3"></circle><circle cx="24" cy="8" fill="currentColor" r="3"></circle><circle cx="26" cy="24" fill="currentColor" r="3"></circle>
   </>}
-  {type === 'box' && <>
+  {type === 'boxplot' && <>
     <path d="M7 5v22M4 5h6M4 27h6M22 5v22M19 5h6M19 27h6M7 10h15M7 22h15" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
     <rect height="12" rx="1" stroke="currentColor" stroke-width="2" width="10" x="10" y="10"></rect><path d="M10 16h10" stroke="currentColor" stroke-width="2"></path>
   </>}
