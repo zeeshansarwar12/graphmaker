@@ -97,3 +97,14 @@ Trailing-slash URLs remain canonical: the live slash URL returned 200 and the
 slashless URL redirected to it with 308. Static output uses directory format.
 No graph algorithms, storage boundary, analytics loading, or consent behavior
 change in this audit.
+
+## DEC-017 — Owner-requested AdSense integration
+**Status:** Accepted (owner request, 2026-10-05)
+
+The shared head loads the owner-provided AdSense publisher script. The Privacy
+page discloses advertising cookies separately from Analytics and links to
+advertising choices. Root ads.txt authorizes the supplied Google publisher ID.
+Do not send editor datasets or project state to advertising services. Do not
+claim account approval or a configured consent platform without verification.
+Google-certified consent configuration and review status remain account-side
+checks; adding the script is not evidence that either has been completed.
