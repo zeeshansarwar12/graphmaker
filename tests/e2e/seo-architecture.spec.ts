@@ -240,3 +240,17 @@ test('Google Analytics uses the production GA4 measurement ID with privacy limit
   expect(inlineScripts).toContain('allow_ad_personalization_signals');
   expect(inlineScripts).toContain('allow_google_signals');
 });
+
+test('advertising disclosures and ads.txt use the configured publisher', async ({ page, request }) => {
+  await openPage(page, '/privacy/');
+  await expect(page.getByRole('heading', { name: 'Google advertising services' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'My Ad Center', exact: true })).toHaveAttribute('href', 'https://myadcenter.google.com/');
+  await expect(page.getByRole('link', { name: 'YourAdChoices', exact: true })).toHaveAttribute('href', 'https://www.aboutads.info/choices/');
+  const script = page.locator('head script[src*="adsbygoogle.js"]');
+  await expect(script).toHaveCount(1);
+  await expect(script).toHaveAttribute('src', 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8860671021606762');
+  const ads = await request.get('/ads.txt');
+  expect(ads.status()).toBe(200);
+  expect(ads.headers()['content-type']).toContain('text/plain');
+  expect((await ads.text()).trim()).toBe('google.com, pub-8860671021606762, DIRECT, f08c47fec0942fa0');
+});
