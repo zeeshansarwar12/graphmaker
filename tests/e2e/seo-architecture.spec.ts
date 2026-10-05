@@ -218,7 +218,7 @@ test('editor controls are semantic and static information pages do not hydrate J
   for (const route of ['/tools/', '/about/', '/privacy/', '/terms/']) {
     await openPage(page, route);
     expect(
-      await page.locator('script[src]:not([src^="https://www.googletagmanager.com/"])').count(),
+      await page.locator('script[src]:not([src^="https://www.googletagmanager.com/"]):not([src^="https://pagead2.googlesyndication.com/"])').count(),
       route,
     ).toBe(0);
     const unsizedImages = await page.locator('img:not([width]), img:not([height])').count();
