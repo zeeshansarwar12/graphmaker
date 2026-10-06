@@ -1,5 +1,6 @@
 ---
 import { allGraphTools } from '../../content/graphTools';
+import { siteCreator } from '../../content/site';
 import ContactLine from '../ui/ContactLine.astro';
 ---
 <footer class="border-border bg-surface border-t py-10">
@@ -12,6 +13,7 @@ import ContactLine from '../ui/ContactLine.astro';
         <span>Graph<span class="text-brand">Maker</span></span>
       </a>
       <p class="text-text-muted mt-3 max-w-xs text-sm leading-6">Turn your data into a clear, polished graph. Free to use, with no signup required.</p>
+      <p class="text-text-muted mt-3 text-sm">Created by <a class="text-brand underline" href="/about/#creator">{siteCreator.name}</a>.</p>
       <ContactLine />
     </div>
 

@@ -3,7 +3,7 @@ import SiteFooter from '../components/navigation/SiteFooter.astro';
 import SiteHeader from '../components/navigation/SiteHeader.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ContactLine from '../components/ui/ContactLine.astro';
-import { legalLastUpdated } from '../content/site';
+import { legalLastUpdated, siteCreator } from '../content/site';
 import Breadcrumbs from '../components/navigation/Breadcrumbs.astro';
 import { pageBreadcrumbs } from '../content/seo';
 const breadcrumbs = pageBreadcrumbs('Privacy', '/privacy/');
@@ -27,6 +27,8 @@ const breadcrumbs = pageBreadcrumbs('Privacy', '/privacy/');
     <h2 class="section-heading mt-9">Advertising choices</h2>
     <p class="text-text-muted mt-3 leading-7">You can manage or opt out of Google's personalized advertising through <a class="text-brand underline" href="https://myadcenter.google.com/">My Ad Center</a>. You can also opt out of personalized advertising from participating third-party providers through <a class="text-brand underline" href="https://www.aboutads.info/choices/">YourAdChoices</a>. These choices do not necessarily stop all ads or the use of identifiers for purposes such as fraud prevention and measurement.</p>
     <p class="text-text-muted mt-3 leading-7">Your browser settings can block or delete cookies and other site storage. Clearing site storage can also delete GraphMaker projects saved locally; export a project file first if you need a backup.</p>
+    <h2 class="section-heading mt-9">Site owner and contact</h2>
+    <p class="text-text-muted mt-3 leading-7">GraphMaker is operated by {siteCreator.name}. Learn about the creator and product on the <a class="text-brand underline" href="/about/#creator">About page</a>.</p>
     <ContactLine />
   </main>
   <SiteFooter />

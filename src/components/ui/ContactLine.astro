@@ -1,4 +1,8 @@
 ---
-import { contactEmail } from '../../content/site';
+import { contactEmail, siteCreator } from '../../content/site';
 ---
-{contactEmail && <p class="mt-3 text-sm">Contact: <a class="text-brand underline" href={`mailto:${contactEmail}`}>{contactEmail}</a></p>}
+<p class="text-text-muted mt-3 text-sm leading-6">
+  {contactEmail
+    ? <>Contact: <a class="text-brand underline" href={`mailto:${contactEmail}`}>{contactEmail}</a></>
+    : <>Questions or feedback? Contact {siteCreator.name} through <a class="text-brand underline" href={siteCreator.linkedInUrl}>LinkedIn</a>.</>}
+</p>

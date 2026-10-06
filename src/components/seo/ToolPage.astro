@@ -15,6 +15,12 @@ interface Props {
 const { config } = Astro.props;
 const siteBase = Astro.site ?? Astro.url;
 const breadcrumbs = toolBreadcrumbs(config.h1, config.canonical);
+const methodAnchors: Record<string, string> = {
+  '/box-plot-maker/': 'box-plot-method',
+  '/histogram-maker/': 'histogram-method',
+  '/supply-and-demand-graph-maker/': 'equilibrium-method',
+};
+const methodAnchor = methodAnchors[config.canonical];
 const applicationSchema = {
   '@context': 'https://schema.org', '@type': 'WebApplication',
   name: config.h1, url: new URL(config.canonical, siteBase).href,
@@ -197,6 +203,9 @@ const applicationSchema = {
         ))}
       </div>
     </section>
+    {methodAnchor && <div class="page-shell max-w-4xl pb-10 text-sm leading-6">
+      <p class="text-text-muted">Review the <a class="text-brand underline" href={`/about/#${methodAnchor}`}>calculation method, worked example, and limitations</a> when interpreting your chart. If something looks incorrect, <a class="text-brand underline" href="/about/#feedback">report an issue</a>.</p>
+    </div>}
   </main>
 
   <SiteFooter />
