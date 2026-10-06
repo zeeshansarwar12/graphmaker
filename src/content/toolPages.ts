@@ -1020,9 +1020,9 @@ export const histogramToolPageConfig = {
       id: 'histogram-bins',
       intro: 'A histogram groups nearby observations into intervals so the overall distribution is easier to see.',
       items: [
-        { title: 'Automatic bin count', description: 'The editor chooses a practical number of bins from the number of valid observations.' },
+        { title: 'Automatic bin count', description: 'For n valid observations greater than one, the count is ceil(log2(n) + 1), limited to 2–30 bins. A single observation or identical values produce one bin.' },
         { title: 'Manual adjustment', description: 'Open Customize when you need to compare the same data with fewer or more intervals.' },
-        { title: 'Frequency counts', description: 'Each bar reports how many observations fall inside its displayed numeric range.' },
+        { title: 'Frequency counts', description: 'Bins have equal widths. Each includes its lower boundary and excludes its upper boundary; the final bin also includes the maximum.' },
       ],
       title: 'How histogram bins work',
     },
@@ -1067,7 +1067,7 @@ export const histogramToolPageConfig = {
   faqs: [
     { question: 'Is this histogram maker free?', answer: 'Yes. You can create and export a histogram without signing up or adding a watermark.' },
     { question: 'What data should I enter?', answer: 'Enter raw numeric observations in a column. Do not enter pre-counted categories unless you want a bar graph instead.' },
-    { question: 'How are histogram bins selected?', answer: 'The automatic setting uses the number of valid observations to choose a readable bin count. You can select a different count inside Customize.' },
+    { question: 'How are histogram bins selected?', answer: 'For n valid observations greater than one, automatic bins use ceil(log2(n) + 1), limited to 2–30. Identical values or a single observation use one bin. Customize lets you choose a manual count from 1–50.' },
     { question: 'What happens to blank or invalid cells?', answer: 'Blank cells are ignored. Invalid non-numeric values are excluded and reported beside the chart so the source data can be corrected.' },
     { question: 'Can I import values from Excel or CSV?', answer: 'Yes. Paste a spreadsheet column or upload CSV and XLSX files. Processing remains in your browser.' },
   ],

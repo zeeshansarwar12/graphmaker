@@ -2,7 +2,7 @@
 |---|---:|---:|---|---|---|---|
 | / | 48 | 120 | https://graphmaker.site/ | index,follow | yes | WebSite, Organization |
 | /tools/ | 56 | 124 | https://graphmaker.site/tools/ | index,follow | yes | ItemList, BreadcrumbList |
-| /about/ | 47 | 141 | https://graphmaker.site/about/ | index,follow | yes | BreadcrumbList |
+| /about/ | 47 | 146 | https://graphmaker.site/about/ | index,follow | yes | AboutPage, Person, BreadcrumbList |
 | /privacy/ | 20 | 49 | https://graphmaker.site/privacy/ | noindex,follow | yes | BreadcrumbList |
 | /terms/ | 18 | 66 | https://graphmaker.site/terms/ | noindex,follow | yes | BreadcrumbList |
 | /bar-graph-maker/ | 60 | 140 | https://graphmaker.site/bar-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
@@ -16,5 +16,5 @@
 | /supply-and-demand-graph-maker/ | 56 | 141 | https://graphmaker.site/supply-and-demand-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /xy-graph-maker/ | 56 | 134 | https://graphmaker.site/xy-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 
-Checked 502 internal links.
+Checked 531 internal links.
 All built HTML assertions passed. Zero broken internal links.

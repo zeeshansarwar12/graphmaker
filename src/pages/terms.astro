@@ -3,7 +3,7 @@ import SiteFooter from '../components/navigation/SiteFooter.astro';
 import SiteHeader from '../components/navigation/SiteHeader.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ContactLine from '../components/ui/ContactLine.astro';
-import { legalLastUpdated } from '../content/site';
+import { legalLastUpdated, siteCreator } from '../content/site';
 import Breadcrumbs from '../components/navigation/Breadcrumbs.astro';
 import { pageBreadcrumbs } from '../content/seo';
 const breadcrumbs = pageBreadcrumbs('Terms', '/terms/');
@@ -18,6 +18,8 @@ const breadcrumbs = pageBreadcrumbs('Terms', '/terms/');
     <p class="text-text-muted mt-4 leading-7">GraphMaker provides browser-based tools for creating, saving, and exporting graphs. You are responsible for the accuracy of the data you enter and for reviewing exported results before using them.</p>
     <h2 class="section-heading mt-9">Local storage</h2><p class="text-text-muted mt-3 leading-7">Projects saved locally depend on browser storage and may be lost if that storage is cleared. Export a project file when you need a separate backup.</p>
     <h2 class="section-heading mt-9">Appropriate use</h2><p class="text-text-muted mt-3 leading-7">Do not use the service to violate applicable law or the rights of others. GraphMaker does not provide professional statistical, legal, medical, or financial advice.</p>
+    <h2 class="section-heading mt-9">Site owner and contact</h2>
+    <p class="text-text-muted mt-3 leading-7">GraphMaker is operated by {siteCreator.name}. Learn about the creator and product on the <a class="text-brand underline" href="/about/#creator">About page</a>.</p>
     <ContactLine />
   </main>
   <SiteFooter />

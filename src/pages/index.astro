@@ -6,12 +6,13 @@ import ChartGlyph from '../components/ui/ChartGlyph.astro';
 import ProductBenefitChecks from '../components/ui/ProductBenefitChecks.astro';
 import { graphTools } from '../content/graphTools';
 import { homepageGraphConfig } from '../graph/configs/homepage';
+import { siteCreator } from '../content/site';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const benefits = [
   { icon: '↯', title: 'Free and fast', copy: 'Create a polished graph immediately without paying or waiting.', color: 'bg-emerald-50 text-emerald-600' },
   { icon: '⌑', title: 'No signup', copy: 'Start with your data right away. No account or login needed.', color: 'bg-violet-50 text-violet-600' },
-  { icon: '◇', title: 'Private by design', copy: 'Your data stays in your browser and is not sent to us.', color: 'bg-blue-50 text-blue-600' },
+  { icon: '◇', title: 'Private by design', copy: 'Your chart data stays in your browser. Page analytics and advertising are disclosed in our Privacy policy.', color: 'bg-blue-50 text-blue-600' },
   { icon: '★', title: 'Professional output', copy: 'Make clean visuals for reports, presentations, and assignments.', color: 'bg-rose-50 text-rose-500' },
 ] as const;
 
@@ -26,7 +27,7 @@ const useCases = [
 const faqs = [
   { question: 'Is this graph maker free to use?', answer: 'Yes. The core graph-making workflow is free and does not require an account.' },
   { question: 'Do I need to sign up before creating a graph?', answer: 'No. You can begin with the sample data, enter your own values, and create a graph without signing up.' },
-  { question: 'Does my data leave my browser?', answer: 'No. Pasted and uploaded data is processed and saved locally in your browser, and your graph data is never sent to a GraphMaker server. Basic page-visit analytics are collected separately; see the Privacy page.' },
+  { question: 'Does my data leave my browser?', answer: 'No. Pasted and uploaded data is processed and saved locally in your browser, and your graph data is never sent to a GraphMaker server. Page-visit analytics and advertising services are separate; see the Privacy page.' },
   { question: 'Which graph types are available?', answer: 'GraphMaker includes bar, line, pie, XY, scatter, histogram, box plot, radar, dot plot, and supply and demand graph makers.' },
   { question: 'Can I use a graph in a report or presentation?', answer: 'Yes. Export clean PNG or SVG files, or CSV data, suitable for documents, slides, assignments, and reports.' },
 ] as const;
@@ -41,6 +42,7 @@ const websiteSchema = {
 const organizationSchema = {
   '@context': 'https://schema.org', '@type': 'Organization', name: 'GraphMaker', url: siteUrl,
   logo: new URL('/images/graphmaker-logo.svg', siteUrl).href,
+  founder: { '@type': 'Person', '@id': new URL('/about/#creator', siteUrl).href, name: siteCreator.name, jobTitle: siteCreator.role, sameAs: [siteCreator.linkedInUrl] },
 };
 ---
 

@@ -5,22 +5,63 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { allGraphTools } from '../content/graphTools';
 import Breadcrumbs from '../components/navigation/Breadcrumbs.astro';
 import { pageBreadcrumbs } from '../content/seo';
+import { siteCreator } from '../content/site';
+import ContactLine from '../components/ui/ContactLine.astro';
+const creatorId = new URL('/about/#creator', Astro.site ?? Astro.url).href;
+const creatorSchema = {
+  '@context': 'https://schema.org', '@type': 'Person', '@id': creatorId,
+  name: siteCreator.name, jobTitle: siteCreator.role, url: creatorId, sameAs: [siteCreator.linkedInUrl],
+};
+const aboutSchema = {
+  '@context': 'https://schema.org', '@type': 'AboutPage',
+  name: 'About GraphMaker', url: new URL('/about/', Astro.site ?? Astro.url).href,
+  about: { '@id': creatorId },
+};
 const breadcrumbs = pageBreadcrumbs('About', '/about/');
 ---
 
 <BaseLayout
   canonical="/about/"
   breadcrumbs={breadcrumbs}
+  structuredData={[aboutSchema, creatorSchema]}
   title="About GraphMaker — Fast, Private Graph Creation"
-  description="Learn how GraphMaker helps people turn spreadsheet data into clear charts quickly, without an account and with data processed in the browser."
+  description="Meet Zeeshan Sarwar, creator of GraphMaker. Learn about the graph tools, calculation methods, browser-based data processing, and reporting issues."
 >
   <SiteHeader hasEditor={false} hasFaq={false} />
   <main class="page-shell max-w-4xl py-10 sm:py-14" id="main-content">
     <Breadcrumbs items={breadcrumbs} />
     <h1 class="mt-7 text-3xl font-bold tracking-tight sm:text-4xl">About GraphMaker</h1>
     <p class="text-text-muted mt-4 text-lg leading-8">GraphMaker is a fast, privacy-first graphing workspace for turning small tables and spreadsheet data into polished charts.</p>
+    <section class="mt-10" id="creator" aria-labelledby="creator-heading">
+      <h2 class="section-heading" id="creator-heading">Meet the creator</h2>
+      <p class="text-text-muted mt-3 leading-7">GraphMaker is created and maintained by {siteCreator.name}, a {siteCreator.role}. Zeeshan brings more than 10 years of experience in interface design and front-end development to the product, with responsibility for its user experience, implementation, and maintenance.</p>
+      <p class="text-text-muted mt-3 leading-7">The goal is straightforward: make it easier to turn spreadsheet data into readable charts without creating an account. The editor brings data entry, chart customization, and export into one workspace.</p>
+      <p class="mt-3"><a class="text-brand underline" href={siteCreator.linkedInUrl}>View Zeeshan Sarwar on LinkedIn</a></p>
+    </section>
     <section class="mt-10" aria-labelledby="purpose-heading"><h2 class="section-heading" id="purpose-heading">Built for a practical job</h2><p class="text-text-muted mt-3 leading-7">The product focuses on the shortest path from data to a usable graph: enter or import a table, choose the right chart, make focused adjustments, and export the result.</p></section>
-    <section class="mt-9" aria-labelledby="privacy-heading"><h2 class="section-heading" id="privacy-heading">Private by design</h2><p class="text-text-muted mt-3 leading-7">Graph data is processed in the browser. Projects can be saved locally on the same device or exported as project files without creating an account.</p></section>
+    <section class="mt-9" aria-labelledby="privacy-heading"><h2 class="section-heading" id="privacy-heading">Private by design</h2><p class="text-text-muted mt-3 leading-7">Pasted and uploaded chart data is processed in the browser. Projects can be saved locally on the same device or exported as project files without creating an account. Page-visit analytics and advertising services are separate from chart processing; see the <a class="text-brand underline" href="/privacy/">Privacy policy</a> for their data and cookie disclosures.</p></section>
+    <section class="mt-9" id="methods" aria-labelledby="methods-heading">
+      <h2 class="section-heading" id="methods-heading">Calculation methods and examples</h2>
+      <p class="text-text-muted mt-3 leading-7">Sample datasets are illustrative examples, not research findings. Statistical conventions can differ between tools; use the method stated on each page when comparing results.</p>
+      <h3 class="mt-5 font-bold" id="box-plot-method">Box plots</h3>
+      <p class="text-text-muted mt-2 leading-7">The <a class="text-brand underline" href="/box-plot-maker/">box plot maker</a> uses median-of-halves quartiles, excluding the overall median from both halves for an odd number of observations. Whiskers stop at observations within 1.5 × IQR of Q1 and Q3; values outside those fences are shown as potential outliers. For the Class A sample, Q1 = 72, median = 80.5, Q3 = 88, and IQR = 16.</p>
+      <p class="text-text-muted mt-2 leading-7">See <a class="text-brand underline" href="https://www.itl.nist.gov/div898/handbook/eda/section3/boxplot.htm">NIST’s explanation of box plots and outlier fences</a>. Quartile conventions vary; <a class="text-brand underline" href="https://support.microsoft.com/en-us/excel/functions/quartile-inc-function">Excel’s QUARTILE.INC</a> uses a different convention and can produce different quartiles.</p>
+      <h3 class="mt-5 font-bold" id="histogram-method">Histograms</h3>
+      <p class="text-text-muted mt-2 leading-7">The <a class="text-brand underline" href="/histogram-maker/">histogram maker</a> uses equal-width bins. For n valid observations greater than one, the automatic count is ceil(log2(n) + 1), limited to 2–30 bins. A single observation or identical values produce one bin. Manual bin counts are rounded and limited to 1–50. Each interval includes its lower boundary and excludes its upper boundary, except the final interval, which includes the maximum.</p>
+      <p class="text-text-muted mt-2 leading-7">For the 15 sample scores, the automatic count is five, the range is 65–94, and the bin width is 5.8. Counts are 2, 4, 3, 3, and 3, totaling 15. Different bin counts can change the apparent shape; compare settings before drawing conclusions. See <a class="text-brand underline" href="https://www.itl.nist.gov/div898/handbook/eda/section3/histogra.htm">NIST’s histogram guidance</a> for interpretation.</p>
+      <h3 class="mt-5 font-bold" id="equilibrium-method">Supply and demand</h3>
+      <p class="text-text-muted mt-2 leading-7">The <a class="text-brand underline" href="/supply-and-demand-graph-maker/">supply and demand maker</a> uses an exact matching row or straight-line interpolation between adjacent quantities where the curves cross. In the sample, demand minus supply changes from +10 at quantity 40 to −10 at quantity 50, giving an estimated equilibrium at quantity 45 and price 55. This is an estimate within the entered range, not a forecast of market behavior.</p>
+    </section>
+    <section class="mt-9" id="quality" aria-labelledby="quality-heading">
+      <h2 class="section-heading" id="quality-heading">Quality checks and limitations</h2>
+      <p class="text-text-muted mt-3 leading-7">The project includes automated tests for data parsing, statistical transformations, local project storage, and browser workflows. These checks help catch regressions; they do not establish independent statistical certification or guarantee that every dataset is suitable for a chart.</p>
+      <p class="text-text-muted mt-3 leading-7">Review warnings about invalid or missing values, verify your inputs, and check the output against the requirements of your assignment, report, or research. The <a class="text-brand underline" href="/terms/">Terms</a> explain usage responsibilities and local-storage limitations.</p>
+    </section>
+    <section class="mt-9" id="feedback" aria-labelledby="feedback-heading">
+      <h2 class="section-heading" id="feedback-heading">Report an issue or suggest an improvement</h2>
+      <p class="text-text-muted mt-3 leading-7">For a calculation or export issue, include the tool URL, browser, steps to reproduce, expected result, and actual result. Use a small non-sensitive example dataset; do not send confidential spreadsheet contents or personal information.</p>
+      <ContactLine />
+    </section>
     <section class="mt-9" aria-labelledby="shared-heading"><h2 class="section-heading" id="shared-heading">One consistent editor</h2><p class="text-text-muted mt-3 leading-7">Every graph maker uses the same editor foundation, with data guidance suited to its graph type.</p><ul class="mt-4 grid gap-2 sm:grid-cols-2">{allGraphTools.map((tool) => <li><a class="text-brand hover:underline" href={tool.href}>{tool.name}</a></li>)}</ul><a class="button-primary mt-5" href="/tools/">Browse graph tools</a></section>
   </main>
   <SiteFooter />
