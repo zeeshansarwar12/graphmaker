@@ -55,6 +55,21 @@ class ReportTests(unittest.TestCase):
                 self.assertEqual(Path('summary.md').read_bytes(),
                                  Path('verification-logs/automation-report.md').read_bytes())
 
+    def test_first_branch_push_uses_default_branch_merge_base(self):
+        with TemporaryDirectory() as temp, chdir(temp):
+            event = {'before': '0' * 40, 'repository': {'default_branch': 'main'}}
+            Path('event.json').write_text(json.dumps(event), encoding='utf-8')
+            env = {'GITHUB_EVENT_PATH': 'event.json', 'GITHUB_SHA': self.head,
+                   'NEEDS': json.dumps(self.needs), 'GITHUB_SERVER_URL': 'https://github.com',
+                   'GITHUB_REPOSITORY': 'owner/repo', 'GITHUB_RUN_ID': '123',
+                   'GITHUB_RUN_ATTEMPT': '1', 'GITHUB_STEP_SUMMARY': 'summary.md'}
+            with patch.dict(os.environ, env), patch.object(report, 'git', side_effect=['b' * 40, 'docs/example.md']) as git:
+                self.assertEqual(report.main(), 0)
+                git.assert_any_call('merge-base', 'origin/main', self.head)
+            data = json.loads(Path('verification-logs/automation-report.json').read_text(encoding='utf-8'))
+            self.assertEqual(data['base_sha'], 'b' * 40)
+            self.assertEqual(data['changed_files'], ['docs/example.md'])
+
     def test_every_required_step_blocks_on_failure_skip_cancel_or_missing(self):
         for job, steps in report.REQUIRED.items():
             for step in steps:

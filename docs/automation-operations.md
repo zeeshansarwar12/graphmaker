@@ -45,7 +45,9 @@ The JSON `schema_version: 1` report and matching Markdown record issue linkage,
 base/head SHA, actual artifact and preview test checkout SHAs, changed files,
 each required step's raw GitHub outcome, run/attempt URL, preview URL, blockers,
 and separate code-completed/tested/preview-verified/merged/live-deployed states.
-Push events may lack an issue link; manual runs lack a comparable base and are
+Push events may lack an issue link. A new branch's first push uses its merge-base
+with the fetched default branch because GitHub supplies an all-zero before SHA.
+Manual runs lack a comparable base and are
 blocked until reviewed with a PR run. PR file list is the base-to-head tree diff.
 Code completion requires PM acceptance review. Live deployment is never inferred
 from preview success. `html` and `http` cover repository-defined SEO/internal-link

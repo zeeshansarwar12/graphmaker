@@ -75,10 +75,14 @@ def main():
     base = pr.get('base', {}).get('sha') or event.get('before')
     checks, blockers, snapshots = evaluate(json.loads(os.environ['NEEDS']), head, os.environ['GITHUB_SHA'])
     try:
+        # A branch's first push has no previous commit in its event payload.
+        if base and set(base) == {'0'}:
+            default_branch = event['repository']['default_branch']
+            base = git('merge-base', f'origin/{default_branch}', head)
         if not base or set(base) == {'0'}:
             raise ValueError('No comparable base SHA in event')
         files = git('diff', '--name-only', base, head).splitlines()
-    except (subprocess.CalledProcessError, ValueError) as error:
+    except (subprocess.CalledProcessError, ValueError, KeyError) as error:
         files = []
         blockers.append(f'Changed files unavailable: {error}')
     body = pr.get('body') or ''
