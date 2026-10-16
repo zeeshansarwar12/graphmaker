@@ -3,6 +3,9 @@
 ## Goal
 Use AI as an implementation partner without letting prompts become the project memory. The repository is the memory.
 
+For issue handoff, draft PR evidence and owner release review, follow
+[automation operations](automation-operations.md).
+
 ## Operating model
 
 ### 1. One scoped task at a time

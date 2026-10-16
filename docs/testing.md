@@ -67,6 +67,17 @@ Every run uploads available logs, `dist`, the rendered page audit, and Playwrigh
 
 After artifact verification passes, `verify-preview` discovers Cloudflare Pages' successful deployment for the exact commit, then audits deployed pages, redirects, assets, and HTML before running the full Playwright suite against that preview. `PLAYWRIGHT_BASE_URL` selects the deployed origin and disables the local artifact server; without it, the existing local test setup is unchanged. Preview evidence is retained as a separate artifact. No production deployment or merge is performed by this workflow.
 
+## CI status evidence
+
+The final `report` job preserves machine-readable JSON and matching Markdown in
+`automation-report-<run_id>-<attempt>` and the Actions summary, even when upstream
+verification fails or is skipped. It records individual outcomes and actual
+checkout SHAs; only complete successful evidence permits a PM review recommendation.
+It performs no release action. Run reporting regression checks with
+`python -m unittest discover -s tests/automation -v`. See
+[automation operations](automation-operations.md) for handoffs, limitations and the
+PR report contract.
+
 ## Manual visual review
 Automated tests do not replace UI inspection. For significant UI tasks, inspect desktop and mobile states for:
 - clipping

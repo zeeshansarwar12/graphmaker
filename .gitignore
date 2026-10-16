@@ -5,6 +5,7 @@ playwright-report/
 test-results/
 coverage/
 verification-logs/
+__pycache__/
 dev.log
 dev.err
 .env
