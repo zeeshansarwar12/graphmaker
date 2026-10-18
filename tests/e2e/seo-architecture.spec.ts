@@ -145,6 +145,13 @@ test('sitemap and robots expose only intended production URLs', async ({ request
     expect(sitemap).not.toMatch(new RegExp(`<loc>https?://[^<]+${excluded.replaceAll('/', '\\/')}</loc>`));
   }
   expect((sitemap.match(/<url>/g) ?? [])).toHaveLength(indexableRoutes.length);
+  const dates = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((match) => match[1]);
+  expect(dates).toHaveLength(indexableRoutes.length);
+  for (const date of dates) {
+    expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(new Date(date).toISOString().slice(0, 10)).toBe(date);
+    expect(Date.parse(date)).toBeLessThanOrEqual(Date.now());
+  }
 
   const robots = await (await request.get('/robots.txt')).text();
   expect(robots).toContain('User-agent: *');

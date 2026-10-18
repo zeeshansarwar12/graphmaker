@@ -111,3 +111,8 @@ Aim for meaningful pages to remain within roughly 2–3 clicks of the homepage.
 - No separate coordinate-plane URL. No keyword-variation or informational-only pages.
 - All three are sibling tools in `/tools/`. The catalog exposes Equation from homepage, hub, footer and editor; contextual links run both directions between Equation and XY/Scatter. Intended click depth is at most two from home.
 - The catalog drives the sitemap; the shared tool shell provides a self-canonical URL, WebApplication and BreadcrumbList. Do not change existing XY metadata to target Equation.
+
+## Sitemap modification dates
+- src/content/pageLastModified.ts records each indexable page's last significant content or tool update (UTC date), verified from Git history.
+- Update affected entries alongside meaningful page/tool changes, including shared editor changes that affect multiple tools. Do not bump dates for builds, deployment, or cosmetic header/footer changes.
+- The sitemap requires an explicit date for every indexable route; SEO tests check complete coverage, valid dates and no future dates.
