@@ -1,3 +1,4 @@
+import { CartesianControls } from './CartesianControls';
 import type { Dispatch } from 'react';
 
 import { getVisibleSeriesIndexes } from '../../graph/configs/graphSettings';
@@ -9,7 +10,7 @@ export interface CustomizableSeries {
 }
 
 interface CustomizePanelProps {
-  chartType: 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy';
+  chartType: 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy' | 'equation';
   dispatch: Dispatch<GraphSettingsAction>;
   onDotPlotSeriesChange?: (columnId: string) => void;
   onScatterColumnChange?: (axis: 'x' | 'y', columnId: string) => void;
@@ -48,6 +49,9 @@ export function CustomizePanel({
 
   return (
     <aside aria-label="Customize graph" className="border-border bg-surface-subtle mt-4 scroll-mt-14 rounded-lg border p-4" id="customize-panel">
+      {(chartType === 'xy' || chartType === 'scatter' || chartType === 'equation') && <CartesianControls key={JSON.stringify(settings.cartesian)} settings={settings} dispatch={dispatch} equation={chartType === 'equation'} />}
+      {chartType === 'equation' && <label className="flex items-center gap-2 my-3 text-sm"><input type="checkbox" checked={settings.showLegend} onChange={event => dispatch({type:'set-legend',value:event.target.checked})} />Show legend</label>}
+      {chartType === 'scatter' && <label className="flex items-center gap-2 my-3 text-sm font-semibold"><input type="checkbox" checked={settings.showTrendline} onChange={event => dispatch({type:'replace-settings',value:{...settings,showTrendline:event.target.checked}})} />Linear trendline and R²</label>}
       <div className="grid gap-4 sm:grid-cols-3">
         {chartType !== 'radar' && chartType !== 'supplydemand' && <label className="text-sm font-semibold">
           Graph title
@@ -81,7 +85,7 @@ export function CustomizePanel({
       {chartType !== 'supplydemand' && <fieldset className="border-border mt-4 border-t pt-4">
         <legend className="sr-only">Graph visibility</legend>
         <div className="flex flex-wrap gap-x-6 gap-y-3">
-          {chartType !== 'boxplot' && chartType !== 'dotplot' && <label className="flex items-center gap-2 text-sm font-medium">
+          {chartType !== 'boxplot' && chartType !== 'dotplot' && chartType !== 'scatter' && chartType !== 'equation' && <label className="flex items-center gap-2 text-sm font-medium">
             <input
               checked={settings.showLegend}
               className="accent-brand h-4 w-4"
@@ -117,7 +121,7 @@ export function CustomizePanel({
             />
             Show outliers
           </label>}
-          {chartType !== 'boxplot' && chartType !== 'dotplot' && <label className="flex items-center gap-2 text-sm font-medium">
+          {chartType !== 'boxplot' && chartType !== 'dotplot' && chartType !== 'scatter' && chartType !== 'equation' && <label className="flex items-center gap-2 text-sm font-medium">
             <input
               checked={settings.showValueLabels}
               className="accent-brand h-4 w-4"

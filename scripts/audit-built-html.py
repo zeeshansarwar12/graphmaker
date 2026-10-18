@@ -91,7 +91,7 @@ def main():
     missing = [route for route in routes if not html_path(route).is_file()]
     if missing:
         raise SystemExit('Cannot audit built HTML; build is missing these pages: ' + ', '.join(missing))
-    assert len(routes) == 15 and len(tools) == 10
+    assert len(routes) == 16 and len(tools) == 11
     errors, rows, docs = [], [], {}
 
     def check(condition, message):
@@ -155,7 +155,7 @@ def main():
             groups = doc.find('div', **{'aria-label': 'Choose a graph type'})
             buttons = groups[0].find('button') if len(groups) == 1 else []
             icons = [icon.text() for button in buttons for icon in button.find('span') if 'data-chart-icon' in icon.attrs]
-            check(len(buttons) == 10 and len(icons) == len(set(icons)) == 10, f'{route}: expected 10 tabs with distinct icons')
+            check(len(buttons) == 11 and len(icons) == len(set(icons)) == 11, f'{route}: expected 11 tabs with distinct icons')
         if route in ['/privacy/', '/terms/']:
             check(robots == 'noindex,follow', f'{route}: legal page must remain noindex')
         for schema in schemas:
@@ -183,7 +183,7 @@ def main():
             check([item.get('position') for item in items] == list(range(1, len(items) + 1)), f'{route}: breadcrumb positions incorrect')
         if route == '/tools/':
             items = by_type.get('ItemList', {}).get('itemListElement', [])
-            check(len(items) == 10 and {item.get('url') for item in items} == {ORIGIN + tool for tool in tools}, '/tools/: ItemList misses tools')
+            check(len(items) == 11 and {item.get('url') for item in items} == {ORIGIN + tool for tool in tools}, '/tools/: ItemList misses tools')
             visible_links = {(a.text().strip(), ORIGIN + a.attrs.get('href', '')) for a in doc.find('a')}
             check(all((item.get('name'), item.get('url')) in visible_links for item in items), '/tools/: ItemList names differ from visible content')
 

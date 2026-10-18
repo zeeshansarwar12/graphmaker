@@ -5,10 +5,11 @@ These values come from source files. Canonicals, image presence, and schema type
 | Page | Title length | Description length | Canonical (configured) | Robots | og:image (configured) | JSON-LD types (configured) |
 |---|---:|---:|---|---|---|---|
 | / | 48 | 120 | https://graphmaker.site/ | index,follow | yes | WebSite, Organization |
-| /about/ | 47 | 141 | https://graphmaker.site/about/ | index,follow | yes | BreadcrumbList |
+| /about/ | 47 | 146 | https://graphmaker.site/about/ | index,follow | yes | BreadcrumbList |
 | /bar-graph-maker/ | 60 | 140 | https://graphmaker.site/bar-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /box-plot-maker/ | 58 | 149 | https://graphmaker.site/box-plot-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /dot-plot-maker/ | 54 | 143 | https://graphmaker.site/dot-plot-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
+| /equation-graph-maker/ | 57 | 145 | https://graphmaker.site/equation-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /histogram-maker/ | 54 | 142 | https://graphmaker.site/histogram-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /line-graph-maker/ | 59 | 137 | https://graphmaker.site/line-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /pie-chart-maker/ | 55 | 136 | https://graphmaker.site/pie-chart-maker/ | index,follow | yes | WebApplication, BreadcrumbList |

@@ -102,3 +102,12 @@ Aim for meaningful pages to remain within roughly 2–3 clicks of the homepage.
 - Do not stuff `free`, `online`, `no signup` into every heading.
 - Product quality and job completion are more important than exact-match repetition.
 - Use static HTML for indexable explanatory content and internal links.
+
+
+## Approved XY cluster extension (2026-10-19)
+- Existing `/xy-graph-maker/`: entered numeric coordinate pairs, connected paths, multiple Y series and coordinate-plane mode. Preserve its title and canonical.
+- Existing `/scatter-plot-maker/`: independent observations, linear regression and R².
+- New `/equation-graph-maker/`: direct explicit equation/function input. Targets equation graph maker, graph maker from equation and function graph maker on one working tool page.
+- No separate coordinate-plane URL. No keyword-variation or informational-only pages.
+- All three are sibling tools in `/tools/`. The catalog exposes Equation from homepage, hub, footer and editor; contextual links run both directions between Equation and XY/Scatter. Intended click depth is at most two from home.
+- The catalog drives the sitemap; the shared tool shell provides a self-canonical URL, WebApplication and BreadcrumbList. Do not change existing XY metadata to target Equation.

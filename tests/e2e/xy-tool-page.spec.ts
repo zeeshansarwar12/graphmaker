@@ -101,3 +101,20 @@ test('does not restore a project saved on another specialist page', async ({ pag
   await expect(page.getByRole('button', { exact: true, name: 'Radar' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByLabel('Metric, row 1')).toHaveValue('Speed');
 });
+
+
+test('the published multi-series example plots its signed coordinates correctly', async ({ page }) => {
+  await openPage(page, '/xy-graph-maker/');
+  const example = page.locator('[aria-labelledby="example-heading"]');
+  const rows = await example.locator('tr').evaluateAll(rows => rows.map(row => Array.from(row.querySelectorAll('th,td'), cell => cell.textContent?.trim() ?? '').join('\t')).join('\n'));
+  await page.getByLabel('X, row 1', { exact: true }).evaluate((element, text) => {
+    const clipboardData = new DataTransfer(); clipboardData.setData('text/plain', text);
+    element.dispatchEvent(new ClipboardEvent('paste', { bubbles: true, clipboardData }));
+  }, rows);
+  await expect(page.getByLabel('X, row 1', { exact: true })).toHaveValue('-2');
+  await expect(page.getByLabel('Y1, row 1', { exact: true })).toHaveValue('-4');
+  await expect(page.getByLabel('Y2, row 3', { exact: true })).toHaveValue('7');
+  await expect(page.locator('[data-chart-status="ready"]')).toHaveAttribute('data-series-count', '2');
+  await page.locator('summary').filter({ hasText: 'Can I plot negative coordinates on a four-quadrant plane?' }).click();
+  await expect(page.getByText(/Keep zero inside both ranges/)).toBeVisible();
+});

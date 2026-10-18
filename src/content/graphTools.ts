@@ -6,6 +6,7 @@ const tools = [
   { name: 'Line Graph Maker', label: 'Line', slug: 'line-graph-maker', description: 'Show trends and changes over time.', type: 'line', icon: '⌁', category: 'Show change' },
   { name: 'Pie Chart Maker', label: 'Pie', slug: 'pie-chart-maker', description: 'Show how values make up a whole.', type: 'pie', icon: '◕', category: 'Show composition' },
   { name: 'XY Graph Maker', label: 'XY', slug: 'xy-graph-maker', description: 'Plot paired X and Y values precisely.', type: 'xy', icon: '⌗', category: 'Explore relationships' },
+  { name: 'Equation Graph Maker', label: 'Equation', slug: 'equation-graph-maker', description: 'Graph mathematical expressions directly on coordinate axes.', type: 'equation', icon: 'ƒ', category: 'Explore relationships' },
   { name: 'Scatter Plot Maker', label: 'Scatter', slug: 'scatter-plot-maker', description: 'Explore relationships and trends.', type: 'scatter', icon: '⠿', category: 'Explore relationships' },
   { name: 'Histogram Maker', label: 'Histogram', slug: 'histogram-maker', description: 'See the shape of a numeric distribution.', type: 'histogram', icon: '▟', category: 'Understand distributions' },
   { name: 'Box Plot Maker', label: 'Box Plot', slug: 'box-plot-maker', description: 'Summarize spread, quartiles, and outliers.', type: 'boxplot', icon: '▣', category: 'Understand distributions' },

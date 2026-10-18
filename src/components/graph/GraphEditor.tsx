@@ -1,4 +1,8 @@
-import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { xyColumns, xyLabels } from '../../graph/transforms/xy';
+import { coordinatePlane, cartesianError } from '../../graph/configs/cartesian';
+import type { CartesianSettings } from '../../graph/configs/cartesian';
+import { addColumn, addRow, updateCell } from '../../graph/transforms/tabularData';
 import { graphTools } from '../../content/graphTools';
 import type { ChangeEvent, ReactNode } from 'react';
 
@@ -48,11 +52,13 @@ import { DataGrid } from './DataGrid';
 import { GraphCanvas } from './GraphCanvas';
 import type { GraphCanvasHandle } from './GraphCanvas';
 
+const EquationInput = lazy(() => import('./EquationInput'));
+
 interface GraphEditorProps {
   config: GraphEditorConfig;
 }
 
-type RenderedChartType = 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy';
+type RenderedChartType = 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy' | 'equation';
 
 function ButtonIcon({ children }: { children: ReactNode }) {
   return <span aria-hidden="true" className="text-brand text-base leading-none">{children}</span>;
@@ -83,6 +89,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
   const projectInputRef = useRef<HTMLInputElement>(null);
   const createdAtRef = useRef(new Date().toISOString());
   const [data, setData] = useState(() => createConfiguredData(config));
+  const [equationBusy, setEquationBusy] = useState(true);
   const [isSampleData, setIsSampleData] = useState(true);
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
   const [isProjectReady, setIsProjectReady] = useState(false);
@@ -151,7 +158,9 @@ export function GraphEditor({ config }: GraphEditorProps) {
     : selectedChartType === 'supplydemand'
     ? [supplyDemandData.demandColumnIndex, supplyDemandData.supplyColumnIndex]
       .filter((index): index is number => index !== null)
-    : (selectedChartType === 'scatter' || selectedChartType === 'xy') && scatterData.yColumnIndex !== null
+    : selectedChartType === 'xy' || selectedChartType === 'equation'
+    ? xyColumns(data).slice(1)
+    : (selectedChartType === 'scatter') && scatterData.yColumnIndex !== null
       ? [scatterData.yColumnIndex]
       : interpretation.seriesColumnIndexes;
   const seriesDefinitions = activeSeriesColumnIndexes.map((columnIndex, index) => ({
@@ -164,7 +173,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
   const visibleSeriesIndexes = getVisibleSeriesIndexes(settings, seriesColumnIds);
   const visibleSeriesColumnIndexes = visibleSeriesIndexes
     .map((index) => seriesDefinitions[index].columnIndex);
-  const hasVisibleMixedScale = selectedChartType !== 'boxplot' && selectedChartType !== 'dotplot' && selectedChartType !== 'histogram' && selectedChartType !== 'supplydemand'
+  const hasVisibleMixedScale = selectedChartType !== 'equation' && selectedChartType !== 'boxplot' && selectedChartType !== 'dotplot' && selectedChartType !== 'histogram' && selectedChartType !== 'supplydemand'
     && hasMixedSeriesScale(data, visibleSeriesColumnIndexes);
   const dimensionName = interpretation.dimensionColumnIndex === null
     ? 'None'
@@ -183,7 +192,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
       ? 'Radar'
     : selectedChartType === 'supplydemand'
       ? 'Supply & Demand'
-      : selectedChartType === 'scatter' ? 'Scatter' : selectedChartType === 'xy' ? 'XY' : 'Bar';
+      : selectedChartType === 'equation' ? 'Equation' : selectedChartType === 'scatter' ? 'Scatter' : selectedChartType === 'xy' ? 'XY' : 'Bar';
   const recommendedRenderedType = interpretation.recommendation === 'Line'
     ? 'line'
     : interpretation.recommendation === 'Box Plot'
@@ -199,7 +208,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     ? 'Scatter plot'
     : `${interpretation.recommendation} chart`;
   const hasUsableScatterColumns = scatterData.xColumnIndex !== null && scatterData.yColumnIndex !== null;
-  const suppressRecommendation = (selectedChartType === 'xy' && interpretation.shape === 'numeric-xy')
+  const suppressRecommendation = selectedChartType === 'equation' || (selectedChartType === 'xy' && hasUsableScatterColumns)
     || (selectedChartType === 'scatter' && hasUsableScatterColumns)
     || (selectedChartType === 'dotplot' && dotPlotData.isCompatible)
     || (selectedChartType === 'supplydemand' && supplyDemandData.isCompatible)
@@ -223,6 +232,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     : [dimensionName !== 'None' ? dimensionName : '', seriesNames.join(', ')].filter(Boolean).join(' → ') || 'No usable columns';
 
   function selectChartType(chartType: RenderedChartType) {
+    if (chartType === 'equation') dispatchSettings({type:'replace-settings',value:{...settings,cartesian:{...coordinatePlane,xStep:null,yStep:null},title:'Equation graph',xAxisTitle:'X',yAxisTitle:'Y',showValueLabels:false}});
     if (chartType === 'boxplot') {
       const labels = createBoxPlotSuggestedLabels(data);
       if (labels) dispatchSettings({ type: 'replace-settings', value: { ...settings, ...labels } });
@@ -381,6 +391,20 @@ export function GraphEditor({ config }: GraphEditorProps) {
     return () => window.clearTimeout(timer);
   }, [config.slug, data, isProjectReady, isStorageAvailable, selectedChartType, settings]);
 
+  const setEquationData = useCallback((nextData: TabularData) => { setData(nextData); }, []);
+  function setCartesian(axes: CartesianSettings) { const error=cartesianError(axes); if(error) {setProjectError(error);return;} dispatchSettings({type:'replace-settings', value:{...settings,cartesian:axes}}); }
+  function addPointNames() {
+    const next = addColumn(data, 'Point name');
+    next.columns[next.columns.length - 1] = {...next.columns[next.columns.length - 1], kind:'label'};
+    updateData(next,'structure');
+  }
+  function plotCoordinate(x: number, y: number) {
+    const detected = xyColumns(data); const indexes = detected.length ? detected : data.columns.flatMap((column,index) => column.kind === 'number' ? [index] : []); if (indexes.length < 2) return;
+    let next = addRow(data); const row = next.rows.length - 1;
+    next = updateCell(next, next.rows[row].id, next.columns[indexes[0]].id, String(x));
+    next = updateCell(next, next.rows[row].id, next.columns[indexes[1]].id, String(y));
+    updateData(next);
+  }
   function updateData(nextData: TabularData, intent: 'edit' | 'replace' | 'structure' = 'edit') {
     setData(nextData);
     setIsSampleData(false);
@@ -397,10 +421,10 @@ export function GraphEditor({ config }: GraphEditorProps) {
         : null;
       dispatchSettings({
         type: 'replace-settings',
-        value: { ...adaptiveSettings, ...boxPlotLabels, ...dotPlotLabels, ...supplyDemandLabels },
+        value: { ...adaptiveSettings, ...boxPlotLabels, ...dotPlotLabels, ...supplyDemandLabels, ...(selectedChartType === 'xy' ? xyLabels(nextData) : {}) },
       });
     } else {
-      const suggested = selectedChartType === 'supplydemand'
+      const suggested = selectedChartType === 'xy' ? xyLabels(data) : selectedChartType === 'supplydemand'
         ? createSupplyDemandSuggestedLabels(data)
         : selectedChartType === 'dotplot'
         ? createDotPlotSuggestedLabels(data, settings.dotPlotSeriesColumnId)
@@ -417,7 +441,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
         && settings.yAxisTitle === defaults.yAxisTitle
       );
       if (labelsAreAutomatic) {
-        const nextLabels = selectedChartType === 'supplydemand'
+        const nextLabels = selectedChartType === 'xy' ? xyLabels(nextData) : selectedChartType === 'supplydemand'
           ? createSupplyDemandSuggestedLabels(nextData)
           : selectedChartType === 'dotplot'
           ? createDotPlotSuggestedLabels(nextData, settings.dotPlotSeriesColumnId)
@@ -451,6 +475,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
   }
 
   function exportGraph(type: 'png' | 'svg') {
+    if (selectedChartType === 'equation' && equationBusy) { setProjectError('Wait for the equation graph to finish updating before exporting.'); return; }
     const dataUrl = graphCanvasRef.current?.exportImage(type);
     if (!dataUrl) {
       setProjectError('Add valid data before exporting the graph.');
@@ -580,13 +605,16 @@ export function GraphEditor({ config }: GraphEditorProps) {
 
       <div className="grid min-w-0 lg:grid-cols-[2fr_3fr]">
         <section aria-labelledby="data-heading" className="border-border order-2 min-w-0 scroll-mt-14 border-t p-4 sm:p-5 lg:order-1 lg:border-t-0 lg:border-r" id="data-editor" ref={dataSectionRef}>
-          <DataGrid data={data} isSampleData={isSampleData} onChange={updateData} />
+          {selectedChartType === 'equation'
+            ? <Suspense fallback={<p role="status">Loading equation input…</p>}><EquationInput settings={settings} dispatch={dispatchSettings} onData={setEquationData} onBusy={setEquationBusy} /></Suspense>
+            : <><DataGrid data={data} isSampleData={isSampleData} onChange={updateData} />{selectedChartType === 'xy' && <div className="mt-3"><p className="text-sm text-text-muted">Use X followed by one or more Y columns. Optional point names appear with coordinate labels.</p>{!data.columns.some(column => column.kind === 'label') && <button className="button-secondary mt-2" onClick={addPointNames} type="button">Add point names</button>}</div>}</>}
+
         </section>
 
         <section aria-labelledby="preview-heading" className="order-1 min-w-0 scroll-mt-14 p-4 sm:p-5 lg:order-2" ref={previewSectionRef}>
           <h3 className="sr-only" id="preview-heading">Graph preview</h3>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 className="min-w-0 flex-1 truncate text-lg font-bold">
+            <h3 data-print-title className="min-w-0 flex-1 truncate text-lg font-bold">
               {settings.title.trim() || 'Untitled graph'}
             </h3>
             <div className="flex flex-wrap items-center gap-3">
@@ -604,6 +632,9 @@ export function GraphEditor({ config }: GraphEditorProps) {
                   Connect points
                 </label>
               )}
+              {selectedChartType === 'xy' && <label className="flex min-h-10 items-center gap-2 text-sm font-semibold"><input type="checkbox" checked={settings.xyPlotOnClick} onChange={event => dispatchSettings({type:'replace-settings',value:{...settings,xyPlotOnClick:event.target.checked}})} />Click to plot</label>}
+              {selectedChartType === 'xy' && settings.xyPlotOnClick && <label className="flex min-h-10 items-center gap-2 text-sm"><input type="checkbox" checked={settings.xySnapToGrid} onChange={event => dispatchSettings({type:'replace-settings',value:{...settings,xySnapToGrid:event.target.checked}})} />Snap to grid</label>}
+              {(selectedChartType === 'xy' || selectedChartType === 'equation') && <button type="button" className="button-secondary graph-print-button" onClick={() => window.print()}>Print graph</button>}
               <button
                 aria-controls="customize-panel"
                 aria-expanded={isCustomizeOpen}
@@ -651,7 +682,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
             />
           )}
 
-          <section aria-label="Detected data" className="border-border bg-surface-subtle mt-3 rounded-md border px-3 py-2 text-sm">
+          {selectedChartType !== 'equation' && <section aria-label="Detected data" className="border-border bg-surface-subtle mt-3 rounded-md border px-3 py-2 text-sm">
             <p className="text-text-muted flex flex-wrap items-center gap-x-1.5 gap-y-1">
               <span><span className="text-text font-semibold">Detected:</span> {detectedRelationship}</span>
               <span aria-hidden="true">·</span>
@@ -679,7 +710,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
             {selectedChartType === 'boxplot' && boxPlotData.isCompatible && (
               <p className="text-text-muted mt-1">Box plot groups: {boxPlotData.groups.map((group) => group.name).join(', ') || 'None'}.</p>
             )}
-          </section>
+          </section>}
           {hasVisibleMixedScale && (
             <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900" role="status">
               These series use very different scales. Hide a series for a clearer comparison.
@@ -691,7 +722,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
             </p>
           )}
 
-          <div className="mt-2 w-full overflow-hidden">
+          <div data-print-graph className="mt-2 w-full overflow-hidden">
             <GraphCanvas
               chartType={selectedChartType}
               data={data}
@@ -702,6 +733,8 @@ export function GraphEditor({ config }: GraphEditorProps) {
               onToggleSeries={toggleSeriesVisibility}
               ref={graphCanvasRef}
               settings={settings}
+              onPlotPoint={selectedChartType === 'xy' && settings.xyPlotOnClick ? plotCoordinate : undefined}
+              onViewportChange={selectedChartType === 'equation' ? setCartesian : undefined}
             />
           </div>
 

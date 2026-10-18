@@ -1,11 +1,15 @@
 import { BarChart, BoxplotChart, LineChart, PieChart, RadarChart, ScatterChart } from 'echarts/charts';
-import { AriaComponent, GridComponent, LegendComponent, RadarComponent, TooltipComponent } from 'echarts/components';
+import { AriaComponent, DataZoomComponent, GridComponent, LegendComponent, RadarComponent, TooltipComponent } from 'echarts/components';
 import { init, use as registerECharts } from 'echarts/core';
 import type { EChartsType } from 'echarts/core';
 import { CanvasRenderer, SVGRenderer } from 'echarts/renderers';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import type { RefObject } from 'react';
 
+import { createEquationChartView } from '../../graph/configs/equationChart';
+import { fitCartesianGrid } from '../../graph/configs/cartesian';
+import type { CartesianSettings } from '../../graph/configs/cartesian';
+import { xyColumns } from '../../graph/transforms/xy';
 import { createBarChartView } from '../../graph/configs/barChart';
 import { createBoxPlotChartView } from '../../graph/configs/boxPlotChart';
 import { createDotPlotChartView } from '../../graph/configs/dotPlotChart';
@@ -21,14 +25,14 @@ import { detectDataShape } from '../../graph/transforms/dataInterpretation';
 import { createScatterData } from '../../graph/transforms/chartData';
 import type { TabularData } from '../../graph/transforms/tabularData';
 
-registerECharts([AriaComponent, BarChart, BoxplotChart, CanvasRenderer, GridComponent, LegendComponent, LineChart, PieChart, RadarChart, RadarComponent, ScatterChart, SVGRenderer, TooltipComponent]);
+registerECharts([AriaComponent, DataZoomComponent, BarChart, BoxplotChart, CanvasRenderer, GridComponent, LegendComponent, LineChart, PieChart, RadarChart, RadarComponent, ScatterChart, SVGRenderer, TooltipComponent]);
 
 export interface GraphCanvasHandle {
   exportImage: (type: 'png' | 'svg') => string | null;
 }
 
 interface GraphCanvasProps {
-  chartType: 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy';
+  chartType: 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy' | 'equation';
   data: TabularData;
   incompatibleAction?: {
     label: string;
@@ -36,9 +40,15 @@ interface GraphCanvasProps {
   };
   onToggleSeries?: (columnId: string) => boolean;
   settings: GraphSettings;
+  onPlotPoint?: (x: number, y: number) => void;
+  onViewportChange?: (axes: CartesianSettings) => void;
 }
 
 interface EChartProps {
+  axes?: CartesianSettings;
+  onPlotPoint?: (x: number, y: number) => void;
+  onViewportChange?: (axes: CartesianSettings) => void;
+  snap?: boolean;
   axisType: 'category' | 'none' | 'time' | 'value';
   chartRef: RefObject<EChartsType | null>;
   insight?: string;
@@ -52,6 +62,7 @@ interface EChartProps {
 }
 
 function EChart({
+  axes, onPlotPoint, onViewportChange, snap,
   axisType,
   chartRef,
   insight,
@@ -64,6 +75,7 @@ function EChart({
   warning,
 }: EChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const pointerStart = useRef<{point:number[];id:number} | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -86,8 +98,36 @@ function EChart({
   }, [chartRef]);
 
   useEffect(() => {
-    chartRef.current?.setOption(options, { notMerge: true });
-  }, [chartRef, options]);
+    const chart = chartRef.current; if (!chart) return;
+    const apply = () => chart.setOption(axes ? fitCartesianGrid(options, axes, chart.getWidth(), chart.getHeight()) : options, {notMerge:true});
+    apply();
+    const observer = new ResizeObserver(apply); if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [axes, chartRef, options]);
+
+  useEffect(() => {
+    const chart = chartRef.current; if (!chart) return;
+    const click = (event: {offsetX: number; offsetY: number}) => {
+      if (!onPlotPoint || !chart.containPixel('grid', [event.offsetX,event.offsetY])) return;
+      const point = chart.convertFromPixel('grid',[event.offsetX,event.offsetY]) as number[];
+      if (!point?.every(Number.isFinite)) return;
+      const xStep = axes?.xStep ?? 1, yStep = axes?.yStep ?? 1;
+      onPlotPoint(snap ? Number((Math.round(point[0]/xStep)*xStep).toPrecision(12)) : Number(point[0].toPrecision(12)), snap ? Number((Math.round(point[1]/yStep)*yStep).toPrecision(12)) : Number(point[1].toPrecision(12)));
+    };
+    const zoom = () => {
+      if (!axes || !onViewportChange) return;
+      const option = chart.getOption(), zooms = option.dataZoom as Array<{start?:number;end?:number}>;
+      const next = {...axes, origin:false, xStep:null, yStep:null};
+      for (const [index, axis] of (['x','y'] as const).entries()) {
+        const min = axes[`${axis}Min`] ?? -10, max = axes[`${axis}Max`] ?? 10, range = max-min;
+        next[`${axis}Min`] = min + range * (zooms[index]?.start ?? 0)/100;
+        next[`${axis}Max`] = min + range * (zooms[index]?.end ?? 100)/100;
+      }
+      if (next.xMax! - next.xMin! >= 1e-8 && next.yMax! - next.yMin! >= 1e-8) onViewportChange(next);
+    };
+    chart.getZr().on('click',click); chart.on('datazoom',zoom);
+    return () => {if (!chart.isDisposed()) {chart.getZr().off('click',click);chart.off('datazoom',zoom);}};
+  }, [axes, chartRef, onPlotPoint, onViewportChange, snap]);
 
   useEffect(() => {
     const chart = chartRef.current;
@@ -111,19 +151,36 @@ function EChart({
     <div data-axis-type={axisType} data-chart-status="ready" data-label-interval={labelInterval} data-series-count={seriesCount}>
       {warning && <p className="mb-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900" role="status">{warning}</p>}
       {insight && <p className="border-border bg-surface-subtle mb-2 rounded-md border px-3 py-2 text-sm font-semibold" data-chart-insight role="status">{insight}</p>}
-      <div aria-hidden="true" className="h-72 w-full sm:h-80" ref={containerRef}></div>
+      <div data-chart-canvas aria-hidden="true" className="h-72 w-full sm:h-80" ref={containerRef}
+        style={{touchAction:onViewportChange ? 'none' : undefined,cursor:onViewportChange ? 'grab' : onPlotPoint ? 'crosshair' : undefined}}
+        onPointerDown={event => {
+          const chart=chartRef.current;if(!chart || !onViewportChange) return;
+          if(pointerStart.current) {pointerStart.current=null;return;}
+          const rect=event.currentTarget.getBoundingClientRect(), pixel=[event.clientX-rect.left,event.clientY-rect.top];
+          if(chart.containPixel('grid',pixel)) {pointerStart.current={point:chart.convertFromPixel('grid',pixel) as number[],id:event.pointerId};event.currentTarget.setPointerCapture(event.pointerId);}
+        }}
+        onPointerCancel={() => {pointerStart.current=null;}}
+        onPointerUp={event => {
+          const start=pointerStart.current;pointerStart.current=null;
+          const chart=chartRef.current;if(!start || !chart || !axes || !onViewportChange || start.id!==event.pointerId) return;
+          const rect=event.currentTarget.getBoundingClientRect(), end=chart.convertFromPixel('grid',[event.clientX-rect.left,event.clientY-rect.top]) as number[];
+          const dx=start.point[0]-end[0],dy=start.point[1]-end[1];
+          if(!Number.isFinite(dx) || !Number.isFinite(dy) || Math.abs(dx)+Math.abs(dy)<1e-8) return;
+          onViewportChange({...axes,xMin:(axes.xMin ?? -10)+dx,xMax:(axes.xMax ?? 10)+dx,yMin:(axes.yMin ?? -10)+dy,yMax:(axes.yMax ?? 10)+dy,origin:false});
+        }}
+      ></div>
       <p aria-live="polite" className="sr-only">{summary}</p>
     </div>
   );
 }
 
 export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(function GraphCanvas(
-  { chartType, data, incompatibleAction, onToggleSeries, settings },
+  { chartType, data, incompatibleAction, onToggleSeries, settings, onPlotPoint, onViewportChange },
   ref,
 ) {
   const chartRef = useRef<EChartsType | null>(null);
   const view = useMemo(
-    () => chartType === 'line'
+    () => chartType === 'equation' ? createEquationChartView(data, settings) : chartType === 'line'
       ? createLineChartView(data, settings)
       : chartType === 'boxplot'
         ? createBoxPlotChartView(data, settings)
@@ -148,7 +205,8 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
   const legendSeries = useMemo(() => {
     const columnIndexes = chartType === 'dotplot' || chartType === 'histogram' || chartType === 'pie' || chartType === 'supplydemand'
       ? []
-      : chartType === 'scatter' || chartType === 'xy'
+      : chartType === 'xy' || chartType === 'equation' ? xyColumns(data).slice(1)
+      : chartType === 'scatter'
       ? [createScatterData(
         data,
         chartType === 'scatter' ? settings.scatterXColumnId : null,
@@ -185,7 +243,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
 
       const svgChart = init(container, undefined, { height, renderer: 'svg', width });
       try {
-        svgChart.setOption(view.options, { notMerge: true });
+        svgChart.setOption({ ...chart.getOption(), animation:false }, { notMerge: true });
         return svgChart.getDataURL({ backgroundColor: '#ffffff', type: 'svg' });
       } finally {
         svgChart.dispose();
@@ -226,9 +284,13 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
   return (
     <div data-chart-orientation={settings.orientation} data-rendered-chart-type={chartType}>
       <EChart
+        axes={chartType === 'xy' || chartType === 'scatter' || chartType === 'equation' ? settings.cartesian : undefined}
+        onPlotPoint={onPlotPoint}
+        onViewportChange={onViewportChange}
+        snap={settings.xySnapToGrid}
         axisType={chartType === 'pie' || chartType === 'radar'
           ? 'none'
-          : chartType === 'dotplot' || chartType === 'scatter' || chartType === 'supplydemand' || chartType === 'xy'
+          : chartType === 'equation' || chartType === 'dotplot' || chartType === 'scatter' || chartType === 'supplydemand' || chartType === 'xy'
           ? 'value'
           : chartType === 'line' && interpretation.shape === 'date-series' ? 'time' : 'category'}
         chartRef={chartRef}

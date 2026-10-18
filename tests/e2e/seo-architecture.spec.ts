@@ -6,6 +6,7 @@ const coreToolRoutes = [
   '/line-graph-maker/',
   '/pie-chart-maker/',
   '/xy-graph-maker/',
+  '/equation-graph-maker/',
   '/scatter-plot-maker/',
   '/histogram-maker/',
   '/box-plot-maker/',
@@ -121,15 +122,15 @@ test('tool pages have distinct related-tool links and valid breadcrumb schema', 
   }
 });
 
-test('every editor has ten distinct icons and every footer links all tools', async ({ page }) => {
+test('every editor has eleven distinct icons and every footer links all tools', async ({ page }) => {
   for (const route of allLinkedRoutes) {
     await openPage(page, route);
     for (const toolRoute of toolRoutes) await expect(page.locator(`footer a[href="${toolRoute}"]`)).toHaveCount(1);
     if (route === '/' || toolRoutes.includes(route as typeof toolRoutes[number])) {
       const tabs = page.getByRole('group', { name: 'Choose a graph type' });
-      await expect(tabs.locator('button')).toHaveCount(10);
+      await expect(tabs.locator('button')).toHaveCount(11);
       const icons = await tabs.locator('[data-chart-icon]').allTextContents();
-      expect(new Set(icons).size, route).toBe(10);
+      expect(new Set(icons).size, route).toBe(11);
       await expect(tabs.getByRole('button', { name: 'Supply & Demand', exact: true })).toBeVisible();
     }
   }

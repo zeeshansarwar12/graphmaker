@@ -229,19 +229,19 @@ export const xyToolPageConfig = {
   canonical: '/xy-graph-maker/',
   comparison: {
     first: {
-      body: 'Choose an XY graph when X has a meaningful numeric scale and you want to show how Y changes from one ordered X value to the next. Connecting points can make that progression easier to follow.',
+      body: 'Choose an XY graph when numeric X spacing and the path between points matter. X values such as 1, 2 and 10 keep their unequal spacing even when connected. Points join in table order, so arrange rows in the sequence you want to draw.',
       title: 'Use an XY graph',
     },
     intro: 'Both charts use paired numeric values. The difference is whether the sequence between points carries meaning.',
     second: {
-      body: 'Choose a scatter plot when each pair is an independent observation and you want to examine association, clusters, or outliers. Points are usually left unconnected.',
+      body: 'Choose a scatter plot for independent observations, clusters or outliers. Use Scatter Plot Maker to add a linear trendline, regression equation and R². Leave observations unconnected when there is no meaningful path between them.',
       title: 'Use a scatter plot',
     },
     title: 'When to use XY vs Scatter',
   },
   definition: [
-    'An XY graph places numeric X values on the horizontal axis and numeric Y values on the vertical axis. Each row becomes one coordinate pair, such as (2, 5).',
-    'Unlike a category chart, the spacing on both axes is proportional to the numbers. That makes XY graphs useful for measurements, experiments, coordinates, and other data where the distance between values matters.',
+    'An XY graph places numeric X values on the horizontal axis and numeric Y values on the vertical axis. This XY plotter can draw one or more Y series against a shared X column. Each row supplies one coordinate pair per series.',
+    'Unlike a category chart, the spacing on both axes is proportional to the numbers. Use it to plot X and Y coordinates, compare measurements or draw ordered paths. Put the input or independent variable on X and the measured response on Y when that fits your experiment; label axes with units such as Time (s) and Distance (m).',
   ],
   editor: {
     graphType: 'xy',
@@ -259,9 +259,9 @@ export const xyToolPageConfig = {
     slug: '/xy-graph-maker/',
   },
   example: {
-    caption: 'Paste this two-column structure into the editor. Each row is plotted as one X/Y pair.',
-    headers: ['X', 'Y'],
-    rows: xySampleData.rows.map((row) => [...row.cells]),
+    caption: 'Paste these three columns to compare two Y series against one shared X column. The first row plots (-2, -4) for Y1 and (-2, 3) for Y2. Zero and positive coordinates work the same way. This worked example is separate from the initial sample above.',
+    headers: ['X', 'Y1', 'Y2'],
+    rows: [['-2', '-4', '3'], ['0', '0', '5'], ['3', '6', '7']],
   },
   faqs: [
     {
@@ -269,7 +269,7 @@ export const xyToolPageConfig = {
       question: 'Is the XY graph maker free?',
     },
     {
-      answer: 'Use two numeric columns. Put horizontal-axis values in the first column and vertical-axis values in the second column.',
+      answer: 'Use one numeric X column followed by one or more numeric Y columns, for example X, Y1 and Y2. Each row pairs the shared X value with each Y value. Use Add series for another Y column, then name and color it in the editor. Blank or invalid pairs are not plotted; connected paths leave a gap at missing values.',
       question: 'How should I arrange X and Y data?',
     },
     {
@@ -281,27 +281,44 @@ export const xyToolPageConfig = {
       question: 'Can I import data from Excel or CSV?',
     },
     {
-      answer: 'Use an XY graph when ordered numeric X values and the path between them matter. Use a scatter plot for independent observations, clusters, correlation, and trend analysis.',
+      answer: 'Use XY for coordinate plotting and ordered paths with true numeric spacing. Use Scatter Plot Maker for independent observations and linear regression with R². Both plot numeric X/Y pairs; choose based on the job you need to do.',
       question: 'What is the difference between an XY graph and a scatter plot?',
+    },
+    {
+      question: 'Can I plot negative coordinates on a four-quadrant plane?',
+      answer: 'Yes. Enter positive, negative or zero coordinates. Open Customize and choose Coordinate plane for a -10 to 10 grid with axes crossing at the origin and equal unit scale. Adjust the axis minimum, maximum and grid spacing, then choose Apply axes. Keep zero inside both ranges to show the origin.',
+    },
+    {
+      question: 'How do I label points or click to plot coordinates?',
+      answer: 'Choose Add point names and enter names such as A or B in the table. In Customize, turn on Show value labels to display names and coordinates. Enable Click to plot to add a point to the first Y series; Snap to grid uses the chosen grid spacing, or whole units when spacing is automatic. You can always enter or edit coordinates in the table.',
+    },
+    {
+      question: 'Can I enter an equation instead of coordinate pairs?',
+      answer: 'Use Equation Graph Maker in Related graph makers below to type a formula such as y = 2x + 3 or y = x² directly. This XY tool plots coordinate pairs you enter, paste or import; it does not calculate an equation from the table.',
+    },
+    {
+      question: 'Should I download PNG or SVG?',
+      answer: 'Choose PNG for slides, documents or sharing on the web. Choose SVG when you need a scalable graphic that stays sharp as it is resized. Print graph opens the browser print view with the title and graph.',
     },
   ],
   features: [
-    { title: 'Connect-points toggle', description: 'Turn Connect points on or off above the preview.' },
-    { title: 'Proportional numeric axes', description: 'Preserve true numeric spacing on both X and Y axes.' },
-    { title: 'Ordered paths or separate points', description: 'Connect coordinates in table order or display each pair independently.' },
-    { title: 'Local processing', description: 'Pasted and uploaded data stays in your browser.' },
-    { title: 'CSV and Excel import', description: 'Upload CSV or XLSX files, or paste directly from a spreadsheet.' },
-    { title: 'PNG and SVG export', description: 'Download a raster image or scalable vector graphic.' },
+    { title: 'Connected paths with numeric spacing', description: 'Join points in table order, including unequal X intervals, or switch to separate points.' },
+    { title: 'Multiple Y series', description: 'Compare several Y columns against one shared X column, with names, colors and visibility controls.' },
+    { title: 'Adjustable coordinate plane', description: 'Set axis bounds, grid spacing and origin axes. Use equal unit scale for coordinate diagrams.' },
+    { title: 'Point names and click-to-plot', description: 'Label points with names and coordinates, or add points to the first series by clicking or tapping the grid.' },
+    { title: 'Private spreadsheet imports', description: 'Paste from Excel or Google Sheets, or upload CSV/XLSX files. Processing stays in your browser.' },
+    { title: 'Download or print', description: 'Export PNG for slides and web use, SVG for scalable graphics, or print the graph.' },
   ],
   h1: 'XY Graph Maker',
   howTo: [
-    { title: 'Add X and Y values', description: 'Type into the sample table, paste two columns, or upload a CSV or Excel file.' },
-    { title: 'Choose how points display', description: 'Keep Connect points on for an ordered path, or turn it off for separate coordinate points.' },
-    { title: 'Customize and export', description: 'Set titles and colors, then download the finished graph as PNG or SVG.' },
+    { title: 'Add X and Y values', description: 'Enter one X column and one or more Y columns. Type, paste a spreadsheet table, or upload CSV/XLSX. Name axes with units that match your data.' },
+    { title: 'Choose how points display', description: 'Connect points in table order or show them separately. Open Customize for axis bounds, grid spacing, coordinate-plane mode and point labels.' },
+    { title: 'Customize and export', description: 'Name and color your series. Download PNG for slides or the web, choose SVG for scalable graphics, or select Print graph.' },
   ],
   intro: 'Plot X and Y values online for free, with no signup. Enter, paste, or upload paired numeric data and download a clean graph in seconds.',
   metaDescription: 'Create an XY graph online from paired X and Y values. Free, no signup or watermark, with CSV and Excel import plus PNG and SVG export.',
   relatedTools: [
+    { name: 'Equation Graph Maker', description: 'Enter a mathematical expression instead of coordinate pairs.', href: '/equation-graph-maker/' },
     { name: 'Scatter Plot Maker', description: 'Plot independent observations and explore relationships between two variables.', href: '/scatter-plot-maker/' },
     { name: 'Line Graph Maker', description: 'Show changes and trends across categories or dates.', href: '/line-graph-maker/' },
     { name: 'Supply and Demand Graph Maker', description: 'Map quantity, demand, and supply curves and estimate their equilibrium.', href: '/supply-and-demand-graph-maker/' },
@@ -384,7 +401,7 @@ export const scatterToolPageConfig = {
       question: 'What is the difference between a scatter plot and an XY graph?',
     },
     {
-      answer: 'Not yet. This page currently focuses on plotting and exporting paired observations without regression, trendlines, R², or correlation calculations.',
+      answer: 'Yes. Open Customize and enable Linear trendline and R² to calculate a least-squares regression equation and fit measure. Correlation calculations are not included. Constant X cannot be fitted; R² is undefined for constant Y.',
       question: 'Does this tool calculate a trendline or correlation?',
     },
   ],
@@ -405,6 +422,7 @@ export const scatterToolPageConfig = {
   intro: 'Create a scatter plot online from paired numeric data. Paste values or upload CSV and Excel files, with no signup required.',
   metaDescription: 'Create a scatter plot online from numeric X and Y data. Map columns, import CSV or Excel files, and export PNG or SVG with no signup.',
   relatedTools: [
+    { name: 'Equation Graph Maker', description: 'Enter a mathematical expression instead of coordinate pairs.', href: '/equation-graph-maker/' },
     { name: 'XY Graph Maker', description: 'Plot paired numeric values and optionally connect consecutive points.', href: '/xy-graph-maker/' },
     { name: 'Line Graph Maker', description: 'Show changes and trends across categories or dates.', href: '/line-graph-maker/' },
     { name: 'Bar Graph Maker', description: 'Compare numeric values across named categories.', href: '/bar-graph-maker/' },
@@ -1298,4 +1316,22 @@ export const supplyDemandToolPageConfig = {
     ],
     title: 'When to use this tool',
   },
+} satisfies ToolPageConfig;
+
+
+export const equationToolPageConfig = {
+  canonical: '/equation-graph-maker/', slug: '/equation-graph-maker/',
+  title: 'Equation Graph Maker — Plot Functions Online | GraphMaker',
+  metaDescription: 'Graph equations like y = x² or sin(x) directly. Plot multiple functions, adjust axes, zoom and pan, then export PNG or SVG. Free, with no signup.',
+  h1: 'Equation Graph Maker',
+  intro: 'Enter an equation and plot its curve directly. Compare up to eight functions, adjust the coordinate plane, and download your graph as PNG or SVG.',
+  editor: { graphType: 'equation', slug: '/equation-graph-maker/', initialSettings: { title: 'Equation graph', xAxisTitle: 'X', yAxisTitle: 'Y', showValueLabels: false, equations: ['y = 2x + 3'], cartesian: { xMin:-10,xMax:10,yMin:-10,yMax:10,xStep:null,yStep:null,origin:true,equalScale:true } }, sampleData: {columns:[{id:'equation-x',kind:'number',name:'X'},{id:'equation-0',kind:'number',name:'y = 2x + 3'}],rows:[]} },
+  definition: ['An equation graph maker calculates points from an expression of the form y = f(x), then draws the curve on numeric X and Y axes. You do not need to calculate a table first.', 'This tool supports arithmetic, powers, parentheses and common real-valued functions. It samples the visible X range and leaves gaps where values are undefined or a segment cannot be resolved within its sampling limit.'],
+  example: {caption:'For y = 2x + 3, these known values lie on the plotted line.',headers:['X','Y'],rows:[['-2','-1'],['0','3'],['2','7']]},
+  howTo: [{title:'Enter an equation',description:'Type y = 2x + 3, y = x², or sin(x). Add more equations to compare their curves.'},{title:'Choose your view',description:'Open Customize to adjust bounds, zoom, pan, grid spacing and colors. Reset axes to return to the initial view.'},{title:'Download your graph',description:'Export PNG or SVG after the graph finishes calculating, or print the graph.'}],
+  features: [{title:'Direct equation input',description:'Plot up to eight expressions with separate colors and visibility controls.'},{title:'Coordinate axes',description:'Control bounds, grid intervals and equal unit scale.'},{title:'Zoom and pan',description:'Explore the graph with chart gestures or accessible buttons in Customize.'},{title:'Local processing',description:'Expressions are calculated in your browser and saved on this device.'},{title:'PNG and SVG export',description:'Download the current graph view without a watermark.'}],
+  comparison: {title:'Equation graphs or XY data?',intro:'Choose a tool based on the information you already have.',first:{title:'Use equations for formulas',body:'Enter a mathematical rule when you want the tool to calculate the curve, such as a parabola or sine wave.'},second:{title:'Use XY for measurements',body:'Use XY Graph Maker when you already have coordinate pairs, experimental observations or a spreadsheet table.'}},
+  faqs:[{question:'Which equations can I graph?',answer:'Explicit functions y = f(x), such as y = 2x + 3, x^2 - 4, and sin(x). Implicit equations, inequalities, parametric plots and symbolic solving are not supported.'},{question:'Which functions and notation are supported?',answer:'Use +, -, *, /, ^, parentheses, x, pi, e, sin, cos, tan, sqrt, abs, exp, ln, log and log10. Implicit multiplication such as 2x and superscripts ² and ³ are supported. Trigonometry uses radians; ln and log are natural logarithms.'},{question:'Why does a curve have gaps?',answer:'Some functions are undefined in parts of their domain, such as 1/x at zero or sqrt(x) for negative X. The tool also leaves gaps when it reaches its sampling limit instead of connecting uncertain segments.'},{question:'Are my equations uploaded?',answer:'No. Equation calculation and local saving happen in your browser. Export a project file if you need a portable backup.'}],
+  relatedTools:[{name:'XY Graph Maker',description:'Plot entered coordinate pairs and ordered numeric paths.',href:'/xy-graph-maker/'},{name:'Scatter Plot Maker',description:'Analyze observed X/Y data with a linear trendline and R².',href:'/scatter-plot-maker/'},{name:'Line Graph Maker',description:'Show changes across categories or dates.',href:'/line-graph-maker/'}],
+  sectionHeadings:{howTo:'How to graph an equation',definition:'Graph a function from its equation',example:'A linear equation example',features:'Equation graph maker features',faq:'Equation graph maker FAQ',faqIntro:'Supported expressions, graph accuracy and local saving.'},
 } satisfies ToolPageConfig;

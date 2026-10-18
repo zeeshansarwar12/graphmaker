@@ -8,6 +8,7 @@
 | /bar-graph-maker/ | 60 | 140 | https://graphmaker.site/bar-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /box-plot-maker/ | 58 | 149 | https://graphmaker.site/box-plot-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /dot-plot-maker/ | 54 | 143 | https://graphmaker.site/dot-plot-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
+| /equation-graph-maker/ | 57 | 145 | https://graphmaker.site/equation-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /histogram-maker/ | 54 | 142 | https://graphmaker.site/histogram-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /line-graph-maker/ | 59 | 137 | https://graphmaker.site/line-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /pie-chart-maker/ | 55 | 136 | https://graphmaker.site/pie-chart-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
@@ -16,5 +17,5 @@
 | /supply-and-demand-graph-maker/ | 56 | 141 | https://graphmaker.site/supply-and-demand-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /xy-graph-maker/ | 56 | 134 | https://graphmaker.site/xy-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 
-Checked 531 internal links.
+Checked 586 internal links.
 All built HTML assertions passed. Zero broken internal links.

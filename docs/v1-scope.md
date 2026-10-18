@@ -101,8 +101,12 @@
 - real-time collaboration
 - public project galleries
 - AI APIs
-- equation parser / Desmos-like calculator
+- unrestricted / Desmos-like calculator (bounded explicit equation graphing approved in DEC-018)
 - network graph editor
 - crochet/cross-stitch tools
 - programmatic thin SEO page generation
 - dozens of template pages
+
+
+## Approved equation/XY extension — DEC-018
+Add a working `/equation-graph-maker/` for explicit real-valued functions, using the shared editor, local worker evaluation, multiple expressions, pan/zoom and existing PNG/SVG export. Integrate coordinate-plane mode into XY instead of creating a second coordinate page. Scatter gains linear trendline and R². See DEC-018 and the SEO map for scope and URL ownership.

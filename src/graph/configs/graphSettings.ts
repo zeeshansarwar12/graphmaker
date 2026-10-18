@@ -1,6 +1,14 @@
+import { defaultCartesian } from './cartesian';
+import type { CartesianSettings } from './cartesian';
+
 export type GraphOrientation = 'horizontal' | 'vertical';
 
 export interface GraphSettings {
+  cartesian: CartesianSettings;
+  equations: string[];
+  showTrendline: boolean;
+  xyPlotOnClick: boolean;
+  xySnapToGrid: boolean;
   dotPlotSeriesColumnId: string | null;
   dotSize: number;
   hiddenSeriesIds: string[];
@@ -66,6 +74,11 @@ export function getVisibleSeriesIndexes(
 
 export function createDefaultGraphSettings(): GraphSettings {
   return {
+    cartesian: { ...defaultCartesian },
+    equations: ['y = 2x + 3'],
+    showTrendline: false,
+    xyPlotOnClick: false,
+    xySnapToGrid: true,
     dotPlotSeriesColumnId: null,
     dotSize: 10,
     hiddenSeriesIds: [],
