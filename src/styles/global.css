@@ -115,3 +115,12 @@ button:disabled {
     width: min(100% - 3rem, 87.5rem);
   }
 }
+
+@media print {
+  body * { visibility: hidden; }
+  main > section:not(:has(#editor)), body > header, body > footer { display: none; }
+  main > section > .page-shell:not(#editor) { display: none; }
+  section[aria-labelledby="preview-heading"] { position: absolute; inset: 0; width: 100%; visibility: visible; }
+  [data-print-title], [data-print-title] *, [data-print-graph], [data-print-graph] * { visibility: visible; }
+  [data-print-graph] [data-chart-canvas] { height: 11cm !important; }
+}

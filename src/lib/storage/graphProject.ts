@@ -1,3 +1,4 @@
+import { cartesianError, defaultCartesian } from '../../graph/configs/cartesian';
 import { createDefaultGraphSettings } from '../../graph/configs/graphSettings';
 import type { GraphSettings } from '../../graph/configs/graphSettings';
 import { createSampleData } from '../../graph/transforms/tabularData';
@@ -16,7 +17,7 @@ export function graphProjectStorageId(slug = '/'): string {
 export interface GraphProject {
   createdAt: string;
   data: TabularData;
-  graphType: 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy';
+  graphType: 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy' | 'equation';
   id: typeof currentProjectId;
   name: string;
   schemaVersion: typeof graphProjectSchemaVersion;
@@ -68,6 +69,9 @@ function isTabularData(value: unknown): value is TabularData {
 
 function isGraphSettings(value: unknown): value is GraphSettings {
   return isRecord(value)
+    && (value.cartesian === undefined || (isRecord(value.cartesian) && ['xMin', 'xMax', 'yMin', 'yMax', 'xStep', 'yStep'].every(key => value.cartesian !== null && isRecord(value.cartesian) && (value.cartesian[key] === null || typeof value.cartesian[key] === 'number')) && typeof value.cartesian.origin === 'boolean' && typeof value.cartesian.equalScale === 'boolean' && cartesianError(value.cartesian as unknown as GraphSettings['cartesian']) === null))
+    && (value.equations === undefined || (Array.isArray(value.equations) && value.equations.length <= 8 && value.equations.every(expression => typeof expression === 'string' && expression.length <= 512)))
+    && ['showTrendline', 'xyPlotOnClick', 'xySnapToGrid'].every(key => value[key] === undefined || typeof value[key] === 'boolean')
     && (value.dotPlotSeriesColumnId === undefined
       || value.dotPlotSeriesColumnId === null
       || typeof value.dotPlotSeriesColumnId === 'string')
@@ -155,7 +159,7 @@ export function parseGraphProject(value: unknown): ProjectParseResult {
 
   if (
     value.id !== currentProjectId
-    || (value.graphType !== 'bar' && value.graphType !== 'boxplot' && value.graphType !== 'dotplot' && value.graphType !== 'histogram' && value.graphType !== 'line' && value.graphType !== 'pie' && value.graphType !== 'radar' && value.graphType !== 'scatter' && value.graphType !== 'supplydemand' && value.graphType !== 'xy')
+    || (value.graphType !== 'bar' && value.graphType !== 'boxplot' && value.graphType !== 'dotplot' && value.graphType !== 'histogram' && value.graphType !== 'line' && value.graphType !== 'pie' && value.graphType !== 'radar' && value.graphType !== 'scatter' && value.graphType !== 'supplydemand' && value.graphType !== 'xy' && value.graphType !== 'equation')
     || typeof value.name !== 'string'
     || !isIsoDate(value.createdAt)
     || !isIsoDate(value.updatedAt)
@@ -172,6 +176,11 @@ export function parseGraphProject(value: unknown): ProjectParseResult {
       ...project,
       settings: {
         ...project.settings,
+        cartesian: project.settings.cartesian ?? { ...defaultCartesian },
+        equations: project.settings.equations ?? ['y = 2x + 3'],
+        showTrendline: project.settings.showTrendline ?? false,
+        xyPlotOnClick: project.settings.xyPlotOnClick ?? false,
+        xySnapToGrid: project.settings.xySnapToGrid ?? true,
         dotPlotSeriesColumnId: project.settings.dotPlotSeriesColumnId ?? null,
         dotSize: project.settings.dotSize ?? 10,
         hiddenSeriesIds: project.settings.hiddenSeriesIds ?? [],

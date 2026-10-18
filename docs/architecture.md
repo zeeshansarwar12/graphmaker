@@ -9,7 +9,7 @@
 - Papa Parse for CSV
 - SheetJS (`xlsx`) for Excel import
 - `simple-statistics` for statistical calculations
-- `math.js` only when equation/function graphing becomes an approved future scope
+- Bounded arithmetic grammar and Web Worker for explicit equation graphing (DEC-018); no unrestricted JavaScript evaluation
 - IndexedDB for local projects
 - Vitest for unit tests
 - Playwright for critical browser flows
@@ -161,3 +161,9 @@ Keep export logic isolated from editor presentation. PNG/SVG export should use t
 V1 must not silently transmit uploaded/pasted datasets to third parties. Analytics events should not include user dataset contents.
 
 GA4 page-view analytics uses the production Measurement ID by default and accepts a validated `PUBLIC_GOOGLE_ANALYTICS_ID` override for alternate deployments. The shared layout disables advertising personalization and Google signals. Do not add dataset values, project names, file contents, chart titles, or other editor state to analytics events.
+
+
+## Explicit equation input mode
+`GraphEditor` lazy-loads `EquationInput` only for equation mode. A module worker compiles a restricted arithmetic AST and adaptively samples the visible X domain. Expressions, axis bounds, colors and visibility remain in validated local project settings. Sampled values use the existing tabular data shape and shared XY chart adapter, with blank rows marking discontinuities. Equation graphs suppress point markers and resample on viewport changes. A four-second worker timeout and bounded expression/sampling work protect the main thread.
+
+SVG export clones the live chart options (including current grid/viewport and visibility) with animation disabled; PNG captures that same live chart. Equal scale is implemented by fitting the chart grid rectangle to the explicit coordinate bounds on resize, preserving numeric bounds rather than stretching units.

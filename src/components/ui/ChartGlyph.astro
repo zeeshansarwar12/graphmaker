@@ -1,6 +1,6 @@
 ---
 interface Props {
-  type: 'bar' | 'line' | 'pie' | 'xy' | 'scatter' | 'boxplot' | 'radar' | 'histogram' | 'dotplot' | 'supplydemand';
+  type: 'bar' | 'line' | 'pie' | 'xy' | 'scatter' | 'boxplot' | 'radar' | 'histogram' | 'dotplot' | 'supplydemand' | 'equation';
 }
 
 const { type } = Astro.props;
@@ -20,6 +20,7 @@ const { type } = Astro.props;
     <path d="M15 3a13 13 0 1 0 13 13H15V3Z" fill="currentColor" opacity=".8"></path>
     <path d="M18 3.4V13h9.6A13 13 0 0 0 18 3.4Z" fill="currentColor"></path>
   </>}
+  {type === 'equation' && <><path d="M3 16h26M16 3v26M4 5Q16 46 28 5" stroke="currentColor" stroke-width="2" fill="none"></path></>}
   {type === 'xy' && <>
     <path d="M5 27V5M5 27h22" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path>
     <path d="m8 22 6-7 5 3 7-10" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>

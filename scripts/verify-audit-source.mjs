@@ -22,9 +22,9 @@ const { graphTools } = await import('../src/content/graphTools.ts');
 const { detectDataShape } = await import('../src/graph/transforms/dataInterpretation.ts');
 const { calculateBoxPlotStatistics } = await import('../src/graph/statistics/boxPlot.ts');
 const { breadcrumbSchema, toolBreadcrumbs } = await import('../src/content/seo.ts');
-assert.equal(graphTools.length, 10);
-assert.equal(new Set(graphTools.map((tool) => tool.icon)).size, 10);
-assert.equal(new Set(graphTools.map((tool) => tool.slug)).size, 10);
+assert.equal(graphTools.length, 11);
+assert.equal(new Set(graphTools.map((tool) => tool.icon)).size, 11);
+assert.equal(new Set(graphTools.map((tool) => tool.slug)).size, 11);
 const rows = [];
 for (const config of Object.values(configs)) {
   assert.ok(config.title.length <= 60, config.canonical);
@@ -63,10 +63,10 @@ for (const [route, filename, types] of [
   if (robots === 'index,follow') assert.ok(description.length >= 70 && description.length <= 160);
   rows.unshift([route, title.length, description.length, robots, types]);
 }
-assert.equal(rows.length, 15);
+assert.equal(rows.length, 16);
 rows.sort((a, b) => a[0].localeCompare(b[0]));
 const heading = '# Source metadata inventory\n\nThese values come from source files. Canonicals, image presence, and schema types below describe the implementation; rendered HTML has not been verified. Run `python scripts/audit-built-html.py` after a successful build for actual output verification.\n\n';
 const table = '| Page | Title length | Description length | Canonical (configured) | Robots | og:image (configured) | JSON-LD types (configured) |\n|---|---:|---:|---|---|---|---|\n' + rows.map(([route, title, description, robots, types]) => `| ${route} | ${title} | ${description} | https://graphmaker.site${route} | ${robots} | yes | ${types} |`).join('\n');
 writeFileSync(new URL('../docs/audit-source-metadata.md', import.meta.url), heading + table + '\n');
 log(table);
-log('\nSupplementary source assertions passed (15 pages, sample parity, comparable line scales, catalog icons, and actual quartile results).');
+log('\nSupplementary source assertions passed (16 pages, sample parity, comparable line scales, catalog icons, and actual quartile results).');

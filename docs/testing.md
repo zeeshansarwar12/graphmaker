@@ -87,3 +87,9 @@ Automated tests do not replace UI inspection. For significant UI tasks, inspect 
 - data-grid usability
 - error/empty states
 - loading states if any
+
+
+## XY / equation cluster regression coverage
+`tests/unit/xy-cluster.test.ts` covers signed multi-series XY data, missing-pair gaps, coordinate settings and equal scale, schema-v1 restoration, least-squares degeneracies, restricted expression parsing, the four supported examples, domain gaps, a non-grid-aligned pole, and high-frequency aliasing.
+`tests/e2e/xy-cluster.spec.ts` covers named-coordinate SVG values, plot visibility and restore, blank-plane pointer plotting, axis validation, regression output, multiple equations and inline validation, save/reopen, viewport controls, PNG/SVG downloads, narrow screens, keyboard entry, pointer panning and print visibility.
+Run the full browser suite because the new type also appears in the shared catalog. SEO tests and the built-HTML auditor expect 11 tools and 14 indexable routes (16 pages including legal pages). New URL canonicals/schema/sitemap and contextual cross-links must pass before publication. Retain the existing XY URL and metadata.

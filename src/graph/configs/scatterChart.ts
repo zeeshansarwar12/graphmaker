@@ -1,3 +1,5 @@
+import { linearRegression } from '../statistics/regression';
+import { cartesianAxis } from './cartesian';
 import type { ScatterSeriesOption } from 'echarts/charts';
 import type { EChartsOption } from 'echarts';
 
@@ -10,6 +12,7 @@ export type ScatterChartView =
   | { message: string; status: 'empty' }
   | {
     options: EChartsOption;
+    insight?: string;
     points: Array<[number, number]>;
     series: Array<{ name: string; values: Array<number | null> }>;
     status: 'ready';
@@ -67,38 +70,23 @@ export function createScatterChartView(data: TabularData, settings: GraphSetting
     ? `${scatter.skippedRowCount} row${scatter.skippedRowCount === 1 ? ' was' : 's were'} ignored because X or Y was blank or invalid.`
     : undefined;
 
+  const regression = settings.showTrendline ? linearRegression(scatter.points) : null;
+  const insight = regression ? ('error' in regression ? regression.error : `y = ${Number(regression.slope.toPrecision(6))}x ${regression.intercept < 0 ? '-' : '+'} ${Number(Math.abs(regression.intercept).toPrecision(6))}; R² = ${regression.rSquared === null ? 'undefined (constant Y)' : Number(regression.rSquared.toPrecision(6))}`) : undefined;
   return {
+    insight,
     options: {
       animationDuration: scatter.points.length > 500 ? 0 : 250,
       aria: { enabled: true },
       color: [settings.seriesColors[0] ?? defaultSeriesColors[0]],
       grid: { bottom: 58, containLabel: true, left: 58, right: 20, top: 24 },
-      series: [scatterSeries],
+      series: [scatterSeries, ...(regression && !('error' in regression) ? [{ type: 'line' as const, name: 'Linear trendline', data: regression.points, showSymbol: false, lineStyle: { type: 'dashed' as const }, silent: true }] : [])],
       tooltip: {
         confine: true,
         formatter: (params) => formatScatterTooltip(params as ScatterTooltipItem, xName, yName),
         trigger: 'item',
       },
-      xAxis: {
-        axisLabel: { color: '#52627a', fontSize: 12 },
-        axisLine: { lineStyle: { color: '#94a3b8' } },
-        name: settings.xAxisTitle || xName,
-        nameGap: 36,
-        nameLocation: 'middle',
-        nameTextStyle: { color: '#52627a', fontSize: 12 },
-        splitLine: { lineStyle: { color: '#e2e8f0' }, show: settings.showGrid },
-        type: 'value',
-      },
-      yAxis: {
-        axisLabel: { color: '#52627a', fontSize: 12 },
-        axisLine: { show: false },
-        name: settings.yAxisTitle || yName,
-        nameGap: 42,
-        nameLocation: 'middle',
-        nameTextStyle: { color: '#52627a', fontSize: 12 },
-        splitLine: { lineStyle: { color: '#e2e8f0' }, show: settings.showGrid },
-        type: 'value',
-      },
+      xAxis: cartesianAxis(settings.cartesian, 'x', settings.xAxisTitle || xName, settings.showGrid),
+      yAxis: cartesianAxis(settings.cartesian, 'y', settings.yAxisTitle || yName, settings.showGrid),
     },
     points: scatter.points,
     series: [{ name: yName, values: scatter.points.map((point) => point[1]) }],

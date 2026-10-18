@@ -108,3 +108,15 @@ Do not send editor datasets or project state to advertising services. Do not
 claim account approval or a configured consent platform without verification.
 Google-certified consent configuration and review status remain account-side
 checks; adding the script is not evidence that either has been completed.
+
+
+## DEC-018 — XY improvements and explicit equation graphing
+**Status:** Accepted (owner approval of XY cluster implementation, 2026-10-19)
+
+Extend the shared editor with multiple Y series on one numeric X axis, coordinate-plane controls, labels and pointer plotting. Keep coordinate-plane features on `/xy-graph-maker/`; do not add a duplicate URL. Add least-squares trendline and R² to Scatter.
+
+Add `/equation-graph-maker/` as a sibling tool under `/tools/`, linked contextually with XY and Scatter. This supersedes the equation-parser exclusion for explicit real-valued `y = f(x)` only. Implicit equations, inequalities, symbolic solving and parametric plots remain outside this scope.
+
+Use the existing GraphEditor, ECharts, IndexedDB, imports and export infrastructure. A bounded arithmetic grammar and worker calculate expressions locally without JavaScript evaluation or a new dependency. Support up to eight expressions, 512 characters and 128 parse operations per expression; bounded adaptive sampling leaves unresolved segments disconnected. Do not promise symbolic or arbitrary-function completeness.
+
+New settings are optional when reading schema-v1 projects, validated when present, and restored with backward-compatible defaults. Publishing remains a separate owner-approved action after verification.

@@ -49,6 +49,7 @@ describe('XY tool page configuration', () => {
       shape: 'numeric-xy',
     });
     expect(xyToolPageConfig.relatedTools.map((tool) => tool.href)).toEqual([
+      '/equation-graph-maker/',
       '/scatter-plot-maker/',
       '/line-graph-maker/',
       '/supply-and-demand-graph-maker/',
@@ -82,11 +83,12 @@ describe('Scatter tool page configuration', () => {
       'number',
     ]);
     expect(scatterToolPageConfig.relatedTools.map((tool) => tool.href)).toEqual([
+      '/equation-graph-maker/',
       '/xy-graph-maker/',
       '/line-graph-maker/',
       '/bar-graph-maker/',
     ]);
-    expect(scatterToolPageConfig.faqs.some((faq) => faq.answer.includes('Not yet'))).toBe(true);
+    expect(scatterToolPageConfig.faqs.some((faq) => faq.answer.includes('least-squares'))).toBe(true);
   });
 });
 
