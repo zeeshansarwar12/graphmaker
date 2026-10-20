@@ -1,3 +1,4 @@
+import { createTreeSampleData } from '../graph/transforms/tree';
 import type { GraphEditorConfig } from '../graph/configs/editor';
 
 export interface ToolPageFeature {
@@ -526,6 +527,7 @@ export const barToolPageConfig = {
   intro: 'Use this free bar chart maker to compare categories with no signup. Enter, paste, or upload data and display multiple numeric series in a clear grouped bar chart.',
   metaDescription: 'Create a bar graph online for free. Paste data or import CSV and Excel files, compare multiple series, and export PNG or SVG with no signup.',
   relatedTools: [
+    { name: 'Tree Diagram Maker', description: 'Organize categories as parent–child branches instead of comparing numeric amounts.', href: '/tree-graph-maker/' },
     { name: 'Line Graph Maker', description: 'Show changes and trends across categories or dates.', href: '/line-graph-maker/' },
     { name: 'Pie Chart Maker', description: 'Show how one numeric series contributes to a whole.', href: '/pie-chart-maker/' },
     { name: 'Histogram Maker', description: 'Explore the distribution of raw numeric observations.', href: '/histogram-maker/' },
@@ -1334,4 +1336,57 @@ export const equationToolPageConfig = {
   faqs:[{question:'Which equations can I graph?',answer:'Explicit functions y = f(x), such as y = 2x + 3, x^2 - 4, and sin(x). Implicit equations, inequalities, parametric plots and symbolic solving are not supported.'},{question:'Which functions and notation are supported?',answer:'Use +, -, *, /, ^, parentheses, x, pi, e, sin, cos, tan, sqrt, abs, exp, ln, log and log10. Implicit multiplication such as 2x and superscripts ² and ³ are supported. Trigonometry uses radians; ln and log are natural logarithms.'},{question:'Why does a curve have gaps?',answer:'Some functions are undefined in parts of their domain, such as 1/x at zero or sqrt(x) for negative X. The tool also leaves gaps when it reaches its sampling limit instead of connecting uncertain segments.'},{question:'Are my equations uploaded?',answer:'No. Equation calculation and local saving happen in your browser. Export a project file if you need a portable backup.'}],
   relatedTools:[{name:'XY Graph Maker',description:'Plot entered coordinate pairs and ordered numeric paths.',href:'/xy-graph-maker/'},{name:'Scatter Plot Maker',description:'Analyze observed X/Y data with a linear trendline and R².',href:'/scatter-plot-maker/'},{name:'Line Graph Maker',description:'Show changes across categories or dates.',href:'/line-graph-maker/'}],
   sectionHeadings:{howTo:'How to graph an equation',definition:'Graph a function from its equation',example:'A linear equation example',features:'Equation graph maker features',faq:'Equation graph maker FAQ',faqIntro:'Supported expressions, graph accuracy and local saving.'},
+} satisfies ToolPageConfig;
+
+
+export const treeToolPageConfig = {
+  canonical: '/tree-graph-maker/', slug: '/tree-graph-maker/',
+  h1: 'Tree Diagram Maker', title: 'Tree Diagram Maker & Generator — Free | GraphMaker',
+  metaDescription: 'Create a tree diagram or tree chart from editable templates. Free tree diagram generator with local saving and PNG/SVG downloads. No signup.',
+  intro: 'Create a tree diagram from an editable template or your own parent–child relationships. Build a tree chart, customize its branches, and download PNG or SVG without signup.',
+  editor: { graphType: 'tree', slug: '/tree-graph-maker/', sampleData: createTreeSampleData(), initialSettings: { title: 'Project tree', orientation: 'horizontal' } },
+  definition: [
+    'A tree diagram shows how items branch from one root. Also called a tree graph or tree chart, it makes a hierarchy visible with connected nodes. Each remaining node has exactly one parent, so you can trace a unique path from the root to any item. Use it to organize a topic, break down a project, or explain a classification.',
+    'This tree diagram maker arranges the branches automatically. It supports one root, up to 50 nodes, and 10 levels. Labels can contain up to 80 characters; long labels are shortened in the drawing and remain available in the editor and text description.',
+    'This tool draws simple hierarchies. It does not calculate branch probabilities, train machine-learning decision trees, or model spouses and multiple parents in a genealogy.',
+  ],
+  example: { caption: 'Use unique IDs for relationships. The root has no Parent ID. Labels can repeat because parents reference IDs, not display names.', headers: ['ID', 'Label', 'Parent ID'], rows: createTreeSampleData().rows.map(row => row.cells) },
+  howTo: [
+    { title: 'Choose a template or start blank', description: 'Preview a blank hierarchy, project plan, organization chart, decision outline, website structure, or classification tree. Choose a template to open a new diagram. Your previous work stays in My diagrams. The diagram fits into view automatically; edit the root and its children to make it your own.' },
+    { title: 'Choose each parent', description: 'Click a node to edit its label, or use the labeled fields in Edit data. Use Add child to grow the tree and the Parent dropdown to move a branch. Keep exactly one root.' },
+    { title: 'Arrange and download', description: 'Choose a direction and color in Customize. Drag to pan, use + and − to zoom, or choose Fit to view. Download the whole diagram as PNG or SVG, or save a project backup.' },
+  ],
+  features: [
+    { title: 'Editable tree diagram templates', description: 'Six original starting points load real nodes into the editor. Change the labels and parent relationships to make each template your own.' },
+    { title: 'Automatic branch layout', description: 'Click any node to edit its label. Connections and spacing update when you add children or change a parent.' },
+    { title: 'Pan, zoom, and fit', description: 'Drag the canvas to explore branches, zoom in for readable labels, and use Fit to view to see the whole tree. Choose left-to-right or top-to-bottom layout in Customize.' },
+    { title: 'Structure checks', description: 'The tool checks unique IDs, missing parents, multiple roots, cycles, and supported size limits before drawing.' },
+    { title: 'Spreadsheet imports', description: 'Paste or upload CSV and Excel tables with ID, Label, and Parent ID columns through Import or edit a table.' },
+    { title: 'Local saving and backup', description: 'Keep separate drafts in My diagrams. Remember my diagrams on this device saves them in this browser; uncheck it for session-only editing. Download a project backup to move work to another browser.' },
+    { title: 'PNG and SVG export', description: 'Download the entire tree diagram with no watermark. SVG preserves vector lines and text.' },
+  ],
+  comparison: { title: 'Tree diagram or bar graph?', intro: 'Choose the tool that matches what you want to explain.', first: { title: 'Tree diagrams show relationships', body: 'Use a tree for project breakdowns, categories, website sections, or reporting hierarchies where each item has one parent.' }, second: { title: 'Bar graphs compare amounts', body: 'Use a bar graph when you have numeric values for categories. Tree branches show structure rather than the size of a measurement.' } },
+  useCases: { title: 'What can you make with a tree chart?', intro: 'Start with one root and organize its branches.', items: [
+    { title: 'Project breakdowns', description: 'Split a project into phases, tasks, and subtasks.' },
+    { title: 'Category trees', description: 'Arrange products, lessons, or subjects into a classification hierarchy.' },
+    { title: 'Simple reporting structures', description: 'Show one reporting parent per team or role. Use labels for role names rather than complex personnel records.' },
+  ] },
+  faqs: [
+    { question: 'How do I create a tree diagram from a template?', answer: 'Choose a template from the gallery or the Tree template selector to open a new diagram. Your current diagram remains available in My diagrams. Edit labels and choose a parent for each node. The tree diagram generator arranges the branches automatically. Export PNG, SVG, or a project backup when ready.' },
+    { question: 'Is a tree chart the same as a tree diagram?', answer: 'Tree chart, tree diagram, and tree graph often describe the same branching hierarchy. This tool creates connected parent–child nodes. It does not create treemaps with nested rectangles or draw botanical trees.' },
+    { question: 'Can I draw a tree diagram without dragging nodes?', answer: 'Yes. Use Add child and the Parent dropdown to draw a tree diagram through its relationships. The creator handles placement and connecting lines. Manual freehand drawing is not required.' },
+    { question: 'Is this tree diagram creator free?', answer: 'Yes. Create and download PNG and SVG tree diagrams without signup or a watermark.' },
+    { question: 'How do I import a tree from Excel or CSV?', answer: 'Open Import or edit a table. Use three columns in this order: ID, Label, Parent ID. Each ID must be unique and every parent must reference an existing ID. Leave Parent ID blank for exactly one root. Imports replace the current tree after confirmation.' },
+    { question: 'What is the difference between a tree graph and a treemap?', answer: 'A tree graph draws nodes connected by branches. A treemap uses nested rectangles whose areas usually represent numeric values. This tool creates branching node diagrams, not treemaps.' },
+    { question: 'Can I make a decision tree or probability tree?', answer: 'You can label branches as choices by naming their child nodes. This version does not support edge labels, probability multiplication, expected-value calculations, or machine-learning model training.' },
+    { question: 'Can I create a family tree?', answer: 'Only a simple one-parent hierarchy. Family trees with couples, multiple parents, photos, or genealogy records need a dedicated genealogy tool.' },
+    { question: 'What happens when I remove a branch?', answer: 'The tool asks you to confirm removal of the selected node and all its descendants. Download a project backup first if you want to keep a copy.' },
+    { question: 'Does my tree data leave my browser?', answer: 'Tree editing, validation, saving, and downloads happen in your browser. Local projects can be lost when browser storage is cleared; download a project backup for safekeeping.' },
+  ],
+  relatedTools: [
+    { name: 'Pie Chart Maker', description: 'Show how numeric category values make up a whole.', href: '/pie-chart-maker/' },
+    { name: 'Bar Graph Maker', description: 'Compare numeric amounts across named categories.', href: '/bar-graph-maker/' },
+    { name: 'Radar Chart Maker', description: 'Compare several numeric metrics across profiles.', href: '/radar-chart-maker/' },
+  ],
+  sectionHeadings: { howTo: 'How to create a tree diagram', definition: 'What is a tree diagram?', example: 'Tree diagram example: project structure', features: 'Tree diagram generator features', faq: 'Tree diagram questions', faqIntro: 'Parent–child relationships, imports, downloads, and supported limits.' },
 } satisfies ToolPageConfig;

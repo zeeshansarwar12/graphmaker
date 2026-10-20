@@ -13,6 +13,7 @@ const tools = [
   { name: 'Radar Chart Maker', label: 'Radar', slug: 'radar-chart-maker', description: 'Compare several metrics across profiles.', type: 'radar', icon: '⬡', category: 'Compare profiles' },
   { name: 'Dot Plot Maker', label: 'Dot Plot', slug: 'dot-plot-maker', description: 'Stack repeated observations on a true numeric scale.', type: 'dotplot', icon: '⠇', category: 'Understand distributions' },
   { name: 'Supply and Demand Graph Maker', label: 'Supply & Demand', slug: 'supply-and-demand-graph-maker', description: 'Plot economics curves and estimate equilibrium.', type: 'supplydemand', icon: '⇄', category: 'Explore economics' },
+  { name: 'Tree Diagram Maker', label: 'Tree', slug: 'tree-graph-maker', description: 'Create tree diagrams and charts from editable templates.', type: 'tree', icon: '⑂', category: 'Organize hierarchies' },
 ] as const satisfies ReadonlyArray<{ name: string; label: string; slug: string; description: string; type: GraphType; icon: string; category: string }>;
 
 export const graphTools = tools.map((tool) => ({ ...tool, href: `/${tool.slug}/` }));

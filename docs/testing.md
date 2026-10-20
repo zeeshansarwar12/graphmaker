@@ -93,3 +93,13 @@ Automated tests do not replace UI inspection. For significant UI tasks, inspect 
 `tests/unit/xy-cluster.test.ts` covers signed multi-series XY data, missing-pair gaps, coordinate settings and equal scale, schema-v1 restoration, least-squares degeneracies, restricted expression parsing, the four supported examples, domain gaps, a non-grid-aligned pole, and high-frequency aliasing.
 `tests/e2e/xy-cluster.spec.ts` covers named-coordinate SVG values, plot visibility and restore, blank-plane pointer plotting, axis validation, regression output, multiple equations and inline validation, save/reopen, viewport controls, PNG/SVG downloads, narrow screens, keyboard entry, pointer panning and print visibility.
 Run the full browser suite because the new type also appears in the shared catalog. SEO tests and the built-HTML auditor expect 11 tools and 14 indexable routes (16 pages including legal pages). New URL canonicals/schema/sitemap and contextual cross-links must pass before publication. Retain the existing XY URL and metadata.
+
+## Tree regression coverage
+`tree.test.ts` validates tree structure, unique IDs, parent references, root count, cycles, limits, chart layouts, subtree operations and schema-v1 persistence. `tree-tool-page.spec.ts` covers editing, parent selection, branch removal, invalid imports, autosave/reopen, full PNG/SVG/JSON downloads, mobile overflow, tool discovery and page metadata. Full suite and built-HTML audit must pass with 12 tools.
+
+## Tree template coverage
+`tree-templates.test.ts` validates every preset, clone isolation and unknown IDs. `tree-templates.spec.ts` covers static gallery links/metadata, non-destructive draft selection, initial template links after saved-work restoration, persistent/session-only preference changes, deletion, autosave restoration and narrow mobile layout. All template fragments must resolve to static IDs and all variants retain the existing canonical URL.
+
+Clipboard CSV regressions cover comma-separated values, quoted commas/escaped quotes, TSV preference, optional title lines above valid header tables, malformed rows, and both cell-paste and Paste data flows with local restoration.
+
+Equation switching regression: paste the exam CSV, enter f(x), autosave and refresh, then return to Bar and verify all five rows and the original title. Repeat the mode switch. Unit tests validate optional table backups and reject malformed backups.

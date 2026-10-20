@@ -110,3 +110,6 @@
 
 ## Approved equation/XY extension — DEC-018
 Add a working `/equation-graph-maker/` for explicit real-valued functions, using the shared editor, local worker evaluation, multiple expressions, pan/zoom and existing PNG/SVG export. Integrate coordinate-plane mode into XY instead of creating a second coordinate page. Scatter gains linear trendline and R². See DEC-018 and the SEO map for scope and URL ownership.
+
+## Approved tree extension — DEC-019
+A simple hierarchy tool at `/tree-graph-maker/`: node labels and parents, automatic layout, left-to-right/top-to-bottom direction, local autosave, JSON backups, and PNG/SVG export. Exactly one root, up to 50 nodes and 10 levels. No general network editor, probability calculation, or genealogy model.

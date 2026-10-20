@@ -130,6 +130,7 @@ describe('Bar tool page configuration', () => {
       shape: 'category-series',
     });
     expect(barToolPageConfig.relatedTools.map((tool) => tool.href)).toEqual([
+      '/tree-graph-maker/',
       '/line-graph-maker/',
       '/pie-chart-maker/',
       '/histogram-maker/',

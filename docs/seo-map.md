@@ -116,3 +116,11 @@ Aim for meaningful pages to remain within roughly 2–3 clicks of the homepage.
 - src/content/pageLastModified.ts records each indexable page's last significant content or tool update (UTC date), verified from Git history.
 - Update affected entries alongside meaningful page/tool changes, including shared editor changes that affect multiple tools. Do not bump dates for builds, deployment, or cosmetic header/footer changes.
 - The sitemap requires an explicit date for every indexable route; SEO tests check complete coverage, valid dates and no future dates.
+
+## Approved tree tool (2026-10-20)
+`/tree-graph-maker/` owns tree graph maker and tree diagram maker intent. It creates branching parent–child diagrams, not treemaps or machine-learning trees. Use the shared catalog to link from home, hub, About, footer and editor; link contextually with Bar for structure versus numerical comparison. One self-canonical page with the shared WebApplication and BreadcrumbList schema; include in sitemap. Total: 12 tools, 15 indexable routes, 17 pages including legal pages.
+
+## Tree diagram keyword cluster and templates (2026-10-20)
+Retain `/tree-graph-maker/` as the single canonical tool URL. Prioritize tree diagram / tree diagram maker in the title, H1, definition and template gallery. Support tree chart, tree diagram generator, create tree diagram, tree diagram creator and tree graph maker naturally in explanations and FAQs. Tree draw has mixed intent; use natural draw-a-tree-diagram wording without creating a botanical or genealogy landing page. Six original presets have static, crawlable on-page previews and fragment links, not separate indexable template pages. Do not claim probability calculations or multiple-parent genealogy support. The owner's 10k Semrush volume is user-provided; additional API metrics were unavailable. See `docs/tree-diagram-research.md`.
+
+The tree page includes an accessible static labeled project diagram beside its import table, with root/branch/leaf explanations and an edit-template link. Feature and how-to copy reflects direct label editing, draft-preserving template selection, pan, zoom and fitting; the FAQ heading uses natural wording.

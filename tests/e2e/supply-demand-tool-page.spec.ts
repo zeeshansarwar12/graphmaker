@@ -10,7 +10,7 @@ test('serves a complete Supply and Demand page with equilibrium on numeric axes'
   await expect(page.getByRole('heading', { level: 1, name: 'Supply and Demand Graph Maker' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Supply and Demand Graph Maker');
 
-  await expect(page.getByRole('button', { exact: true, name: 'Supply & Demand' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { exact: true, name: 'Supply & Demand' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.getByLabel('Quantity, row 1', { exact: true })).toHaveValue('10');
   await expect(page.getByLabel('Supply, row 7')).toHaveValue('80');
   const chart = page.locator('[data-rendered-chart-type="supplydemand"] [data-chart-status="ready"]');
@@ -21,7 +21,7 @@ test('serves a complete Supply and Demand page with equilibrium on numeric axes'
   await expect(page.locator('[data-chart-insight]')).toHaveText('Equilibrium: quantity 45, value 55.');
 
   for (const name of ['Paste data', 'Upload CSV', 'Upload Excel', 'Save locally', 'Download']) {
-    await expect(page.getByRole('button', { name })).toBeVisible();
+    await expect(page.getByRole('button', { name, exact: true })).toBeVisible();
   }
   for (const heading of [
     'How to make a supply and demand graph',
@@ -44,7 +44,7 @@ test('serves a complete Supply and Demand page with equilibrium on numeric axes'
   await expect(page.getByLabel('Show equilibrium marker')).toBeChecked();
   await page.getByLabel('Show equilibrium marker').uncheck();
   await page.getByRole('button', { name: 'Save locally' }).click();
-  await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
+  await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
   await reloadPage(page);
   await page.getByRole('button', { name: 'Customize' }).click();
   await expect(page.getByLabel('Show equilibrium marker')).not.toBeChecked();

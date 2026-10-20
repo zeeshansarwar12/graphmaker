@@ -10,7 +10,7 @@ test('serves a complete crawlable XY tool page with the shared editor preset', a
   await expect(page.getByRole('heading', { level: 1, name: 'XY Graph Maker' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Home/Graph tools/XY Graph Maker');
 
-  await expect(page.getByRole('button', { exact: true, name: 'XY' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { exact: true, name: 'XY' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.getByLabel('X, row 1')).toHaveValue('1');
   await expect(page.getByLabel('Y, row 5')).toHaveValue('7');
   await expect(page.getByLabel('Connect points')).toBeChecked();
@@ -58,7 +58,7 @@ test('accepts pasted XY data and remains usable on mobile', async ({ page }) => 
   await expect(page.getByLabel('Time, row 1')).toHaveValue('1');
   await expect(page.getByLabel('Distance, row 3')).toHaveValue('60');
   await expect(page.getByRole('heading', { level: 3, name: 'Distance by Time' })).toBeVisible();
-  await expect(page.getByRole('button', { exact: true, name: 'XY' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('combobox', { name: 'Chart type' })).toHaveValue('xy');
   expect(await page.evaluate(
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
   )).toBe(false);
@@ -67,9 +67,9 @@ test('accepts pasted XY data and remains usable on mobile', async ({ page }) => 
 test('does not restore a project saved on another specialist page', async ({ page }) => {
   await openPage(page, '/radar-chart-maker/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
-  await page.getByRole('button', { exact: true, name: 'Line' }).click();
+  await page.getByRole('radio', { exact: true, name: 'Line' }).click();
   await page.getByRole('button', { name: 'Save locally' }).click();
-  await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
+  await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
 
   await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
@@ -92,13 +92,13 @@ test('does not restore a project saved on another specialist page', async ({ pag
   });
 
   await openPage(page, '/xy-graph-maker/');
-  await expect(page.getByRole('button', { exact: true, name: 'XY' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { exact: true, name: 'XY' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.getByLabel('X, row 1')).toHaveValue('1');
   await expect(page.getByLabel('Y, row 5')).toHaveValue('7');
   await expect(page.locator('[data-rendered-chart-type="xy"] [data-chart-status="ready"]')).toBeVisible();
 
   await openPage(page, '/radar-chart-maker/');
-  await expect(page.getByRole('button', { exact: true, name: 'Radar' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { exact: true, name: 'Radar' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.getByLabel('Metric, row 1')).toHaveValue('Speed');
 });
 

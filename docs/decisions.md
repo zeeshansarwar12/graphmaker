@@ -120,3 +120,18 @@ Add `/equation-graph-maker/` as a sibling tool under `/tools/`, linked contextua
 Use the existing GraphEditor, ECharts, IndexedDB, imports and export infrastructure. A bounded arithmetic grammar and worker calculate expressions locally without JavaScript evaluation or a new dependency. Support up to eight expressions, 512 characters and 128 parse operations per expression; bounded adaptive sampling leaves unresolved segments disconnected. Do not promise symbolic or arbitrary-function completeness.
 
 New settings are optional when reading schema-v1 projects, validated when present, and restored with backward-compatible defaults. Publishing remains a separate owner-approved action after verification.
+
+## DEC-019 — Simple tree graph maker
+**Status:** Accepted (owner request, 2026-10-20)
+
+Add `/tree-graph-maker/` for parent–child hierarchies using the shared GraphEditor, ECharts TreeChart, client-side tabular state, IndexedDB and PNG/SVG exports. This is a bounded extension of the network-editor exclusion, not a general graph editor. Exactly one root, one parent per non-root node, unique IDs, no cycles, at most 50 nodes and 10 levels; labels and IDs at most 80 characters. Tree settings reuse orientation and the first series color. Existing schema-v1 project files remain compatible. Tree projects use ID, Label, Parent ID columns and remain local.
+
+Provide editable labels, parent selection, add-child and confirmed branch removal, two layout directions, and optional shared spreadsheet imports. Validate imported hierarchies before drawing and show inline recovery guidance. Selecting Tree preserves existing data and offers an explicit sample-tree replacement action if incompatible. Probability calculations, edge labels, machine learning, genealogy-specific relationships, general networks and collaboration remain out of scope. One canonical tool page covers tree graph maker and tree diagram maker; no keyword-variant page. Publishing remains separate.
+
+## DEC-020 — Tree diagram templates and keyword consolidation
+**Status:** Accepted (owner request, 2026-10-20)
+
+Keep the existing tree URL and shared editor. Promote Tree Diagram Maker as its public heading and catalog name, covering overlapping diagram/chart/generator/creator intent on one page. Add six original, valid parent–child templates: blank hierarchy, project plan, organization chart, decision outline, website structure, and classification. Static gallery links use existing-page fragments; no duplicate SEO routes. Template loading asks before replacing data, title and orientation, and uses the current local saving/export infrastructure. Canceled or unknown template links must leave the project unchanged. Decision templates remain diagram outlines without probability/expected-value calculations. No general network, genealogy or AI scope expansion.
+
+## DEC-021 — Preserve tree drafts when opening templates
+Accepted: owner request, 20 October 2026. Supersedes destructive template replacement in DEC-020. Selection or gallery links open a new draft immediately; no Load template button or replacement dialog. Keep up to 20 diagrams, never silently discard older drafts, and expose My diagrams and explicit deletion. Remember my diagrams on this device is checked by default as a storage preference, not affirmative consent. Unchecking removes persistent tree workspace and legacy tree copies; drafts remain only in memory until the page closes. Store validated schema-v1 snapshots in IndexedDB with serialized writes and a small localStorage preference. No cloud storage or new dependency.

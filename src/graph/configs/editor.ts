@@ -1,7 +1,7 @@
 import type { GraphSettings } from './graphSettings';
 import type { TabularData } from '../transforms/tabularData';
 
-export type GraphType = 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy' | 'equation';
+export type GraphType = 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy' | 'equation' | 'tree';
 
 export interface GraphEditorConfig {
   graphType: GraphType;

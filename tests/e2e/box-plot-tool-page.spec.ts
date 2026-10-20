@@ -11,7 +11,7 @@ test('serves a complete Box Plot page with the shared grouped-data preset', asyn
   await expect(page.getByRole('heading', { level: 1, name: 'Box Plot Maker' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Box Plot Maker');
 
-  await expect(page.getByRole('button', { exact: true, name: 'Box Plot' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { exact: true, name: 'Box Plot' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.getByLabel('Class A, row 1', { exact: true })).toHaveValue('72');
   await expect(page.getByLabel('Class B, row 10')).toHaveValue('80');
   await expect(page.locator('[data-rendered-chart-type="boxplot"] [data-chart-status="ready"]')).toBeVisible();
@@ -21,7 +21,7 @@ test('serves a complete Box Plot page with the shared grouped-data preset', asyn
   await expect(page.locator('[data-chart-status="ready"]')).toContainText('Class B: minimum 74');
 
   for (const name of ['Paste data', 'Upload CSV', 'Upload Excel', 'Save locally', 'Download']) {
-    await expect(page.getByRole('button', { name })).toBeVisible();
+    await expect(page.getByRole('button', { name, exact: true })).toBeVisible();
   }
 
   for (const heading of [

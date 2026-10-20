@@ -1,6 +1,6 @@
 ---
 interface Props {
-  type: 'bar' | 'line' | 'pie' | 'xy' | 'scatter' | 'boxplot' | 'radar' | 'histogram' | 'dotplot' | 'supplydemand' | 'equation';
+  type: 'bar' | 'line' | 'pie' | 'xy' | 'scatter' | 'boxplot' | 'radar' | 'histogram' | 'dotplot' | 'supplydemand' | 'equation' | 'tree';
 }
 
 const { type } = Astro.props;
@@ -54,4 +54,5 @@ const { type } = Astro.props;
     <path d="m7 25 6-5 6-6 8-6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4"></path>
     <circle cx="17" cy="16.5" fill="currentColor" r="2.8"></circle>
   </>}
+  {type === 'tree' && <><path d="M16 9v7M6 16h20M6 16v6M16 16v6M26 16v6" stroke="currentColor" stroke-width="2"></path><rect x="12" y="2" width="8" height="7" rx="1" fill="currentColor"></rect><rect x="2" y="22" width="8" height="7" rx="1" fill="currentColor"></rect><rect x="12" y="22" width="8" height="7" rx="1" fill="currentColor"></rect><rect x="22" y="22" width="8" height="7" rx="1" fill="currentColor"></rect></>}
 </svg>

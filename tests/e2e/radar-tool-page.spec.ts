@@ -11,7 +11,7 @@ test('serves a complete Radar page with a percentage-scaled multi-series preset'
   await expect(page.getByRole('heading', { level: 1, name: 'Radar Chart Maker' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Radar Chart Maker');
 
-  await expect(page.getByRole('button', { exact: true, name: 'Radar' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { exact: true, name: 'Radar' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.getByLabel('Metric, row 1', { exact: true })).toHaveValue('Speed');
   await expect(page.getByLabel('Team A, row 5')).toHaveValue('92');
   await expect(page.getByLabel('Team B, row 5')).toHaveValue('89');
@@ -25,7 +25,7 @@ test('serves a complete Radar page with a percentage-scaled multi-series preset'
   await expect(page.getByRole('button', { name: 'Switch to Bar' })).toHaveCount(0);
 
   for (const name of ['Paste data', 'Upload CSV', 'Upload Excel', 'Save locally', 'Download']) {
-    await expect(page.getByRole('button', { name })).toBeVisible();
+    await expect(page.getByRole('button', { name, exact: true })).toBeVisible();
   }
 
   for (const heading of [

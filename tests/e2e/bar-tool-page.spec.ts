@@ -10,7 +10,7 @@ test('serves a complete crawlable Bar tool page with grouped sample series', asy
   await expect(page.getByRole('heading', { level: 1, name: 'Bar Graph Maker' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Bar Graph Maker');
 
-  await expect(page.getByRole('button', { exact: true, name: 'Bar' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { exact: true, name: 'Bar' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.getByLabel('Category, row 1')).toHaveValue('Jan');
   await expect(page.getByLabel('Sales, row 3')).toHaveValue('240');
   await expect(page.getByLabel('Profit, row 4')).toHaveValue('63');

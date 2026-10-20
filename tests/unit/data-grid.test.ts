@@ -147,3 +147,14 @@ describe('numeric validation', () => {
     }]);
   });
 });
+
+describe('CSV clipboard input',()=>{
+  it('separates the reported exam title, header and five values',()=>{
+    const result=parseClipboardTable('Exam results\nCategory,Value\nEnglish,72\nMath,88\nScience,81\nHistory,65\nComputer,94');
+    expect(result).toMatchObject({ok:true,title:'Exam results',rows:[['Category','Value'],['English','72'],['Math','88'],['Science','81'],['History','65'],['Computer','94']]});
+    if(result.ok){const data=createDataFromClipboard(result.rows);expect(data.columns.map(c=>c.name)).toEqual(['Category','Value']);expect(data.rows).toHaveLength(5);}
+  });
+  it('preserves commas and escaped quotes in quoted CSV cells',()=>{expect(parseClipboardTable('Category,Value\n"English, advanced",72\n"Math ""honors""",88')).toMatchObject({ok:true,rows:[['Category','Value'],['English, advanced','72'],['Math "honors"','88']]});});
+  it('keeps commas inside tab-separated cells and detects a title above TSV',()=>{expect(parseClipboardTable('Exam results\nCategory\tValue\nEnglish, advanced\t72')).toMatchObject({ok:true,title:'Exam results',rows:[['Category','Value'],['English, advanced','72']]});});
+  it('rejects ragged CSV without silently removing malformed data',()=>{expect(parseClipboardTable('Category,Value\nEnglish,72\nMath')).toMatchObject({ok:false});expect(parseClipboardTable('99\nCategory,Value\nEnglish,72')).toMatchObject({ok:false});});
+});

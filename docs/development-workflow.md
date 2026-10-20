@@ -125,3 +125,6 @@ A feature is done when:
 - desktop/mobile behavior is checked where relevant;
 - no unrelated behavior regressed;
 - documentation is updated if the feature changes a contract or decision.
+
+## Loading performance gate
+Before calling editor changes deployment-ready, compare initial JavaScript requests on a production build, keep optional chart/import code on demand, investigate bundle warnings, and report measured tradeoffs. Do not hide warnings by raising thresholds or claim production speed from local payload sizes.

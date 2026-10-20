@@ -100,7 +100,7 @@ for (const fixture of graphFixtures) {
     await openPage(page, '/');
     await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
     await pasteReplacement(page, fixture.table);
-    await page.getByRole('button', { exact: true, name: fixture.button }).click();
+    await page.getByRole('radio', { exact: true, name: fixture.button }).click();
 
     const chart = page.locator('[data-chart-status="ready"]');
     await expect(page.locator(`[data-rendered-chart-type="${fixture.renderedType}"]`)).toBeVisible();
@@ -115,9 +115,9 @@ for (const fixture of graphFixtures) {
     )).toBe(false);
 
     await page.getByRole('button', { name: 'Save locally' }).click();
-    await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
+    await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
     await reloadPage(page);
-    await expect(page.getByRole('button', { exact: true, name: fixture.button })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('combobox', { name: 'Chart type' })).toHaveValue(fixture.renderedType);
     await expect(page.locator(`[data-rendered-chart-type="${fixture.renderedType}"]`)).toBeVisible();
 
     for (const extension of ['png', 'svg', 'csv'] as const) {

@@ -10,7 +10,7 @@ test('serves a complete Dot Plot page with the shared raw-observation preset', a
   await expect(page.getByRole('heading', { level: 1, name: 'Dot Plot Maker' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Dot Plot Maker');
 
-  await expect(page.getByRole('button', { exact: true, name: 'Dot Plot' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { exact: true, name: 'Dot Plot' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.getByLabel('Value, row 1', { exact: true })).toHaveValue('12');
   await expect(page.getByLabel('Value, row 20')).toHaveValue('24');
   const chart = page.locator('[data-rendered-chart-type="dotplot"] [data-chart-status="ready"]');
@@ -21,7 +21,7 @@ test('serves a complete Dot Plot page with the shared raw-observation preset', a
   await expect(chart).toContainText('18: 4');
 
   for (const name of ['Paste data', 'Upload CSV', 'Upload Excel', 'Save locally', 'Download']) {
-    await expect(page.getByRole('button', { name })).toBeVisible();
+    await expect(page.getByRole('button', { name, exact: true })).toBeVisible();
   }
   for (const heading of [
     'How to make a dot plot',

@@ -169,3 +169,27 @@ When sample data is cleared:
 
 ## Error states
 Use inline, local explanations near the relevant control/data area. Give a recovery action when possible.
+
+## Editor usability update — 2026-10-20
+
+On mobile, use a labeled native chart-type select exposing every catalog entry. Desktop uses a wrapping radio group with a single tab stop and arrow/Home/End navigation. Value edits preserve graph titles; importing replacement data retains existing adaptive-label behavior. Show one Add row action outside the table scroller. Pie customization omits axis, grid, and orientation settings; orientation is limited to bars and box plots.
+
+The editor autosaves locally with IndexedDB. Keep Save locally as an immediate save/retry action, report successful autosaves on-device, and label the portable JSON export Download project backup. Contact email remains unset until supplied by the owner.
+
+## Tree editor
+Use the shared mobile preview/data/customization order. Each node has a labeled text field, parent select, Add child, and confirmed Remove branch. Keep raw table import in a disclosure. Customization shows graph title, tree layout, and one color. Diagram dimensions grow within the 50-node/10-level bounds; drag the canvas to pan without page overflow. Reset view restores the starting position; a focusable canvas supports arrow keys and Home. Node clicks still edit labels; drags do not open the label editor.
+
+## Tree diagram templates
+Place a six-card static template gallery immediately after the tree workspace. Use original SVG structure previews, descriptive titles, node counts and clear Use template links. A labeled native template selector in TreeInput uses the same catalog. Open presets as separate drafts and preserve the current tree in My diagrams. Both routes preserve mobile stacking and local saving.
+
+Tree preview nodes open a nearby label form on click. A labeled node picker provides keyboard access to the same form. Save commits to the shared table and autosave; Cancel or Escape discards the draft. Blank labels cannot be saved.
+
+Tree nodes use simple rectangular boxes with white fill, thin colored borders and centered labels; avoid stretched rounded/pill symbols.
+
+Tree view controls provide 5–200% zoom in 25% steps, centered on the visible canvas. Keyboard +/− zoom; Home/0 and Reset view restore 100% and the starting position. Zoom is temporary and does not crop or scale downloaded diagrams.
+
+Loading a tree template automatically fits the complete diagram inside the visible preview. Fit to view repeats this at any time; Reset view retains its 100% meaning. Narrow layouts may need zoom below 25% to display broad vertical templates.
+
+Template selection opens a separate diagram immediately and brings the preview into view; existing work remains available in My diagrams.
+
+Tree templates now open a separate draft on selection (DEC-021). My diagrams switches drafts without loss of labels, title or layout. The default-checked device-storage preference explains session-only behavior and removal of saved copies. No template confirmation or Load template button. A 20-draft limit asks users to delete a diagram rather than silently evict work.
