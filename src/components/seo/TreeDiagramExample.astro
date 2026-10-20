@@ -1,0 +1,34 @@
+---
+const nodes = [
+  {x:180,y:40,label:'Project'},
+  {x:90,y:140,label:'Planning'},
+  {x:270,y:140,label:'Development'},
+  {x:60,y:260,label:'Research'},
+  {x:170,y:260,label:'Design'},
+  {x:290,y:260,label:'Testing'},
+];
+---
+<figure class="my-5" data-tree-diagram-example>
+  <svg class="border-border w-full rounded-md border bg-white" viewBox="0 0 360 310" role="img" aria-labelledby="tree-example-title" aria-describedby="tree-example-description">
+    <title id="tree-example-title">Project tree diagram with a root, branches, and leaves</title>
+    <desc id="tree-example-description">Project is the root. It branches into Planning and Development. Planning has Research and Design as leaves; Development has Testing as a leaf.</desc>
+    <g fill="none" stroke="#2563eb" stroke-width="1.5">
+      <path d="M180 57V90H90V123M180 90H270V123M90 157V205H60V243M90 205H170V243M270 157V205H290V243" />
+    </g>
+    {nodes.map(node => <g>
+      <rect x={node.x-51} y={node.y-17} width="102" height="34" fill="white" stroke="#2563eb" stroke-width="1.5" />
+      <text x={node.x} y={node.y+4} text-anchor="middle" fill="#10213a" font-size="12" font-family="system-ui, sans-serif">{node.label}</text>
+    </g>)}
+    <g fill="#475569" font-size="11" font-family="system-ui, sans-serif" text-anchor="middle">
+      <text x="180" y="16">Root</text><text x="90" y="116">Branch</text><text x="270" y="116">Branch</text>
+      <text x="60" y="295">Leaf</text><text x="170" y="295">Leaf</text><text x="290" y="295">Leaf</text>
+    </g>
+  </svg>
+  <figcaption class="text-text-muted mt-3 text-sm leading-6">Read from the root to the leaves: Project → Planning → Research is one path through this tree.</figcaption>
+</figure>
+<dl class="text-text-muted mb-5 space-y-2 text-sm leading-6">
+  <div><dt class="inline font-semibold text-slate-900">Root: </dt><dd class="inline">the starting node, with no parent.</dd></div>
+  <div><dt class="inline font-semibold text-slate-900">Branch: </dt><dd class="inline">a connection to a child node; Planning groups two tasks.</dd></div>
+  <div><dt class="inline font-semibold text-slate-900">Leaf: </dt><dd class="inline">a node with no children, such as Research or Testing.</dd></div>
+</dl>
+<a class="text-brand text-sm font-semibold underline" href="/tree-graph-maker/#tree-template-project">Edit this project tree template</a>

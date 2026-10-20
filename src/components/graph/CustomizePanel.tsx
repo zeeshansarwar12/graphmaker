@@ -10,7 +10,7 @@ export interface CustomizableSeries {
 }
 
 interface CustomizePanelProps {
-  chartType: 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy' | 'equation';
+  chartType: 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy' | 'equation' | 'tree';
   dispatch: Dispatch<GraphSettingsAction>;
   onDotPlotSeriesChange?: (columnId: string) => void;
   onScatterColumnChange?: (axis: 'x' | 'y', columnId: string) => void;
@@ -47,6 +47,13 @@ export function CustomizePanel({
   const visibleSeriesIndexes = getVisibleSeriesIndexes(settings, seriesColumnIds);
   const visibleSeriesIndexSet = new Set(visibleSeriesIndexes);
 
+  if (chartType === 'tree') return <aside aria-label="Customize graph" className="border-border bg-surface-subtle mt-4 scroll-mt-14 rounded-lg border p-4" id="customize-panel">
+    <label className="block text-sm font-semibold">Graph title<input className={fieldClassName} value={settings.title} onChange={event => dispatch({ type: 'set-title', value: event.target.value })} /></label>
+    <label className="mt-4 block text-sm font-semibold">Tree layout<select className={fieldClassName} value={settings.orientation} onChange={event => dispatch({ type: 'set-orientation', value: event.target.value as GraphSettings['orientation'] })}><option value="horizontal">Left to right</option><option value="vertical">Top to bottom</option></select></label>
+    <label className="mt-4 flex min-h-10 items-center gap-3 text-sm font-semibold">Tree color<input aria-label="Tree color" type="color" value={settings.seriesColors[0] ?? '#2563eb'} onChange={event => dispatch({ type: 'set-series-color', index: 0, value: event.target.value })} /></label>
+    <p className="text-text-muted mt-3 text-xs">Wide or tall trees can be scrolled. Downloads include the whole diagram.</p>
+  </aside>;
+
   return (
     <aside aria-label="Customize graph" className="border-border bg-surface-subtle mt-4 scroll-mt-14 rounded-lg border p-4" id="customize-panel">
       {(chartType === 'xy' || chartType === 'scatter' || chartType === 'equation') && <CartesianControls key={JSON.stringify(settings.cartesian)} settings={settings} dispatch={dispatch} equation={chartType === 'equation'} />}
@@ -62,7 +69,7 @@ export function CustomizePanel({
             value={settings.title}
           />
         </label>}
-        {chartType !== 'radar' && <label className="text-sm font-semibold">
+        {chartType !== 'radar' && chartType !== 'pie' && <label className="text-sm font-semibold">
           X-axis title
           <input
             className={fieldClassName}
@@ -71,7 +78,7 @@ export function CustomizePanel({
             value={settings.xAxisTitle}
           />
         </label>}
-        <label className="text-sm font-semibold">
+        {chartType !== 'pie' && chartType !== 'radar' && <label className="text-sm font-semibold">
           Y-axis title
           <input
             className={fieldClassName}
@@ -79,7 +86,7 @@ export function CustomizePanel({
             type="text"
             value={settings.yAxisTitle}
           />
-        </label>
+        </label>}
       </div>
 
       {chartType !== 'supplydemand' && <fieldset className="border-border mt-4 border-t pt-4">
@@ -103,7 +110,7 @@ export function CustomizePanel({
             />
             Filled areas
           </label>}
-          {chartType !== 'boxplot' && <label className="flex items-center gap-2 text-sm font-medium">
+          {chartType !== 'boxplot' && chartType !== 'pie' && <label className="flex items-center gap-2 text-sm font-medium">
             <input
               checked={settings.showGrid}
               className="accent-brand h-4 w-4"
@@ -327,7 +334,7 @@ export function CustomizePanel({
         </div>
       </fieldset>}
 
-      {chartType !== 'dotplot' && chartType !== 'radar' && chartType !== 'supplydemand' && <details className="border-border mt-4 border-t pt-4">
+      {(chartType === 'bar' || chartType === 'boxplot') && <details className="border-border mt-4 border-t pt-4">
         <summary className="text-text-muted hover:text-text cursor-pointer text-sm font-semibold">Advanced controls</summary>
         <label className="mt-4 block max-w-xs text-sm font-semibold">
           Orientation

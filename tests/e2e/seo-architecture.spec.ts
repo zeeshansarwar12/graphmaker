@@ -13,7 +13,7 @@ const coreToolRoutes = [
   '/radar-chart-maker/',
 ] as const;
 
-const specialistToolRoutes = ['/dot-plot-maker/', '/supply-and-demand-graph-maker/'] as const;
+const specialistToolRoutes = ['/tree-graph-maker/', '/dot-plot-maker/', '/supply-and-demand-graph-maker/'] as const;
 const toolRoutes = [...coreToolRoutes, ...specialistToolRoutes] as const;
 const indexableRoutes = ['/', '/tools/', '/about/', ...toolRoutes] as const;
 const allLinkedRoutes = [...indexableRoutes, '/privacy/', '/terms/'] as const;
@@ -122,16 +122,16 @@ test('tool pages have distinct related-tool links and valid breadcrumb schema', 
   }
 });
 
-test('every editor has eleven distinct icons and every footer links all tools', async ({ page }) => {
+test('every editor has twelve distinct icons and every footer links all tools', async ({ page }) => {
   for (const route of allLinkedRoutes) {
     await openPage(page, route);
     for (const toolRoute of toolRoutes) await expect(page.locator(`footer a[href="${toolRoute}"]`)).toHaveCount(1);
     if (route === '/' || toolRoutes.includes(route as typeof toolRoutes[number])) {
-      const tabs = page.getByRole('group', { name: 'Choose a graph type' });
-      await expect(tabs.locator('button')).toHaveCount(11);
+      const tabs = page.getByRole('radiogroup', { name: 'Choose a graph type' });
+      await expect(tabs.locator('button')).toHaveCount(12);
       const icons = await tabs.locator('[data-chart-icon]').allTextContents();
-      expect(new Set(icons).size, route).toBe(11);
-      await expect(tabs.getByRole('button', { name: 'Supply & Demand', exact: true })).toBeVisible();
+      expect(new Set(icons).size, route).toBe(12);
+      await expect(tabs.getByRole('radio', { name: 'Supply & Demand', exact: true })).toBeVisible();
     }
   }
 });
@@ -145,6 +145,13 @@ test('sitemap and robots expose only intended production URLs', async ({ request
     expect(sitemap).not.toMatch(new RegExp(`<loc>https?://[^<]+${excluded.replaceAll('/', '\\/')}</loc>`));
   }
   expect((sitemap.match(/<url>/g) ?? [])).toHaveLength(indexableRoutes.length);
+  const dates = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((match) => match[1]);
+  expect(dates).toHaveLength(indexableRoutes.length);
+  for (const date of dates) {
+    expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(new Date(date).toISOString().slice(0, 10)).toBe(date);
+    expect(Date.parse(date)).toBeLessThanOrEqual(Date.now());
+  }
 
   const robots = await (await request.get('/robots.txt')).text();
   expect(robots).toContain('User-agent: *');

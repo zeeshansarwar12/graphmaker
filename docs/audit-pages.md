@@ -1,7 +1,7 @@
 | Page | Title length | Description length | Canonical | Robots | og:image | JSON-LD types |
 |---|---:|---:|---|---|---|---|
 | / | 48 | 120 | https://graphmaker.site/ | index,follow | yes | WebSite, Organization |
-| /tools/ | 56 | 124 | https://graphmaker.site/tools/ | index,follow | yes | ItemList, BreadcrumbList |
+| /tools/ | 56 | 126 | https://graphmaker.site/tools/ | index,follow | yes | ItemList, BreadcrumbList |
 | /about/ | 47 | 146 | https://graphmaker.site/about/ | index,follow | yes | AboutPage, Person, BreadcrumbList |
 | /privacy/ | 20 | 49 | https://graphmaker.site/privacy/ | noindex,follow | yes | BreadcrumbList |
 | /terms/ | 18 | 66 | https://graphmaker.site/terms/ | noindex,follow | yes | BreadcrumbList |
@@ -15,7 +15,8 @@
 | /radar-chart-maker/ | 60 | 151 | https://graphmaker.site/radar-chart-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /scatter-plot-maker/ | 58 | 133 | https://graphmaker.site/scatter-plot-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /supply-and-demand-graph-maker/ | 56 | 141 | https://graphmaker.site/supply-and-demand-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
+| /tree-graph-maker/ | 50 | 140 | https://graphmaker.site/tree-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /xy-graph-maker/ | 56 | 134 | https://graphmaker.site/xy-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 
-Checked 586 internal links.
+Checked 650 internal links.
 All built HTML assertions passed. Zero broken internal links.

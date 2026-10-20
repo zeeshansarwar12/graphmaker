@@ -23,7 +23,7 @@ export interface CellIssue {
 }
 
 export type ClipboardParseResult =
-  | { ok: true; rows: string[][] }
+  | { ok: true; rows: string[][]; title?: string }
   | { error: string; ok: false };
 
 const sampleValues = [
@@ -157,6 +157,13 @@ export function validateData(data: TabularData): CellIssue[] {
 export function parseClipboardTable(input: string): ClipboardParseResult {
   if (input.trim() === '') return { error: 'The clipboard does not contain tabular data.', ok: false };
 
+  let inQuotes=false,hasTab=false,hasComma=false;
+  for(let index=0;index<input.length;index++){
+    const character=input[index];
+    if(character==='"'){if(inQuotes && input[index+1]==='"'){index++;continue;}inQuotes=!inQuotes;}
+    else if(!inQuotes){if(character==='\t')hasTab=true;if(character===',')hasComma=true;}
+  }
+  const delimiter=hasTab ? '\t' : hasComma ? ',' : '\t';
   const rows: string[][] = [];
   let row: string[] = [];
   let cell = '';
@@ -179,7 +186,7 @@ export function parseClipboardTable(input: string): ClipboardParseResult {
 
     if (character === '"' && cell === '') {
       quoted = true;
-    } else if (character === '\t') {
+    } else if (character === delimiter) {
       row.push(cell);
       cell = '';
     } else if (character === '\n' || character === '\r') {
@@ -201,6 +208,8 @@ export function parseClipboardTable(input: string): ClipboardParseResult {
   while (rows.length > 1 && rows.at(-1)?.every((value) => value === '')) rows.pop();
   if (rows[0]?.[0]?.startsWith('\uFEFF')) rows[0][0] = rows[0][0].slice(1);
 
+  let title: string | undefined;
+  if(rows.length>=3 && rows[0].length===1 && rows[0][0].trim() && !Number.isFinite(Number(rows[0][0])) && rows[1].length>1 && rowsHaveHeader(rows.slice(1)) && rows.slice(1).every(values=>values.length===rows[1].length)) title=rows.shift()![0].trim();
   const columnCount = rows[0]?.length ?? 0;
   const malformedRowIndex = rows.findIndex((values) => values.length !== columnCount);
   if (malformedRowIndex !== -1) {
@@ -210,7 +219,7 @@ export function parseClipboardTable(input: string): ClipboardParseResult {
     };
   }
 
-  return { ok: true, rows };
+  return title ? {ok:true,rows,title} : { ok: true, rows };
 }
 
 export function pasteRectangularData(
@@ -249,6 +258,7 @@ export function rowsHaveHeader(rows: string[][]): boolean {
   if (rows.length < 2 || (rows[0]?.length ?? 0) < 1) return false;
 
   const firstRow = rows[0];
+  if (firstRow.length === 3 && ['id', 'label', 'parent id'].every((name, index) => firstRow[index].trim().toLowerCase() === name)) return true;
   const headersAreText = firstRow.every(
     (value) => value.trim() === '' || !Number.isFinite(Number(value)),
   );
@@ -268,7 +278,9 @@ export function createDataFromRows(rows: string[][]): TabularData {
   return {
     columns: Array.from({ length: columnCount }, (_, index) => ({
       id: `column-${index + 1}`,
-      kind: dataRows.some((values) => values[index]?.trim() !== '')
+      kind: hasHeader && rows[0].length === 3 && ['id', 'label', 'parent id'].every((name, column) => rows[0][column].trim().toLowerCase() === name)
+        ? 'label'
+        : dataRows.some((values) => values[index]?.trim() !== '')
         && dataRows.filter((values) => values[index]?.trim() !== '').filter((values) => (
           Number.isFinite(Number(values[index]?.trim()))
         )).length / dataRows.filter((values) => values[index]?.trim() !== '').length >= 0.5

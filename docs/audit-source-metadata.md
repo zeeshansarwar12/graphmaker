@@ -18,5 +18,6 @@ These values come from source files. Canonicals, image presence, and schema type
 | /scatter-plot-maker/ | 58 | 133 | https://graphmaker.site/scatter-plot-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /supply-and-demand-graph-maker/ | 56 | 141 | https://graphmaker.site/supply-and-demand-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /terms/ | 18 | 66 | https://graphmaker.site/terms/ | noindex,follow | yes | BreadcrumbList |
-| /tools/ | 56 | 124 | https://graphmaker.site/tools/ | index,follow | yes | ItemList, BreadcrumbList |
+| /tools/ | 56 | 126 | https://graphmaker.site/tools/ | index,follow | yes | ItemList, BreadcrumbList |
+| /tree-graph-maker/ | 50 | 140 | https://graphmaker.site/tree-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /xy-graph-maker/ | 56 | 134 | https://graphmaker.site/xy-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |

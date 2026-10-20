@@ -12,7 +12,7 @@ test('renders the Astro shell and shared editor island', async ({ page }) => {
   await expect(page.getByRole('region', { name: 'Graph preview' })).toBeVisible();
   await expect(page.locator('[data-chart-status="ready"] canvas')).toBeVisible();
   await expect(page.locator('[data-chart-status="ready"]')).toHaveAttribute('data-series-count', '1');
-  await expect(page.getByRole('button', { name: 'Bar' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { name: 'Bar' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.getByRole('button', { name: 'Save locally' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Download', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Popular Graph Makers' })).toBeVisible();
@@ -189,7 +189,7 @@ test('previews CSV imports and preserves data when a later import fails', async 
 test('completes the edit, paste, customize, save, restore, export, and reset journey', async ({ page }) => {
   await openPage(page, '/');
   await expect(page.locator('[data-chart-status="ready"]')).toBeVisible();
-  await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
+  await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
 
   await page.getByLabel('Sales, row 1').fill('99');
   await expect(page.locator('[data-chart-status="ready"]')).toContainText('Sales: Jan 99');
@@ -205,7 +205,7 @@ test('completes the edit, paste, customize, save, restore, export, and reset jou
   await page.getByRole('button', { name: 'Customize' }).click();
   await page.getByLabel('Graph title').fill('Saved Revenue');
   await page.getByRole('button', { name: 'Save locally' }).click();
-  await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
+  await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
 
   await reloadPage(page);
   await expect(page.getByRole('heading', { level: 3, name: 'Saved Revenue' })).toBeVisible();
@@ -222,7 +222,7 @@ test('completes the edit, paste, customize, save, restore, export, and reset jou
   await page.getByRole('button', { name: 'Reset graph' }).click();
   await expect(page.getByRole('heading', { level: 3, name: 'Monthly Sales' })).toBeVisible();
   await expect(page.getByLabel('Sales, row 1')).toHaveValue('32');
-  await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
+  await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
 
   await reloadPage(page);
   await expect(page.getByRole('heading', { level: 3, name: 'Monthly Sales' })).toBeVisible();
@@ -231,7 +231,7 @@ test('completes the edit, paste, customize, save, restore, export, and reset jou
 
 test('recovers safely from corrupted IndexedDB project state', async ({ page }) => {
   await openPage(page, '/');
-  await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
+  await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
 
   await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
@@ -294,7 +294,7 @@ test('imports and exports portable projects and graph files', async ({ page }) =
   await expect(page.getByLabel('Revenue, row 2')).toHaveValue('145');
 
   const projectDownloadPromise = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Export project' }).click();
+  await page.getByRole('button', { name: 'Download project backup' }).click();
   const projectDownload = await projectDownloadPromise;
   expect(projectDownload.suggestedFilename()).toBe('imported-revenue.graphmaker.json');
   const projectPath = await projectDownload.path();
@@ -321,7 +321,7 @@ test('imports and exports portable projects and graph files', async ({ page }) =
 test('keeps long labels and a large dataset contained on a narrow screen', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 780 });
   await openPage(page, '/');
-  await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
+  await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
 
   const header = 'A very long category heading,Revenue from a very long series name,Profit,Cost';
   const rows = Array.from({ length: 60 }, (_, index) => (
@@ -384,7 +384,7 @@ test('interprets a pasted 60-row date dataset and recommends a readable line cha
   await expect(page.getByLabel('Show value labels')).not.toBeChecked();
 
   await page.getByRole('button', { name: 'Switch to Line' }).click();
-  await expect(page.getByRole('button', { name: 'Line' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { name: 'Line' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.locator('[data-rendered-chart-type="line"]')).toBeVisible();
   await expect(page.locator('[data-chart-status="ready"]')).toHaveAttribute('data-axis-type', 'time');
   await expect(page.getByLabel('Date, row 60')).toHaveValue('2026-03-01');
@@ -393,7 +393,7 @@ test('interprets a pasted 60-row date dataset and recommends a readable line cha
 test('toggles mixed-scale series and restores visibility after reload', async ({ page }) => {
   await page.setViewportSize({ width: 1400, height: 900 });
   await openPage(page, '/');
-  await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
+  await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
 
   await page.getByLabel('Choose CSV file').setInputFiles({
     buffer: Buffer.from([
@@ -442,7 +442,7 @@ test('toggles mixed-scale series and restores visibility after reload', async ({
   await expect(chart).toContainText('Visitors: Jan 710');
 
   await page.getByRole('button', { name: 'Save locally' }).click();
-  await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
+  await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
   await reloadPage(page);
 
   await expect(page.getByLabel('Show Visitors series')).toHaveCount(0);
@@ -481,7 +481,7 @@ test('detects, renders, and restores numeric X/Y data as a scatter plot', async 
   await expect(page.getByText('Scatter plot recommended for this data.')).toHaveCount(0);
   await expect(page.getByRole('heading', { level: 3, name: 'Weight by Height' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'Pie' }).click();
+  await page.getByRole('radio', { name: 'Pie' }).click();
   await expect(page.locator('[data-chart-status="empty"]')).toContainText(
     'This data isn’t suitable for a pie chart.',
   );
@@ -494,7 +494,7 @@ test('detects, renders, and restores numeric X/Y data as a scatter plot', async 
   const incompatiblePreview = page.locator('[data-chart-status="empty"]');
   expect((await incompatiblePreview.boundingBox())?.height).toBeLessThan(220);
 
-  await page.getByRole('button', { name: 'Histogram' }).click();
+  await page.getByRole('radio', { name: 'Histogram' }).click();
   await expect(page.locator('[data-chart-status="empty"]')).toContainText(
     'This data may not be suitable for a histogram.',
   );
@@ -509,7 +509,7 @@ test('detects, renders, and restores numeric X/Y data as a scatter plot', async 
   await expect(page.getByLabel('Y-axis title')).toHaveValue('Weight');
 
   await page.getByRole('button', { name: 'Switch to Scatter' }).click();
-  await expect(page.getByRole('button', { name: 'Scatter' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { name: 'Scatter' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.locator('[data-rendered-chart-type="scatter"]')).toBeVisible();
   await expect(page.locator('[data-chart-status="ready"]')).toHaveAttribute('data-axis-type', 'value');
   await expect(page.locator('[data-chart-status="ready"]')).toContainText(
@@ -518,10 +518,10 @@ test('detects, renders, and restores numeric X/Y data as a scatter plot', async 
   await expect(detected).toContainText('Chart: Scatter');
 
   await page.getByRole('button', { name: 'Save locally' }).click();
-  await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
+  await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
   await reloadPage(page);
 
-  await expect(page.getByRole('button', { name: 'Scatter' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { name: 'Scatter' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.locator('[data-rendered-chart-type="scatter"]')).toBeVisible();
   await expect(page.getByLabel('Height, row 5')).toHaveValue('170');
   await expect(page.getByLabel('Weight, row 5')).toHaveValue('67');
@@ -552,7 +552,7 @@ test('detects, renders, and restores category shares as a pie chart', async ({ p
   await expect(page.getByRole('heading', { level: 3, name: 'Value by Category' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Switch to Pie' }).click();
-  await expect(page.getByRole('button', { name: 'Pie' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { name: 'Pie' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.locator('[data-rendered-chart-type="pie"]')).toBeVisible();
   await expect(page.locator('[data-chart-status="ready"]')).toHaveAttribute('data-axis-type', 'none');
   await expect(page.locator('[data-chart-status="ready"]')).toContainText(
@@ -560,10 +560,10 @@ test('detects, renders, and restores category shares as a pie chart', async ({ p
   );
 
   await page.getByRole('button', { name: 'Save locally' }).click();
-  await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
+  await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
   await reloadPage(page);
 
-  await expect(page.getByRole('button', { name: 'Pie' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { name: 'Pie' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.locator('[data-rendered-chart-type="pie"]')).toBeVisible();
   await expect(page.getByLabel('Category, row 1')).toHaveValue('Product A');
   await expect(page.getByLabel('Value, row 4')).toHaveValue('10');
@@ -606,7 +606,7 @@ test('bins raw observations and restores histogram settings', async ({ page }) =
 
   await page.getByRole('button', { name: 'Switch to Histogram' }).click();
   const chart = page.locator('[data-chart-status="ready"]');
-  await expect(page.getByRole('button', { name: 'Histogram' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { name: 'Histogram' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.locator('[data-rendered-chart-type="histogram"]')).toBeVisible();
   await expect(chart).toHaveAttribute('data-axis-type', 'category');
   await expect(chart).toContainText(
@@ -619,10 +619,10 @@ test('bins raw observations and restores histogram settings', async ({ page }) =
   await expect(chart).toContainText('Histogram of Score with 15 observations in 3 bins.');
 
   await page.getByRole('button', { name: 'Save locally' }).click();
-  await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
+  await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
   await reloadPage(page);
 
-  await expect(page.getByRole('button', { name: 'Histogram' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { name: 'Histogram' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.locator('[data-rendered-chart-type="histogram"]')).toBeVisible();
   await expect(page.getByLabel('Score, row 15')).toHaveValue('81');
   await page.getByRole('button', { name: 'Customize' }).click();
@@ -652,10 +652,10 @@ test('renders a box plot from raw observations and restores outlier visibility',
   }, pastedTable);
 
   await expect(page.getByRole('heading', { level: 3, name: 'Distribution of Score' })).toBeVisible();
-  await page.getByRole('button', { name: 'Box Plot' }).click();
+  await page.getByRole('radio', { name: 'Box Plot' }).click();
 
   const chart = page.locator('[data-chart-status="ready"]');
-  await expect(page.getByRole('button', { name: 'Box Plot' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { name: 'Box Plot' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.locator('[data-rendered-chart-type="boxplot"]')).toBeVisible();
   await expect(chart).toHaveAttribute('data-series-count', '1');
   await expect(chart).toContainText(
@@ -670,10 +670,10 @@ test('renders a box plot from raw observations and restores outlier visibility',
   await expect(page.locator('[data-chart-orientation="horizontal"]')).toBeVisible();
 
   await page.getByRole('button', { name: 'Save locally' }).click();
-  await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
+  await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
   await reloadPage(page);
 
-  await expect(page.getByRole('button', { name: 'Box Plot' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { name: 'Box Plot' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.locator('[data-rendered-chart-type="boxplot"]')).toBeVisible();
   await page.getByRole('button', { name: 'Customize' }).click();
   await expect(page.getByLabel('Show outliers')).not.toBeChecked();
@@ -699,10 +699,10 @@ test('renders and restores a multi-series radar chart', async ({ page }) => {
   }, pastedTable);
 
   await expect(page.getByRole('heading', { level: 3, name: 'Team A and Team B by Metric' })).toBeVisible();
-  await page.getByRole('button', { name: 'Radar' }).click();
+  await page.getByRole('radio', { name: 'Radar' }).click();
 
   const chart = page.locator('[data-chart-status="ready"]');
-  await expect(page.getByRole('button', { name: 'Radar' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { name: 'Radar' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.locator('[data-rendered-chart-type="radar"]')).toBeVisible();
   await expect(chart).toHaveAttribute('data-axis-type', 'none');
   await expect(chart).toHaveAttribute('data-series-count', '2');
@@ -717,10 +717,10 @@ test('renders and restores a multi-series radar chart', async ({ page }) => {
   await expect(chart).toHaveAttribute('data-series-count', '1');
 
   await page.getByRole('button', { name: 'Save locally' }).click();
-  await expect(page.getByText('Saved locally on this device. No cloud backup.')).toBeVisible();
+  await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
   await reloadPage(page);
 
-  await expect(page.getByRole('button', { name: 'Radar' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { name: 'Radar' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.locator('[data-rendered-chart-type="radar"]')).toBeVisible();
   await page.getByRole('button', { name: 'Customize' }).click();
   await expect(page.getByLabel('Filled areas')).not.toBeChecked();

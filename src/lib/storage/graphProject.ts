@@ -15,9 +15,10 @@ export function graphProjectStorageId(slug = '/'): string {
 }
 
 export interface GraphProject {
+  tableBackup?: { data: TabularData; settings: GraphSettings };
   createdAt: string;
   data: TabularData;
-  graphType: 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy' | 'equation';
+  graphType: 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy' | 'equation' | 'tree';
   id: typeof currentProjectId;
   name: string;
   schemaVersion: typeof graphProjectSchemaVersion;
@@ -30,6 +31,7 @@ export type ProjectParseResult =
   | { error: string; ok: false };
 
 interface CreateProjectInput {
+  tableBackup?: GraphProject['tableBackup'];
   createdAt?: string;
   data: TabularData;
   graphType: GraphProject['graphType'];
@@ -124,6 +126,7 @@ function isGraphSettings(value: unknown): value is GraphSettings {
 }
 
 export function createProjectSnapshot({
+  tableBackup,
   createdAt,
   data,
   graphType,
@@ -131,6 +134,7 @@ export function createProjectSnapshot({
   settings,
 }: CreateProjectInput): GraphProject {
   return {
+    ...(tableBackup ? { tableBackup } : {}),
     createdAt: createdAt ?? now,
     data,
     graphType,
@@ -159,10 +163,11 @@ export function parseGraphProject(value: unknown): ProjectParseResult {
 
   if (
     value.id !== currentProjectId
-    || (value.graphType !== 'bar' && value.graphType !== 'boxplot' && value.graphType !== 'dotplot' && value.graphType !== 'histogram' && value.graphType !== 'line' && value.graphType !== 'pie' && value.graphType !== 'radar' && value.graphType !== 'scatter' && value.graphType !== 'supplydemand' && value.graphType !== 'xy' && value.graphType !== 'equation')
+    || (value.graphType !== 'bar' && value.graphType !== 'boxplot' && value.graphType !== 'dotplot' && value.graphType !== 'histogram' && value.graphType !== 'line' && value.graphType !== 'pie' && value.graphType !== 'radar' && value.graphType !== 'scatter' && value.graphType !== 'supplydemand' && value.graphType !== 'xy' && value.graphType !== 'equation' && value.graphType !== 'tree')
     || typeof value.name !== 'string'
     || !isIsoDate(value.createdAt)
     || !isIsoDate(value.updatedAt)
+    || (value.tableBackup !== undefined && (!isRecord(value.tableBackup) || !isTabularData(value.tableBackup.data) || !isGraphSettings(value.tableBackup.settings)))
     || !isTabularData(value.data)
     || !isGraphSettings(value.settings)
   ) {

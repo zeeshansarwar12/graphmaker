@@ -245,3 +245,13 @@ it('does not export an invalid equation as a blank valid graph', () => {
   const result = sampleEquations(['bad(x)'], -1, 1);
   expect(createEquationChartView(result.data, {...createDefaultGraphSettings(),cartesian:coordinatePlane}).status).toBe('empty');
 });
+
+it('validates and roundtrips an equation table backup',()=>{
+ const settings=createDefaultGraphSettings();
+ const data=createDataFromRows([['Category','Value'],['English','72']]);
+ const project=createProjectSnapshot({data,settings,graphType:'equation',tableBackup:{data,settings}});
+ const result=parseGraphProject(JSON.parse(JSON.stringify(project)));
+ expect(result.ok).toBe(true);
+ if(result.ok) expect(result.project.tableBackup).toEqual({data,settings});
+ expect(parseGraphProject({...project,tableBackup:{data:{},settings}}).ok).toBe(false);
+});

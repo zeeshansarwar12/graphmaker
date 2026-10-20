@@ -1,3 +1,7 @@
+import {readTreeWorkspace, writeTreeWorkspace, treeRememberKey, treeDraftLimit} from '../../lib/storage/treeDrafts';
+import type {TreeDraft} from '../../lib/storage/treeDrafts';
+import type {GraphProject} from '../../lib/storage/graphProject';
+import { createTreeTemplateData } from '../../content/treeTemplates';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { xyColumns, xyLabels } from '../../graph/transforms/xy';
 import { coordinatePlane, cartesianError } from '../../graph/configs/cartesian';
@@ -52,13 +56,14 @@ import { DataGrid } from './DataGrid';
 import { GraphCanvas } from './GraphCanvas';
 import type { GraphCanvasHandle } from './GraphCanvas';
 
+const TreeInput = lazy(() => import('./TreeInput'));
 const EquationInput = lazy(() => import('./EquationInput'));
 
 interface GraphEditorProps {
   config: GraphEditorConfig;
 }
 
-type RenderedChartType = 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy' | 'equation';
+type RenderedChartType = 'bar' | 'boxplot' | 'dotplot' | 'histogram' | 'line' | 'pie' | 'radar' | 'scatter' | 'supplydemand' | 'xy' | 'equation' | 'tree';
 
 function ButtonIcon({ children }: { children: ReactNode }) {
   return <span aria-hidden="true" className="text-brand text-base leading-none">{children}</span>;
@@ -87,9 +92,35 @@ export function GraphEditor({ config }: GraphEditorProps) {
   const graphCanvasRef = useRef<GraphCanvasHandle>(null);
   const previewSectionRef = useRef<HTMLElement>(null);
   const projectInputRef = useRef<HTMLInputElement>(null);
+  const tableBackupRef = useRef<GraphProject['tableBackup']>(undefined);
   const createdAtRef = useRef(new Date().toISOString());
   const [data, setData] = useState(() => createConfiguredData(config));
+  const isTreePage=config.graphType==='tree';
+  const [rememberTrees,setRememberTrees]=useState(true);
+  const rememberTreesRef=useRef(true);
+  const draftsRef=useRef<TreeDraft[]>([]);
+  const activeDraftRef=useRef('initial');
+  const [draftRevision,setDraftRevision]=useState(0);
+  function snapshotTree(){return createProjectSnapshot({tableBackup:tableBackupRef.current,createdAt:createdAtRef.current,data,graphType:selectedChartType,settings});}
+  const storeDraft=useCallback((project:GraphProject)=>{
+    const draft={id:activeDraftRef.current,project};
+    const index=draftsRef.current.findIndex(item=>item.id===draft.id);
+    if(index<0) draftsRef.current=[...draftsRef.current,draft];else draftsRef.current=draftsRef.current.map((item,i)=>i===index?draft:item);
+  },[]);
+  const persistProject=useCallback(async (project:GraphProject)=>{
+    if(!isTreePage) return saveCurrentProject(project,config.slug);
+    storeDraft(project);
+    if(rememberTreesRef.current) await writeTreeWorkspace({activeId:activeDraftRef.current,drafts:draftsRef.current});
+  },[isTreePage,config.slug,storeDraft]);
+  function restoreDraft(project:GraphProject){tableBackupRef.current=project.tableBackup;setData(project.data);dispatchSettings({type:'replace-settings',value:project.settings});setSelectedChartType(project.graphType);createdAtRef.current=project.createdAt;setTreeFitRequest(value=>value+1);setSavedState(null);}
+  function openDraft(id:string){storeDraft(snapshotTree());const draft=draftsRef.current.find(item=>item.id===id);if(!draft)return;activeDraftRef.current=id;restoreDraft(draft.project);setDraftRevision(value=>value+1);}
+  async function changeRemember(checked:boolean){
+    rememberTreesRef.current=checked;setRememberTrees(checked);
+    try{localStorage.setItem(treeRememberKey,String(checked));if(checked)await persistProject(snapshotTree());else{await writeTreeWorkspace(null);await deleteCurrentProject(config.slug);}setIsStorageAvailable(true);}
+    catch{setIsStorageAvailable(false);setProjectError('Could not update saved copies. Browser storage may be unavailable. Download a project backup to keep your work.');}
+  }
   const [equationBusy, setEquationBusy] = useState(true);
+  const [treeFitRequest, setTreeFitRequest] = useState(0);
   const [isSampleData, setIsSampleData] = useState(true);
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
   const [isProjectReady, setIsProjectReady] = useState(false);
@@ -98,6 +129,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
   const [projectError, setProjectError] = useState<string | null>(null);
   const [projectNotice, setProjectNotice] = useState<string | null>(null);
   const [selectedChartType, setSelectedChartType] = useState<RenderedChartType>(config.graphType);
+  const [savedState, setSavedState] = useState<{ data: TabularData; settings: ReturnType<typeof createConfiguredSettings>; chartType: RenderedChartType } | null>(null);
   const [saveStatus, setSaveStatus] = useState<'checking' | 'error' | 'saved' | 'saving'>('checking');
   const [settings, dispatchSettings] = useReducer(
     graphSettingsReducer,
@@ -149,7 +181,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     ],
   );
   const boxPlotData = useMemo(() => createBoxPlotData(data), [data]);
-  const activeSeriesColumnIndexes = selectedChartType === 'boxplot'
+  const activeSeriesColumnIndexes = selectedChartType === 'tree' ? [] : selectedChartType === 'boxplot'
     ? boxPlotData.groups.map((group) => group.columnIndex)
     : selectedChartType === 'histogram'
     ? histogramData.numericColumnIndexes
@@ -173,12 +205,12 @@ export function GraphEditor({ config }: GraphEditorProps) {
   const visibleSeriesIndexes = getVisibleSeriesIndexes(settings, seriesColumnIds);
   const visibleSeriesColumnIndexes = visibleSeriesIndexes
     .map((index) => seriesDefinitions[index].columnIndex);
-  const hasVisibleMixedScale = selectedChartType !== 'equation' && selectedChartType !== 'boxplot' && selectedChartType !== 'dotplot' && selectedChartType !== 'histogram' && selectedChartType !== 'supplydemand'
+  const hasVisibleMixedScale = selectedChartType !== 'tree' && selectedChartType !== 'equation' && selectedChartType !== 'boxplot' && selectedChartType !== 'dotplot' && selectedChartType !== 'histogram' && selectedChartType !== 'supplydemand'
     && hasMixedSeriesScale(data, visibleSeriesColumnIndexes);
   const dimensionName = interpretation.dimensionColumnIndex === null
     ? 'None'
     : data.columns[interpretation.dimensionColumnIndex]?.name.trim() || 'Unnamed column';
-  const selectedChartLabel = selectedChartType === 'line'
+  const selectedChartLabel = selectedChartType === 'tree' ? 'Tree' : selectedChartType === 'line'
     ? 'Line'
     : selectedChartType === 'boxplot'
       ? 'Box Plot'
@@ -208,7 +240,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     ? 'Scatter plot'
     : `${interpretation.recommendation} chart`;
   const hasUsableScatterColumns = scatterData.xColumnIndex !== null && scatterData.yColumnIndex !== null;
-  const suppressRecommendation = selectedChartType === 'equation' || (selectedChartType === 'xy' && hasUsableScatterColumns)
+  const suppressRecommendation = selectedChartType === 'tree' || selectedChartType === 'equation' || (selectedChartType === 'xy' && hasUsableScatterColumns)
     || (selectedChartType === 'scatter' && hasUsableScatterColumns)
     || (selectedChartType === 'dotplot' && dotPlotData.isCompatible)
     || (selectedChartType === 'supplydemand' && supplyDemandData.isCompatible)
@@ -232,6 +264,23 @@ export function GraphEditor({ config }: GraphEditorProps) {
     : [dimensionName !== 'None' ? dimensionName : '', seriesNames.join(', ')].filter(Boolean).join(' → ') || 'No usable columns';
 
   function selectChartType(chartType: RenderedChartType) {
+    if (chartType === selectedChartType) return;
+    if (selectedChartType === 'equation' && tableBackupRef.current) {
+      const backup = tableBackupRef.current;
+      tableBackupRef.current = undefined;
+      setData(backup.data);
+      dispatchSettings({type:'replace-settings',value:{...backup.settings,equations:settings.equations}});
+      setSelectedChartType(chartType);
+      setProjectNotice('Restored your table and chart settings.');
+      return;
+    }
+    if (chartType === 'equation') {
+      tableBackupRef.current = {data,settings};
+      setProjectNotice('Equation graphs calculate X/Y points. Your table is preserved; switch back to a table chart to restore it.');
+    }
+    if (chartType === 'tree' && selectedChartType !== 'tree') {
+      dispatchSettings({ type: 'replace-settings', value: { ...settings, title: 'Tree graph', orientation: 'horizontal' } });
+    }
     if (chartType === 'equation') dispatchSettings({type:'replace-settings',value:{...settings,cartesian:{...coordinatePlane,xStep:null,yStep:null},title:'Equation graph',xAxisTitle:'X',yAxisTitle:'Y',showValueLabels:false}});
     if (chartType === 'boxplot') {
       const labels = createBoxPlotSuggestedLabels(data);
@@ -320,13 +369,21 @@ export function GraphEditor({ config }: GraphEditorProps) {
 
     void (async () => {
       try {
+        if(isTreePage){
+          const remember=localStorage.getItem(treeRememberKey)!=='false';rememberTreesRef.current=remember;setRememberTrees(remember);
+          if(!remember){setSaveStatus('saved');return;}
+          const workspace=await readTreeWorkspace();
+          if(cancelled)return;
+          if(workspace){draftsRef.current=workspace.drafts;activeDraftRef.current=workspace.activeId;const project=workspace.drafts.find(item=>item.id===workspace.activeId)!.project;tableBackupRef.current=project.tableBackup;setData(project.data);dispatchSettings({type:'replace-settings',value:project.settings});setSelectedChartType(project.graphType);createdAtRef.current=project.createdAt;setIsSampleData(false);setDraftRevision(value=>value+1);setSaveStatus('saving');return;}
+        }
         const stored = await loadCurrentProject(config.slug);
         if (cancelled) return;
 
         const storedProjectMatchesPage = stored.status === 'ready'
-          && (config.slug === '/' || stored.project.graphType === config.graphType);
+          && (config.slug === '/' || stored.project.graphType === config.graphType || (stored.project.graphType === 'equation' && !!stored.project.tableBackup));
 
         if (storedProjectMatchesPage) {
+          tableBackupRef.current = stored.project.tableBackup;
           setData(stored.project.data);
           dispatchSettings({ type: 'replace-settings', value: stored.project.settings });
           setSelectedChartType(stored.project.graphType);
@@ -336,7 +393,8 @@ export function GraphEditor({ config }: GraphEditorProps) {
         } else if (stored.status === 'ready') {
           await deleteCurrentProject(config.slug);
           if (cancelled) return;
-          setData(createConfiguredData(config));
+          tableBackupRef.current = undefined;
+    setData(createConfiguredData(config));
           dispatchSettings({ type: 'replace-settings', value: createConfiguredSettings(config) });
           setSelectedChartType(config.graphType);
           createdAtRef.current = new Date().toISOString();
@@ -362,23 +420,24 @@ export function GraphEditor({ config }: GraphEditorProps) {
     return () => {
       cancelled = true;
     };
-  }, [config]);
+  }, [config,isTreePage]);
 
   useEffect(() => {
     if (!isProjectReady || !isStorageAvailable) return;
 
     const timer = window.setTimeout(() => {
       setSaveStatus('saving');
-      const project = createProjectSnapshot({
+      const project = createProjectSnapshot({tableBackup:tableBackupRef.current,
         createdAt: createdAtRef.current,
         data,
         graphType: selectedChartType,
         settings,
       });
 
-      void saveCurrentProject(project, config.slug)
+      void persistProject(project)
         .then(() => {
           setProjectError(null);
+          setSavedState({ data, settings, chartType: selectedChartType });
           setSaveStatus('saved');
         })
         .catch(() => {
@@ -389,7 +448,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     }, 350);
 
     return () => window.clearTimeout(timer);
-  }, [config.slug, data, isProjectReady, isStorageAvailable, selectedChartType, settings]);
+  }, [config.slug, data, isProjectReady, isStorageAvailable, selectedChartType, settings,rememberTrees,persistProject]);
 
   const setEquationData = useCallback((nextData: TabularData) => { setData(nextData); }, []);
   function setCartesian(axes: CartesianSettings) { const error=cartesianError(axes); if(error) {setProjectError(error);return;} dispatchSettings({type:'replace-settings', value:{...settings,cartesian:axes}}); }
@@ -405,9 +464,10 @@ export function GraphEditor({ config }: GraphEditorProps) {
     next = updateCell(next, next.rows[row].id, next.columns[indexes[1]].id, String(y));
     updateData(next);
   }
-  function updateData(nextData: TabularData, intent: 'edit' | 'replace' | 'structure' = 'edit') {
+  function updateData(nextData: TabularData, intent: 'edit' | 'replace' | 'structure' = 'edit', pastedTitle?: string) {
     setData(nextData);
     setIsSampleData(false);
+    if (selectedChartType === 'tree') return;
     if (intent === 'replace') {
       const adaptiveSettings = createAdaptiveSettings(nextData, settings);
       const boxPlotLabels = selectedChartType === 'boxplot'
@@ -421,9 +481,9 @@ export function GraphEditor({ config }: GraphEditorProps) {
         : null;
       dispatchSettings({
         type: 'replace-settings',
-        value: { ...adaptiveSettings, ...boxPlotLabels, ...dotPlotLabels, ...supplyDemandLabels, ...(selectedChartType === 'xy' ? xyLabels(nextData) : {}) },
+        value: { ...adaptiveSettings, ...boxPlotLabels, ...dotPlotLabels, ...supplyDemandLabels, ...(selectedChartType === 'xy' ? xyLabels(nextData) : {}), ...(pastedTitle ? {title:pastedTitle} : {}) },
       });
-    } else {
+    } else if (intent === 'structure' || settings.title === 'Untitled Graph') {
       const suggested = selectedChartType === 'xy' ? xyLabels(data) : selectedChartType === 'supplydemand'
         ? createSupplyDemandSuggestedLabels(data)
         : selectedChartType === 'dotplot'
@@ -457,26 +517,29 @@ export function GraphEditor({ config }: GraphEditorProps) {
   async function saveNow() {
     setSaveStatus('saving');
     try {
-      await saveCurrentProject(createProjectSnapshot({
+      await persistProject(createProjectSnapshot({tableBackup:tableBackupRef.current,
         createdAt: createdAtRef.current,
         data,
         graphType: selectedChartType,
         settings,
-      }), config.slug);
+      }));
       setIsStorageAvailable(true);
       setProjectError(null);
       setProjectNotice(null);
+      setSavedState({ data, settings, chartType: selectedChartType });
       setSaveStatus('saved');
+      return true;
     } catch {
       setIsStorageAvailable(false);
       setSaveStatus('error');
       setProjectError('Local saving is unavailable in this browser. Export a project file to keep a copy.');
+      return false;
     }
   }
 
-  function exportGraph(type: 'png' | 'svg') {
+  async function exportGraph(type: 'png' | 'svg') {
     if (selectedChartType === 'equation' && equationBusy) { setProjectError('Wait for the equation graph to finish updating before exporting.'); return; }
-    const dataUrl = graphCanvasRef.current?.exportImage(type);
+    const dataUrl = await graphCanvasRef.current?.exportImage(type);
     if (!dataUrl) {
       setProjectError('Add valid data before exporting the graph.');
       return;
@@ -495,7 +558,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
   }
 
   function exportProject() {
-    const project = createProjectSnapshot({
+    const project = createProjectSnapshot({tableBackup:tableBackupRef.current,
       createdAt: createdAtRef.current,
       data,
       graphType: selectedChartType,
@@ -519,6 +582,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
         setProjectError(parsed.error);
         return;
       }
+      tableBackupRef.current = parsed.project.tableBackup;
       setData(parsed.project.data);
       dispatchSettings({ type: 'replace-settings', value: parsed.project.settings });
       setSelectedChartType(parsed.project.graphType);
@@ -540,6 +604,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
       // The new project will still replace the old record during the next autosave.
     }
 
+    tableBackupRef.current = undefined;
     setData(createConfiguredData(config));
     dispatchSettings({ type: 'replace-settings', value: createConfiguredSettings(config) });
     setSelectedChartType(config.graphType);
@@ -551,6 +616,8 @@ export function GraphEditor({ config }: GraphEditorProps) {
     setProjectNotice('Started a new graph.');
     setSaveStatus('saving');
   }
+
+  const currentSaveStatus = saveStatus === 'saved' && (savedState?.data !== data || savedState?.settings !== settings || savedState?.chartType !== selectedChartType) ? 'saving' : saveStatus;
 
   return (
     <section
@@ -570,13 +637,31 @@ export function GraphEditor({ config }: GraphEditorProps) {
 
       <fieldset className="contents" disabled={!isProjectReady}>
 
-      <div aria-label="Choose a graph type" className="border-border flex min-w-0 gap-2 overflow-x-auto border-b p-3" role="group">
+      <label className="border-border block border-b p-3 text-sm font-semibold lg:hidden">
+        Chart type
+        <select className="border-border focus:border-brand mt-2 min-h-11 w-full rounded-md border bg-white px-3" value={selectedChartType} onChange={(event) => selectChartType(event.target.value as RenderedChartType)}>
+          {graphTools.map((tool) => <option key={tool.type} value={tool.type}>{tool.label}</option>)}
+        </select>
+      </label>
+      <div aria-label="Choose a graph type" className="border-border hidden min-w-0 flex-wrap gap-2 border-b p-3 lg:flex" role="radiogroup">
         {graphTools.map(({ label, icon, type: renderedType }) => {
           const isSelected = renderedType === selectedChartType;
 
           return (
             <button
-              aria-pressed={isSelected}
+              aria-checked={isSelected}
+              role="radio"
+              tabIndex={isSelected ? 0 : -1}
+              onKeyDown={(event) => {
+                const directions: Record<string, number> = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+                const direction = directions[event.key];
+                if (direction === undefined && event.key !== 'Home' && event.key !== 'End') return;
+                event.preventDefault();
+                const index = graphTools.findIndex((tool) => tool.type === selectedChartType);
+                const next = event.key === 'Home' ? 0 : event.key === 'End' ? graphTools.length - 1 : (index + direction + graphTools.length) % graphTools.length;
+                selectChartType(graphTools[next].type);
+                event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]')[next]?.focus();
+              }}
               className={isSelected
                 ? 'bg-brand shrink-0 rounded-md border border-brand px-3.5 py-2 text-sm font-semibold text-white shadow-sm'
                 : 'border-border text-text hover:border-slate-300 hover:bg-surface-subtle shrink-0 rounded-md border bg-white px-3.5 py-2 text-sm font-medium'}
@@ -605,7 +690,27 @@ export function GraphEditor({ config }: GraphEditorProps) {
 
       <div className="grid min-w-0 lg:grid-cols-[2fr_3fr]">
         <section aria-labelledby="data-heading" className="border-border order-2 min-w-0 scroll-mt-14 border-t p-4 sm:p-5 lg:order-1 lg:border-t-0 lg:border-r" id="data-editor" ref={dataSectionRef}>
-          {selectedChartType === 'equation'
+          {isTreePage && <div className="border-border mb-4 rounded-md border p-3" data-draft-revision={draftRevision}>
+            <label className="flex items-start gap-2 text-sm font-semibold"><input type="checkbox" disabled={!isProjectReady} className="mt-1" checked={rememberTrees} onChange={event=>{void changeRemember(event.target.checked);}}/>Remember my diagrams on this device</label>
+            <p className="text-text-muted mt-2 text-xs leading-5">Saves diagrams in this browser. Uncheck to remove saved tree copies and keep drafts only until this page closes. No cloud backup.</p>
+            <label className="mt-3 block text-sm font-semibold">My diagrams<select aria-label="My diagrams" className="border-border mt-1 w-full rounded-md border bg-white p-2" value={activeDraftRef.current} onChange={event=>openDraft(event.target.value)}>
+              {!draftsRef.current.length && <option value={activeDraftRef.current}>{settings.title}</option>}
+              {draftsRef.current.map((draft,index)=><option key={draft.id} value={draft.id}>{draft.id===activeDraftRef.current?settings.title:draft.project.settings.title} · {index+1}</option>)}
+            </select></label>
+            {draftsRef.current.length>1 && <button className="text-text-muted mt-2 text-sm underline" type="button" onClick={()=>{if(!window.confirm('Delete this diagram? Download a project backup first if you need a copy.'))return;draftsRef.current=draftsRef.current.filter(d=>d.id!==activeDraftRef.current);const next=draftsRef.current[0];activeDraftRef.current=next.id;restoreDraft(next.project);setDraftRevision(value=>value+1);}}>Delete current diagram</button>}
+          </div>}
+          {selectedChartType === 'tree'
+            ? <Suspense fallback={<p role="status">Loading tree editor…</p>}><TreeInput isReady={isProjectReady} data={data} isSampleData={isSampleData} onChange={updateData} onApplyTemplate={template => {
+              if(draftsRef.current.length>=treeDraftLimit){setProjectError('You have 20 diagrams. Delete a draft before opening another template.');return;}
+              storeDraft(snapshotTree());
+              activeDraftRef.current=crypto.randomUUID();
+              createdAtRef.current=new Date().toISOString();
+              const next=createProjectSnapshot({tableBackup:tableBackupRef.current,createdAt:createdAtRef.current,data:createTreeTemplateData(template),graphType:'tree',settings:{...settings,title:template.title,orientation:template.orientation}});
+              storeDraft(next);restoreDraft(next);setDraftRevision(value=>value+1);
+              requestAnimationFrame(() => previewSectionRef.current?.scrollIntoView({block:'start'}));
+              setIsSampleData(true);setProjectNotice('Opened a new diagram. Your previous diagram is available in My diagrams.');
+            }} /></Suspense>
+            : selectedChartType === 'equation'
             ? <Suspense fallback={<p role="status">Loading equation input…</p>}><EquationInput settings={settings} dispatch={dispatchSettings} onData={setEquationData} onBusy={setEquationBusy} /></Suspense>
             : <><DataGrid data={data} isSampleData={isSampleData} onChange={updateData} />{selectedChartType === 'xy' && <div className="mt-3"><p className="text-sm text-text-muted">Use X followed by one or more Y columns. Optional point names appear with coordinate labels.</p>{!data.columns.some(column => column.kind === 'label') && <button className="button-secondary mt-2" onClick={addPointNames} type="button">Add point names</button>}</div>}</>}
 
@@ -682,7 +787,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
             />
           )}
 
-          {selectedChartType !== 'equation' && <section aria-label="Detected data" className="border-border bg-surface-subtle mt-3 rounded-md border px-3 py-2 text-sm">
+          {selectedChartType !== 'tree' && selectedChartType !== 'equation' && <section aria-label="Detected data" className="border-border bg-surface-subtle mt-3 rounded-md border px-3 py-2 text-sm">
             <p className="text-text-muted flex flex-wrap items-center gap-x-1.5 gap-y-1">
               <span><span className="text-text font-semibold">Detected:</span> {detectedRelationship}</span>
               <span aria-hidden="true">·</span>
@@ -724,12 +829,15 @@ export function GraphEditor({ config }: GraphEditorProps) {
 
           <div data-print-graph className="mt-2 w-full overflow-hidden">
             <GraphCanvas
+              onRetryChart={() => { if(isTreePage && !rememberTreesRef.current){setProjectError('Download a project backup before reloading. Session-only diagrams will be lost when this page closes.');return;} void saveNow().then(saved => {if(saved) window.location.reload();}); }}
+              treeFitRequest={treeFitRequest}
               chartType={selectedChartType}
               data={data}
               incompatibleAction={isSelectedChartIncompatible && recommendedRenderedType ? {
                 label: `Switch to ${interpretation.recommendation}`,
                 onClick: () => selectChartType(recommendedRenderedType),
               } : undefined}
+              onRenameTreeNode={(id, label) => updateData({...data, rows: data.rows.map(row => row.cells[0].trim() === id ? {...row,cells:[row.cells[0],label,row.cells[2]]} : row)})}
               onToggleSeries={toggleSeriesVisibility}
               ref={graphCanvasRef}
               settings={settings}
@@ -745,22 +853,23 @@ export function GraphEditor({ config }: GraphEditorProps) {
               <button className="button-secondary" onClick={exportCsv} type="button"><ButtonIcon>▤</ButtonIcon>CSV</button>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button className="button-secondary" onClick={saveNow} type="button"><ButtonIcon>♡</ButtonIcon>Save locally</button>
+              <button className="button-secondary" disabled={isTreePage && !rememberTrees} onClick={saveNow} type="button"><ButtonIcon>♡</ButtonIcon>Save locally</button>
               <button className="button-primary" onClick={() => exportGraph('png')} type="button"><ButtonIcon>↓</ButtonIcon>Download</button>
             </div>
           </div>
 
           <div className="border-border mt-3 flex flex-wrap items-center justify-between gap-3 border-t pt-3">
             <p className="text-text-muted text-xs" role="status">
-              {saveStatus === 'checking' && 'Checking this device for a saved project…'}
-              {saveStatus === 'saving' && 'Saving locally…'}
-              {saveStatus === 'saved' && 'Saved locally on this device. No cloud backup.'}
-              {saveStatus === 'error' && 'Local autosave unavailable.'}
+              {isTreePage && !rememberTrees && 'Session only. Diagrams are not saved on this device.'}
+              {(!isTreePage || rememberTrees) && currentSaveStatus === 'checking' && 'Checking this device for a saved project…'}
+              {(!isTreePage || rememberTrees) && currentSaveStatus === 'saving' && 'Saving locally…'}
+              {(!isTreePage || rememberTrees) && currentSaveStatus === 'saved' && 'Autosaved on this device. No cloud backup.'}
+              {(!isTreePage || rememberTrees) && currentSaveStatus === 'error' && 'Local autosave unavailable.'}
             </p>
             <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
               <button className="text-text-muted hover:text-text font-medium" onClick={() => setIsResetConfirming(true)} type="button">New graph</button>
               <button className="text-text-muted hover:text-text font-medium" onClick={() => projectInputRef.current?.click()} type="button">Import project</button>
-              <button className="text-text-muted hover:text-text font-medium" onClick={exportProject} type="button">Export project</button>
+              <button className="text-text-muted hover:text-text font-medium" onClick={exportProject} type="button">Download project backup</button>
               <input
                 accept=".json,application/json"
                 aria-label="Choose GraphMaker project file"

@@ -6,6 +6,8 @@ import SiteFooter from '../navigation/SiteFooter.astro';
 import SiteHeader from '../navigation/SiteHeader.astro';
 import type { ToolPageConfig } from '../../content/toolPages';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import TreeTemplateGallery from './TreeTemplateGallery.astro';
+import TreeDiagramExample from './TreeDiagramExample.astro';
 import ProductBenefitChecks from '../ui/ProductBenefitChecks.astro';
 
 interface Props {
@@ -49,6 +51,8 @@ const applicationSchema = {
       </div>
     </section>
 
+    {config.editor.graphType === 'tree' && <TreeTemplateGallery />}
+
     <section aria-labelledby="how-to-heading" class="page-shell py-14 sm:py-16">
       <div class="mx-auto max-w-5xl">
         <h2 class="section-heading text-center" id="how-to-heading">{config.sectionHeadings.howTo}</h2>
@@ -66,14 +70,15 @@ const applicationSchema = {
 
     <section aria-labelledby="definition-heading" class="border-border bg-surface-subtle border-y py-14 sm:py-16">
       <div class="page-shell grid gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-start">
-        <div class="max-w-3xl">
+        <div class="min-w-0 max-w-3xl">
           <h2 class="section-heading" id="definition-heading">{config.sectionHeadings.definition}</h2>
           {config.definition.map((paragraph) => <p class="text-text-muted mt-4 leading-7">{paragraph}</p>)}
         </div>
-        <div aria-labelledby="example-heading" class="border-border bg-surface rounded-lg border p-5 shadow-sm">
+        <div aria-labelledby="example-heading" class="min-w-0 border-border bg-surface rounded-lg border p-5 shadow-sm">
           <h2 class="text-xl font-bold" id="example-heading">{config.sectionHeadings.example}</h2>
+          {config.editor.graphType === 'tree' && <TreeDiagramExample />}
           <p class="text-text-muted mt-2 text-sm leading-6">{config.example.caption}</p>
-          <div class="border-border mt-4 overflow-hidden rounded-md border">
+          <div class="border-border mt-4 overflow-x-auto rounded-md border">
             <table class="w-full border-collapse text-left text-sm">
               <thead class="bg-surface-blue">
                 <tr>{config.example.headers.map((header) => <th class="border-border border-b px-4 py-2 font-bold" scope="col">{header}</th>)}</tr>

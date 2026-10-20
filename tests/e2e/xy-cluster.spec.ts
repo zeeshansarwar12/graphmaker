@@ -59,7 +59,7 @@ test("XY plots multiple series and exports the same named coordinates", async ({
   );
   await page.getByRole("button", { name: "Save locally", exact: true }).click();
   await expect(
-    page.getByText("Saved locally on this device. No cloud backup.", {
+    page.getByText("Autosaved on this device. No cloud backup.", {
       exact: true,
     }),
   ).toBeVisible();
@@ -160,7 +160,7 @@ test("Equation graphs all requested examples, multiple functions and rejects cod
   await ready(page);
   await page.getByRole("button", { name: "Save locally", exact: true }).click();
   await expect(
-    page.getByText("Saved locally on this device. No cloud backup.", {
+    page.getByText("Autosaved on this device. No cloud backup.", {
       exact: true,
     }),
   ).toBeVisible();
@@ -233,7 +233,7 @@ test('equation viewport gestures, keyboard inputs and print view remain usable',
   await page.locator('#editor').screenshot({path:'verification-logs/equation-desktop.png'});
   await page.emulateMedia({media:'print'});
   await expect(canvas).toBeVisible();await expect(page.getByRole('button',{name:'Print graph',exact:true})).not.toBeVisible();
-  await expect(page.getByText('Saved locally on this device. No cloud backup.',{exact:true})).not.toBeVisible();
+  await expect(page.getByText('Autosaved on this device. No cloud backup.',{exact:true})).not.toBeVisible();
   await page.locator('section[aria-labelledby="preview-heading"]').screenshot({path:'verification-logs/equation-print.png'});
 });
 

@@ -18,7 +18,7 @@ test('serves a complete crawlable Pie tool page with accurate percentages', asyn
   await expect(page.getByRole('heading', { level: 1, name: 'Pie Chart Maker' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Pie Chart Maker');
 
-  await expect(page.getByRole('button', { exact: true, name: 'Pie' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('radio', { exact: true, name: 'Pie' })).toHaveAttribute('aria-checked', 'true');
   await expect(page.getByLabel('Category, row 1')).toHaveValue('Product A');
   await expect(page.getByLabel('Value, row 4')).toHaveValue('10');
   await expect(page.locator('[data-rendered-chart-type="pie"] [data-chart-status="ready"]')).toHaveAttribute('data-axis-type', 'none');

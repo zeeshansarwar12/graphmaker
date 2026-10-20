@@ -7,6 +7,7 @@ export type TabularImportResult =
   | {
     data: TabularData;
     headerDetected: boolean;
+    title?: string;
     ok: true;
   }
   | { error: string; ok: false };

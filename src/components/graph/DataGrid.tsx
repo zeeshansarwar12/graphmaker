@@ -20,12 +20,14 @@ import type { TabularImportResult } from '../../lib/import/tabularImport';
 import { ImportPreview } from './ImportPreview';
 
 interface DataGridProps {
+  headingId?: string;
   data: TabularData;
   isSampleData: boolean;
-  onChange: (data: TabularData, intent?: 'edit' | 'replace' | 'structure') => void;
+  onChange: (data: TabularData, intent?: 'edit' | 'replace' | 'structure', title?: string) => void;
 }
 
 interface PendingImport {
+  title?: string;
   data: TabularData;
   headerDetected: boolean;
   name: string;
@@ -65,7 +67,7 @@ function clipboardReadErrorMessage(error: unknown): string {
   return 'The clipboard could not be read. Paste directly into a selected cell, or try the Paste data button again.';
 }
 
-export function DataGrid({ data, isSampleData, onChange }: DataGridProps) {
+export function DataGrid({ data, isSampleData, onChange, headingId = 'data-heading' }: DataGridProps) {
   const csvInputRef = useRef<HTMLInputElement>(null);
   const excelInputRef = useRef<HTMLInputElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -98,6 +100,7 @@ export function DataGrid({ data, isSampleData, onChange }: DataGridProps) {
     setPendingImport({
       data: result.data,
       headerDetected: result.headerDetected,
+      title: result.title,
       name,
     });
   }
@@ -147,6 +150,7 @@ export function DataGrid({ data, isSampleData, onChange }: DataGridProps) {
     onChange(
       replacesDataset ? createDataFromClipboard(result.rows) : pasteRectangularData(data, result.rows, rowIndex, columnIndex),
       replacesDataset ? 'replace' : 'edit',
+      replacesDataset ? result.title : undefined,
     );
     setPendingImport(null);
     setImportError(null);
@@ -194,6 +198,7 @@ export function DataGrid({ data, isSampleData, onChange }: DataGridProps) {
       data: createDataFromClipboard(result.rows),
       headerDetected: rowsHaveHeader(result.rows),
       ok: true,
+      title: result.title,
     }, 'Clipboard data');
     setIsImporting(false);
   }
@@ -245,7 +250,7 @@ export function DataGrid({ data, isSampleData, onChange }: DataGridProps) {
   function confirmImport() {
     if (!pendingImport) return;
     const imported = pendingImport;
-    onChange(imported.data, 'replace');
+    onChange(imported.data, 'replace', imported.title);
     setPendingImport(null);
     setImportError(null);
     setImportMessage(`Imported ${imported.data.rows.length} row${imported.data.rows.length === 1 ? '' : 's'} from ${imported.name}.`);
@@ -254,7 +259,7 @@ export function DataGrid({ data, isSampleData, onChange }: DataGridProps) {
   return (
     <div ref={gridRef}>
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h3 className="text-lg font-bold" id="data-heading">Data</h3>
+        <h3 className="text-lg font-bold" id={headingId}>Data</h3>
         <div className="flex items-center gap-3 text-sm">
           {isSampleData && <span className="text-brand font-semibold">Sample data</span>}
           <button className="text-text-muted hover:text-text font-medium" onClick={() => commit(clearData(data), 'structure')} type="button">Clear</button>
@@ -346,9 +351,7 @@ export function DataGrid({ data, isSampleData, onChange }: DataGridProps) {
           <div className="text-text-muted px-4 py-6 text-center text-sm">No rows yet. Add a row or paste your data to begin.</div>
         )}
 
-        <button className="border-border text-text-muted hover:bg-surface-subtle w-full border-t px-3 py-2 text-left text-sm font-medium" onClick={() => commit(addRow(data), 'structure')} type="button">
-          <span aria-hidden="true">＋</span> Add row
-        </button>
+
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
