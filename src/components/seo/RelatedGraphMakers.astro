@@ -1,0 +1,16 @@
+---
+import type { RelatedTool } from '../../content/toolPages';
+interface Props { tools: RelatedTool[] }
+const { tools } = Astro.props;
+---
+<section aria-labelledby="related-heading" class="page-shell py-14 sm:py-16">
+      <h2 class="section-heading text-center" id="related-heading">Related graph makers</h2>
+      <div class="mx-auto mt-8 grid max-w-5xl gap-4 md:grid-cols-3">
+        {tools.map((tool) => (
+          <a class="border-border hover:border-brand hover:shadow-editor group rounded-lg border p-5 transition" href={tool.href}>
+            <h3 class="group-hover:text-brand font-bold">{tool.name} <span aria-hidden="true">→</span></h3>
+            <p class="text-text-muted mt-2 text-sm leading-6">{tool.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>

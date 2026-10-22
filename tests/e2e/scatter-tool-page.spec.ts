@@ -10,7 +10,7 @@ test('serves a complete scatter page with a points-only shared-editor preset', a
   await expect(page.getByRole('heading', { level: 1, name: 'Scatter Plot Maker' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Scatter Plot Maker');
 
-  await expect(page.getByRole('radio', { exact: true, name: 'Scatter' })).toHaveAttribute('aria-checked', 'true');
+  await expect(page.getByRole('combobox', { name: 'Change chart type' })).toHaveValue('scatter');
   await expect(page.getByLabel('Hours Studied, row 1')).toHaveValue('1');
   await expect(page.getByLabel('Exam Score, row 8')).toHaveValue('91');
   await expect(page.getByLabel('Connect points')).toHaveCount(0);

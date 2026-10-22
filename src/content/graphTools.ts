@@ -17,7 +17,13 @@ const tools = [
 ] as const satisfies ReadonlyArray<{ name: string; label: string; slug: string; description: string; type: GraphType; icon: string; category: string }>;
 
 export const graphTools = tools.map((tool) => ({ ...tool, href: `/${tool.slug}/` }));
-export const allGraphTools = graphTools;
+// Bar workflow pages share the Bar engine; do not duplicate editor type controls.
+export const barWorkflowTools = [
+  { name: 'Stacked Bar Graph Maker', label: 'Stacked bar', slug: 'stacked-bar-graph-maker', href: '/stacked-bar-graph-maker/', description: 'Show component values and totals in segmented bars.', type: 'bar' as const, icon: '▥', category: 'Show composition' },
+  { name: 'Horizontal Bar Graph Maker', label: 'Horizontal bar', slug: 'horizontal-bar-graph-maker', href: '/horizontal-bar-graph-maker/', description: 'Compare rankings and named categories with sideways bars.', type: 'bar' as const, icon: '▥', category: 'Compare categories' },
+  { name: 'Grouped Bar Graph Maker', label: 'Grouped bar', slug: 'grouped-bar-chart-maker', href: '/grouped-bar-chart-maker/', description: 'Compare two or more datasets side by side.', type: 'bar' as const, icon: '▥', category: 'Compare categories' },
+];
+export const allGraphTools = [...graphTools, ...barWorkflowTools];
 
 export const indexableRoutes = [
   '/',

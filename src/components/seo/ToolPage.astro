@@ -1,11 +1,16 @@
 ---
 import { GraphWorkspace } from '../graph/GraphWorkspace';
 import Breadcrumbs from '../navigation/Breadcrumbs.astro';
+import { pageLastModified } from '../../content/pageLastModified';
 import { toolBreadcrumbs } from '../../content/seo';
 import SiteFooter from '../navigation/SiteFooter.astro';
 import SiteHeader from '../navigation/SiteHeader.astro';
 import type { ToolPageConfig } from '../../content/toolPages';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import BarTemplateGallery from './BarTemplateGallery.astro';
+import { barWorkflowTools } from '../../content/graphTools';
+import RelatedGraphMakers from './RelatedGraphMakers.astro';
+import { barTemplatePages } from '../../content/barTemplates';
 import SupplyDemandTemplates from './SupplyDemandTemplates.astro';
 import TreeTemplateGallery from './TreeTemplateGallery.astro';
 import TreeDiagramExample from './TreeDiagramExample.astro';
@@ -26,13 +31,31 @@ const methodAnchors: Record<string, string> = {
 const methodAnchor = methodAnchors[config.canonical];
 const applicationSchema = {
   '@context': 'https://schema.org', '@type': 'WebApplication',
-  name: config.h1, url: new URL(config.canonical, siteBase).href,
+  ...(config.connectedSchema ? {
+    '@id': new URL(`${config.canonical}#application`, siteBase).href,
+    mainEntityOfPage: { '@id': new URL(`${config.canonical}#webpage`, siteBase).href },
+    publisher: { '@id': new URL('/#organization', siteBase).href },
+    inLanguage: 'en', isAccessibleForFree: true,
+    browserRequirements: 'Requires JavaScript and a modern web browser.',
+    featureList: config.features.map(feature => feature.description),
+  } : {}),
+  name: config.h1, ...(config.alternateName ? { alternateName: config.alternateName } : {}), url: new URL(config.canonical, siteBase).href,
   description: config.intro, applicationCategory: 'BusinessApplication', operatingSystem: 'Any',
   offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
 };
+const webpageSchema = config.connectedSchema ? {
+  '@context': 'https://schema.org', '@type': 'WebPage',
+  '@id': new URL(`${config.canonical}#webpage`, siteBase).href,
+  name: config.h1, url: new URL(config.canonical, siteBase).href, description: config.intro,
+  inLanguage: 'en', isAccessibleForFree: true, dateModified: pageLastModified[config.canonical],
+  isPartOf: { '@id': new URL(barWorkflowTools.some(tool => tool.href === config.canonical) ? '/bar-graph-maker/#webpage' : '/#website', siteBase).href },
+  ...(config.canonical === '/bar-graph-maker/' ? { hasPart: barWorkflowTools.map(tool => ({ '@id': new URL(`${tool.href}#webpage`, siteBase).href })) } : {}),
+  publisher: { '@id': new URL('/#organization', siteBase).href },
+  mainEntity: { '@id': new URL(`${config.canonical}#application`, siteBase).href },
+} : undefined;
 ---
 
-<BaseLayout title={config.title} description={config.metaDescription} canonical={config.canonical} structuredData={applicationSchema} breadcrumbs={breadcrumbs}>
+<BaseLayout title={config.title} description={config.metaDescription} canonical={config.canonical} structuredData={webpageSchema ? [applicationSchema, webpageSchema] : applicationSchema} breadcrumbs={breadcrumbs}>
   <SiteHeader />
 
   <main id="main-content" class:list={{"supply-page":config.editor.graphType === "supplydemand"}}>
@@ -52,6 +75,14 @@ const applicationSchema = {
       </div>
     </section>
 
+    {barTemplatePages.includes(config.canonical) && <>
+      {config.canonical === '/bar-graph-maker/' && <nav aria-label="Bar graph types" class="page-shell pt-8">
+        <h2 class="section-heading text-center">Choose a bar graph type</h2>
+        <div class="mt-5 grid gap-4 md:grid-cols-3">{barWorkflowTools.map(tool => <a class="border-border rounded-lg border p-5 hover:border-brand" href={tool.href}><span class="font-bold">{tool.name}</span><p class="text-text-muted mt-2 text-sm leading-6">{tool.description}</p></a>)}</div>
+      </nav>}
+      <BarTemplateGallery page={config.canonical} />
+      <RelatedGraphMakers tools={config.relatedTools} />
+    </>}
     {config.editor.graphType === 'tree' && <TreeTemplateGallery />}
     {config.editor.graphType === 'supplydemand' && <SupplyDemandTemplates />}
 
@@ -182,17 +213,7 @@ const applicationSchema = {
       </div>
     </section>
 
-    <section aria-labelledby="related-heading" class="page-shell py-14 sm:py-16">
-      <h2 class="section-heading text-center" id="related-heading">Related graph makers</h2>
-      <div class="mx-auto mt-8 grid max-w-5xl gap-4 md:grid-cols-3">
-        {config.relatedTools.map((tool) => (
-          <a class="border-border hover:border-brand hover:shadow-editor group rounded-lg border p-5 transition" href={tool.href}>
-            <h3 class="group-hover:text-brand font-bold">{tool.name} <span aria-hidden="true">→</span></h3>
-            <p class="text-text-muted mt-2 text-sm leading-6">{tool.description}</p>
-          </a>
-        ))}
-      </div>
-    </section>
+    {!barTemplatePages.includes(config.canonical) && <RelatedGraphMakers tools={config.relatedTools} />}
 
     <section aria-labelledby="faq-heading" class="page-shell max-w-4xl pb-14 sm:pb-16" id="faq">
       <div class="text-center">

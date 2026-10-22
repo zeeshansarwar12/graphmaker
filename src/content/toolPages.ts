@@ -18,6 +18,8 @@ export interface RelatedTool {
 }
 
 export interface ToolPageConfig {
+  connectedSchema?: boolean;
+  alternateName?: string[];
   additionalSections?: Array<{
     id: string;
     intro: string;
@@ -450,6 +452,8 @@ export const scatterToolPageConfig = {
 } satisfies ToolPageConfig;
 
 export const barToolPageConfig = {
+  connectedSchema: true,
+  alternateName: ['Bar Chart Maker'],
   canonical: '/bar-graph-maker/',
   comparison: {
     first: {
@@ -527,10 +531,11 @@ export const barToolPageConfig = {
   intro: 'Use this free bar chart maker to compare categories with no signup. Enter, paste, or upload data and display multiple numeric series in a clear grouped bar chart.',
   metaDescription: 'Create a bar graph online for free. Paste data or import CSV and Excel files, compare multiple series, and export PNG or SVG with no signup.',
   relatedTools: [
-    { name: 'Tree Diagram Maker', description: 'Organize categories as parent–child branches instead of comparing numeric amounts.', href: '/tree-graph-maker/' },
-    { name: 'Line Graph Maker', description: 'Show changes and trends across categories or dates.', href: '/line-graph-maker/' },
+    { name: 'Grouped Bar Chart Maker', description: 'Compare two or more datasets with double, clustered, or side-by-side bars.', href: '/grouped-bar-chart-maker/' },
+    { name: 'Stacked Bar Graph Maker', description: 'Compare totals and component values with segmented bars.', href: '/stacked-bar-graph-maker/' },
+    { name: 'Horizontal Bar Chart Maker', description: 'Compare ranked categories with sideways bars and readable labels.', href: '/horizontal-bar-graph-maker/' },
+    { name: 'Line Chart Maker', description: 'Show changes and trends across categories or dates.', href: '/line-graph-maker/' },
     { name: 'Pie Chart Maker', description: 'Show how one numeric series contributes to a whole.', href: '/pie-chart-maker/' },
-    { name: 'Histogram Maker', description: 'Explore the distribution of raw numeric observations.', href: '/histogram-maker/' },
   ],
   sectionHeadings: {
     definition: 'What is a bar graph?',
@@ -554,6 +559,7 @@ export const barToolPageConfig = {
 } satisfies ToolPageConfig;
 
 export const lineToolPageConfig = {
+  alternateName: ['Line Chart Maker'],
   additionalSections: [
     {
       id: 'multiple-line-graphs',
@@ -639,10 +645,10 @@ export const lineToolPageConfig = {
     { title: 'Add one or more series', description: 'Place each measurement in its own numeric column and use clear headers for legend labels.' },
     { title: 'Customize and export', description: 'Adjust titles, grid, colors, and labels, then download the result as PNG or SVG.' },
   ],
-  intro: 'Create a line graph online for free with no signup. Plot dates or categories, compare multiple numeric series, and see changes update live.',
+  intro: 'Use this free line chart maker to plot dates or categories, compare multiple numeric series, and see your line graph update live. No signup required.',
   metaDescription: 'Create a line graph online for free. Plot dates on a true time axis, compare multiple series, import CSV or Excel, and export PNG or SVG.',
   relatedTools: [
-    { name: 'Bar Graph Maker', description: 'Compare numeric values across separate named categories.', href: '/bar-graph-maker/' },
+    { name: 'Bar Chart Maker', description: 'Compare numeric values across separate named categories.', href: '/bar-graph-maker/' },
     { name: 'XY Graph Maker', description: 'Plot paired numeric values and optionally connect consecutive points.', href: '/xy-graph-maker/' },
     { name: 'Supply and Demand Graph Maker', description: 'Draw economics curves against quantity and identify an in-range equilibrium.', href: '/supply-and-demand-graph-maker/' },
     { name: 'Scatter Plot Maker', description: 'Plot independent numeric observations without connecting lines.', href: '/scatter-plot-maker/' },

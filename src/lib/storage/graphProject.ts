@@ -114,6 +114,7 @@ function isGraphSettings(value: unknown): value is GraphSettings {
     && (value.supplyDemandXColumnId === undefined
       || value.supplyDemandXColumnId === null
       || typeof value.supplyDemandXColumnId === 'string')
+    && (value.barLayout === undefined || value.barLayout === 'grouped' || value.barLayout === 'stacked')
     && (value.orientation === 'horizontal' || value.orientation === 'vertical')
     && Array.isArray(value.seriesColors)
     && value.seriesColors.every((color) => typeof color === 'string')
@@ -184,6 +185,7 @@ export function parseGraphProject(value: unknown): ProjectParseResult {
       ...project,
       settings: {
         ...project.settings,
+        barLayout: project.settings.barLayout ?? 'grouped',
         cartesian: project.settings.cartesian ?? { ...defaultCartesian },
         equations: project.settings.equations ?? ['y = 2x + 3'],
         showTrendline: project.settings.showTrendline ?? false,

@@ -1,7 +1,13 @@
+import { barWorkflowTools } from './graphTools';
+
 export interface Breadcrumb { name: string; href: string }
 export const pageBreadcrumbs = (name: string, href: string): Breadcrumb[] => [{ name: 'Home', href: '/' }, { name, href }];
 export const toolBreadcrumbs = (name: string, href: string): Breadcrumb[] => [
-  { name: 'Home', href: '/' }, { name: 'Graph tools', href: '/tools/' }, { name, href },
+  { name: 'Home', href: '/' },
+  barWorkflowTools.some(tool => tool.href === href)
+    ? { name: 'Bar Graph Maker', href: '/bar-graph-maker/' }
+    : { name: 'Graph tools', href: '/tools/' },
+  { name, href },
 ];
 export function breadcrumbSchema(items: Breadcrumb[], base: URL) {
   return {

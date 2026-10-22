@@ -10,7 +10,7 @@ test('serves a complete crawlable Line tool page with a true time-axis preset', 
   await expect(page.getByRole('heading', { level: 1, name: 'Line Graph Maker' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Line Graph Maker');
 
-  await expect(page.getByRole('radio', { exact: true, name: 'Line' })).toHaveAttribute('aria-checked', 'true');
+  await expect(page.getByRole('combobox', { name: 'Change chart type' })).toHaveValue('line');
   await expect(page.getByLabel('Date, row 1')).toHaveValue('2026-01-01');
   await expect(page.getByLabel('Product A Sales, row 7')).toHaveValue('940');
   await expect(page.getByLabel('Product B Sales, row 7')).toHaveValue('880');
@@ -36,7 +36,7 @@ test('serves a complete crawlable Line tool page with a true time-axis preset', 
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();
   }
 
-  await expect(page.getByRole('link', { name: /Bar Graph Maker/ }).first()).toHaveAttribute('href', '/bar-graph-maker/');
+  await expect(page.getByRole('link', { name: /Bar Chart Maker/ }).first()).toHaveAttribute('href', '/bar-graph-maker/');
   await expect(page.getByRole('link', { name: /XY Graph Maker/ }).first()).toHaveAttribute('href', '/xy-graph-maker/');
   await expect(page.getByRole('link', { name: /Scatter Plot Maker/ }).first()).toHaveAttribute('href', '/scatter-plot-maker/');
 });

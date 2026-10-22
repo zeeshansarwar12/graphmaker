@@ -13,7 +13,7 @@ const coreToolRoutes = [
   '/radar-chart-maker/',
 ] as const;
 
-const specialistToolRoutes = ['/tree-graph-maker/', '/dot-plot-maker/', '/supply-and-demand-graph-maker/'] as const;
+const specialistToolRoutes = ['/stacked-bar-graph-maker/', '/horizontal-bar-graph-maker/', '/grouped-bar-chart-maker/', '/tree-graph-maker/', '/dot-plot-maker/', '/supply-and-demand-graph-maker/'] as const;
 const toolRoutes = [...coreToolRoutes, ...specialistToolRoutes] as const;
 const indexableRoutes = ['/', '/tools/', '/about/', ...toolRoutes] as const;
 const allLinkedRoutes = [...indexableRoutes, '/privacy/', '/terms/'] as const;
@@ -118,20 +118,33 @@ test('tool pages have distinct related-tool links and valid breadcrumb schema', 
     expect(app.offers).toMatchObject({ price: 0, priceCurrency: 'USD' });
     expect(schema['@type'], route).toBe('BreadcrumbList');
     expect(schema.itemListElement).toHaveLength(3);
+    if (['/stacked-bar-graph-maker/', '/horizontal-bar-graph-maker/', '/grouped-bar-chart-maker/'].includes(route)) {
+      expect(schema.itemListElement[1]).toMatchObject({ name: 'Bar Graph Maker', item: productionOrigin + '/bar-graph-maker/' });
+      await expect(page.getByRole('navigation', { name: 'Breadcrumb', exact: true }).getByRole('link', { name: 'Bar Graph Maker', exact: true })).toHaveAttribute('href', '/bar-graph-maker/');
+      const webpage = schemas.find((item: Record<string, unknown>) => item['@type'] === 'WebPage');
+      expect(webpage.isPartOf).toEqual({ '@id': productionOrigin + '/bar-graph-maker/#webpage' });
+    }
     expect(new URL(schema.itemListElement[2].item).pathname).toBe(route);
   }
 });
 
-test('every editor has twelve distinct icons and every footer links all tools', async ({ page }) => {
+test('homepage shows chart icons, specialist pages use a compact selector, and footers link all tools', async ({ page }) => {
   for (const route of allLinkedRoutes) {
     await openPage(page, route);
     for (const toolRoute of toolRoutes) await expect(page.locator(`footer a[href="${toolRoute}"]`)).toHaveCount(1);
     if (route === '/' || toolRoutes.includes(route as typeof toolRoutes[number])) {
-      const tabs = page.getByRole('radiogroup', { name: 'Choose a graph type' });
-      await expect(tabs.locator('button')).toHaveCount(12);
-      const icons = await tabs.locator('[data-chart-icon]').allTextContents();
-      expect(new Set(icons).size, route).toBe(12);
-      await expect(tabs.getByRole('radio', { name: 'Supply & Demand', exact: true })).toBeVisible();
+      if (route === '/') {
+        const tabs = page.getByRole('radiogroup', { name: 'Choose a graph type' });
+        await expect(tabs.locator('button')).toHaveCount(12);
+        const icons = await tabs.locator('[data-chart-icon]').allTextContents();
+        expect(new Set(icons).size, route).toBe(12);
+        await expect(tabs.getByRole('radio', { name: 'Supply & Demand', exact: true })).toBeVisible();
+      } else {
+        await expect(page.getByRole('radiogroup', { name: 'Choose a graph type' })).toHaveCount(0);
+        const selector = page.getByRole('combobox', { name: 'Change chart type' });
+        await expect(selector).toBeVisible();
+        await expect(selector.locator('option')).toHaveCount(12);
+      }
     }
   }
 });
@@ -226,7 +239,7 @@ test('editor controls are semantic and static information pages do not hydrate J
   for (const route of ['/tools/', '/about/', '/privacy/', '/terms/']) {
     await openPage(page, route);
     expect(
-      await page.locator('script[src]:not([src^="https://www.googletagmanager.com/"]):not([src^="https://pagead2.googlesyndication.com/"])').count(),
+      await page.locator('script[src]').evaluateAll(scripts => scripts.filter(script => new URL((script as HTMLScriptElement).src).origin === window.location.origin).length),
       route,
     ).toBe(0);
     const unsizedImages = await page.locator('img:not([width]), img:not([height])').count();
@@ -261,4 +274,75 @@ test('advertising disclosures and ads.txt use the configured publisher', async (
   expect(ads.status()).toBe(200);
   expect(ads.headers()['content-type']).toContain('text/plain');
   expect((await ads.text()).trim()).toBe('google.com, pub-8860671021606762, DIRECT, f08c47fec0942fa0');
+});
+
+test('graph and chart wording matches homepage and tool schema', async ({ page }) => {
+  await openPage(page, '/');
+  await expect(page).toHaveTitle('Free Online Graph & Chart Maker | GraphMaker');
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /graphs and charts online/);
+  await expect(page.locator('main')).toContainText('Create bar charts, line graphs, pie charts');
+  const homeSchemas = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent() ?? '[]');
+  expect(homeSchemas.find((item: Record<string, unknown>) => item['@type'] === 'WebSite').name).toBe('GraphMaker');
+  expect(homeSchemas.find((item: Record<string, unknown>) => item['@type'] === 'Organization').name).toBe('GraphMaker');
+  const app = homeSchemas.find((item: Record<string, unknown>) => item['@type'] === 'WebApplication');
+  expect(app.alternateName).toBe('Free Online Chart Maker');
+  expect(app.description).toBe(await page.locator('main p').first().innerText());
+  for (const [route, alias] of [
+    ['/bar-graph-maker/', 'Bar Chart Maker'],
+    ['/line-graph-maker/', 'Line Chart Maker'],
+    ['/grouped-bar-chart-maker/', 'Grouped Bar Chart Maker'],
+  ]) {
+    await openPage(page, route);
+    const schemas = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent() ?? '[]');
+    expect(schemas.find((item: Record<string, unknown>) => item['@type'] === 'WebApplication').alternateName).toContain(alias);
+    expect((await page.locator('main').innerText()).toLowerCase()).toContain(alias.toLowerCase());
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://graphmaker.site${route}`);
+  }
+});
+
+test('homepage schema connects the page, tool, website, publisher and image', async ({ request }) => {
+  const html = await (await request.get('/')).text();
+  const match = html.match(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/);
+  expect(match).not.toBeNull();
+  const schemas = JSON.parse(match![1]);
+  const byType = Object.fromEntries(schemas.map((item: Record<string, unknown>) => [item['@type'], item]));
+  const ids = schemas.map((item: Record<string, unknown>) => item['@id']);
+  expect(ids.every((id: unknown) => typeof id === 'string' && id.startsWith('https://graphmaker.site/#'))).toBe(true);
+  expect(new Set(ids).size).toBe(5);
+  const { WebPage: webpage, WebSite: website, Organization: publisher, WebApplication: app, ImageObject: image } = byType;
+  expect(webpage.mainEntity['@id']).toBe(app['@id']);
+  expect(app.mainEntityOfPage['@id']).toBe(webpage['@id']);
+  expect(webpage.isPartOf['@id']).toBe(website['@id']);
+  for (const item of [webpage, website, app]) expect(item.publisher['@id']).toBe(publisher['@id']);
+  expect(app.creator['@id']).toBe(publisher.founder['@id']);
+  expect(webpage.primaryImageOfPage['@id']).toBe(image['@id']);
+  expect(image).toMatchObject({ width: 1200, height: 630 });
+  expect((await request.get(new URL(image.contentUrl).pathname)).ok()).toBe(true);
+  expect(webpage.isAccessibleForFree).toBe(true);
+  expect(app).toMatchObject({ isAccessibleForFree: true, operatingSystem: 'Any', inLanguage: 'en' });
+  expect(app.browserRequirements).toContain('JavaScript');
+  expect(app.featureList).toHaveLength(5);
+  expect(app.offers.price).toBe(0);
+  expect(webpage.dateModified).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  expect(app.aggregateRating).toBeUndefined();
+  expect(app.review).toBeUndefined();
+});
+
+
+test('bar directory and footer group workflow pages under their parent', async ({ page }) => {
+  await openPage(page, '/tools/');
+  const routes=['/stacked-bar-graph-maker/','/horizontal-bar-graph-maker/','/grouped-bar-chart-maker/'];
+  const children=page.getByRole('navigation',{name:'Bar graph makers',exact:true});
+  await expect(children).toHaveCount(1);
+  const footer=page.locator('footer ul[aria-label="Bar graph makers"]');
+  for(const route of routes){
+    await expect(children.locator(`a[href="${route}"]`)).toBeVisible();
+    await expect(footer.locator(`a[href="${route}"]`)).toBeVisible();
+  }
+  await expect(footer.locator('..').locator(':scope > a')).toHaveAttribute('href','/bar-graph-maker/');
+  await openPage(page, '/bar-graph-maker/');
+  for(const route of routes)await expect(page.getByRole('navigation',{name:'Bar graph types',exact:true}).locator(`a[href="${route}"]`)).toBeVisible();
+  const schemas=JSON.parse(await page.locator('script[type="application/ld+json"]').textContent()??'[]');
+  const parent=schemas.find((item:Record<string,unknown>)=>item['@type']==='WebPage');
+  expect(parent.hasPart.map((item:{'@id':string})=>item['@id']).sort()).toEqual(routes.map(route=>productionOrigin+route+'#webpage').sort());
 });

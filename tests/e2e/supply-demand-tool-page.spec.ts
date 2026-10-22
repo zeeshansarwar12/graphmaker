@@ -10,7 +10,7 @@ test('serves a complete Supply and Demand page with equilibrium on numeric axes'
   await expect(page.getByRole('heading', { level: 1, name: 'Supply and Demand Graph Maker' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Supply and Demand Graph Maker');
 
-  await expect(page.getByRole('radio', { exact: true, name: 'Supply & Demand' })).toHaveAttribute('aria-checked', 'true');
+  await expect(page.getByRole('combobox', { name: 'Change chart type' })).toHaveValue('supplydemand');
   await expect(page.getByLabel('Quantity, row 1', { exact: true })).toHaveValue('10');
   await expect(page.getByLabel('Supply, row 7')).toHaveValue('80');
   const chart = page.locator('[data-rendered-chart-type="supplydemand"] [data-chart-status="ready"]');

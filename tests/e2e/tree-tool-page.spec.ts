@@ -78,7 +78,7 @@ test('tree CSV imports validate roots, missing parents and cycles without render
 test('tree tool works on narrow mobile without page overflow', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 320, height: 780 });
   await openPage(page, '/tree-graph-maker/');
-  await expect(page.getByRole('combobox', { name: 'Chart type' })).toHaveValue('tree');
+  await expect(page.getByRole('combobox', { name: 'Change chart type' })).toHaveValue('tree');
   await expect(page.locator(chart).locator('canvas')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)).toBe(false);
   await page.screenshot({ path: testInfo.outputPath('tree-mobile.png') });

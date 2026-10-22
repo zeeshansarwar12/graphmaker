@@ -91,7 +91,7 @@ def main():
     missing = [route for route in routes if not html_path(route).is_file()]
     if missing:
         raise SystemExit('Cannot audit built HTML; build is missing these pages: ' + ', '.join(missing))
-    assert len(routes) == 17 and len(tools) == 12
+    assert len(routes) == 20 and len(tools) == 15
     errors, rows, docs = [], [], {}
 
     def check(condition, message):
@@ -134,7 +134,7 @@ def main():
             continue
         check(len(doc.find('h1')) == 1, f'{route}: expected exactly one H1')
         check(0 < len(title) <= 60, f'{route}: title exceeds 60 characters or is missing')
-        check('noindex' in robots or 70 <= len(description) <= 160, f'{route}: description outside 70–160 characters')
+        check('noindex' in robots or 70 <= len(description) <= 160, f'{route}: description outside 70â€“160 characters')
         check(canonical == ORIGIN + route == meta('og:url', 'property'), f'{route}: canonical/og:url/slash mismatch')
         check(title == meta('og:title', 'property'), f'{route}: title and og:title differ')
         check(bool(image) and bool(meta('twitter:image')), f'{route}: social image missing')
@@ -151,11 +151,16 @@ def main():
         footers = doc.find('footer')
         footer_links = {node.attrs.get('href') for footer in footers for node in footer.find('a')}
         check(set(tools) <= footer_links, f'{route}: footer misses graph tools')
-        if route == '/' or route in tools:
+        if route == '/':
             groups = doc.find('div', **{'aria-label': 'Choose a graph type'})
             buttons = groups[0].find('button') if len(groups) == 1 else []
             icons = [icon.text() for button in buttons for icon in button.find('span') if 'data-chart-icon' in icon.attrs]
             check(len(buttons) == 12 and len(icons) == len(set(icons)) == 12, f'{route}: expected 12 tabs with distinct icons')
+        if route in tools:
+            labels = [label for label in doc.find('label') if 'Change chart type' in label.text()]
+            selects = labels[0].find('select') if len(labels) == 1 else []
+            check(len(selects) == 1 and len(selects[0].find('option')) == 12, f'{route}: compact chart selector missing options')
+            check(not doc.find('div', **{'aria-label': 'Choose a graph type'}), f'{route}: specialist page exposes full chart strip')
         if route in ['/privacy/', '/terms/']:
             check(robots == 'noindex,follow', f'{route}: legal page must remain noindex')
         for schema in schemas:
@@ -178,12 +183,13 @@ def main():
             visible = [li.text().strip() for nav in navs for li in nav.find('li') if li.attrs.get('aria-hidden') != 'true']
             items = by_type.get('BreadcrumbList', {}).get('itemListElement', [])
             check([item.get('name') for item in items] == visible and len(visible) >= 2, f'{route}: breadcrumb schema differs from visible trail')
-            expected_hrefs = ['/', '/tools/', route] if route in tools else ['/', route]
+            bar_children = {'/grouped-bar-chart-maker/', '/horizontal-bar-graph-maker/', '/stacked-bar-graph-maker/'}
+            expected_hrefs = ['/', '/bar-graph-maker/', route] if route in bar_children else ['/', '/tools/', route] if route in tools else ['/', route]
             check([item.get('item') for item in items] == [ORIGIN + href for href in expected_hrefs], f'{route}: breadcrumb URLs incorrect')
             check([item.get('position') for item in items] == list(range(1, len(items) + 1)), f'{route}: breadcrumb positions incorrect')
         if route == '/tools/':
             items = by_type.get('ItemList', {}).get('itemListElement', [])
-            check(len(items) == 12 and {item.get('url') for item in items} == {ORIGIN + tool for tool in tools}, '/tools/: ItemList misses tools')
+            check(len(items) == 15 and {item.get('url') for item in items} == {ORIGIN + tool for tool in tools}, '/tools/: ItemList misses tools')
             visible_links = {(a.text().strip(), ORIGIN + a.attrs.get('href', '')) for a in doc.find('a')}
             check(all((item.get('name'), item.get('url')) in visible_links for item in items), '/tools/: ItemList names differ from visible content')
 

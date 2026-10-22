@@ -1,5 +1,5 @@
 ---
-import { allGraphTools } from '../../content/graphTools';
+import { graphTools, barWorkflowTools } from '../../content/graphTools';
 import { siteCreator } from '../../content/site';
 import ContactLine from '../ui/ContactLine.astro';
 ---
@@ -7,10 +7,7 @@ import ContactLine from '../ui/ContactLine.astro';
   <div class="page-shell grid gap-9 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
     <div>
       <a aria-label="Graph Maker home" class="inline-flex items-center gap-2 text-xl font-bold tracking-tight" href="/">
-        <svg aria-hidden="true" class="text-brand h-7 w-7" viewBox="0 0 28 28">
-          <rect fill="currentColor" height="9" rx="1" width="5" x="2" y="17"></rect><rect fill="currentColor" height="16" opacity=".72" rx="1" width="5" x="10" y="10"></rect><rect fill="currentColor" height="23" rx="1" width="5" x="18" y="3"></rect>
-        </svg>
-        <span>Graph<span class="text-brand">Maker</span></span>
+        <img src="/images/graphmaker-header.webp" alt="GraphMaker" width="690" height="261" class="h-12 w-auto sm:h-14" loading="lazy" decoding="async" />
       </a>
       <p class="text-text-muted mt-3 max-w-xs text-sm leading-6">Turn your data into a clear, polished graph. Free to use, with no signup required.</p>
       <p class="text-text-muted mt-3 text-sm">Created by <a class="text-brand underline" href="/about/#creator">{siteCreator.name}</a>.</p>
@@ -21,7 +18,12 @@ import ContactLine from '../ui/ContactLine.astro';
       <h2 class="text-sm font-bold">Tools</h2>
       <ul class="text-text-muted mt-3 grid gap-2 text-sm">
         <li><a class="hover:text-brand" href="/tools/">All graph tools</a></li>
-        {allGraphTools.map((tool) => <li><a class="hover:text-brand" href={tool.href}>{tool.name}</a></li>)}
+        {graphTools.map((tool) => <li>
+          <a class="hover:text-brand" href={tool.href}>{tool.name}</a>
+          {tool.type === 'bar' && <ul aria-label="Bar graph makers" class="border-border mt-2 ml-2 grid gap-2 border-l pl-3">
+            {barWorkflowTools.map(child => <li><a class="hover:text-brand" href={child.href}>{child.name}</a></li>)}
+          </ul>}
+        </li>)}
       </ul>
     </nav>
 
