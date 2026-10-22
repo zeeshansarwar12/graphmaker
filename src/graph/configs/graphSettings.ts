@@ -26,6 +26,11 @@ export interface GraphSettings {
   showOutliers: boolean;
   showValueLabels: boolean;
   title: string;
+  supplyDemandInputMode?: 'inverse' | 'schedule';
+  supplyDemandDemandShift?: number;
+  supplyDemandSupplyShift?: number;
+  supplyDemandShowOriginal?: boolean;
+  supplyDemandMonochrome?: boolean;
   supplyDemandDemandColumnId: string | null;
   supplyDemandSupplyColumnId: string | null;
   supplyDemandXColumnId: string | null;
@@ -96,6 +101,11 @@ export function createDefaultGraphSettings(): GraphSettings {
     showOutliers: true,
     showValueLabels: true,
     title: 'Monthly Sales',
+    supplyDemandInputMode: 'inverse',
+    supplyDemandDemandShift: 0,
+    supplyDemandSupplyShift: 0,
+    supplyDemandShowOriginal: true,
+    supplyDemandMonochrome: false,
     supplyDemandDemandColumnId: null,
     supplyDemandSupplyColumnId: null,
     supplyDemandXColumnId: null,

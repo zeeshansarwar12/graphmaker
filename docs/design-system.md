@@ -193,3 +193,8 @@ Loading a tree template automatically fits the complete diagram inside the visib
 Template selection opens a separate diagram immediately and brings the preview into view; existing work remains available in My diagrams.
 
 Tree templates now open a separate draft on selection (DEC-021). My diagrams switches drafts without loss of labels, title or layout. The default-checked device-storage preference explains session-only behavior and removal of saved copies. No template confirmation or Load template button. A 20-draft limit asks users to delete a diagram rather than silently evict work.
+
+## Supply-demand templates
+Six static graph previews below the existing workspace pair economics concept names with scenario descriptions, numeric explanations and Use template links. The existing input pane gains progressively disclosed economics controls. Original curves use dashed/dotted styling with E1/E2; optional monochrome remains readable without color.
+
+Supply-demand mobile refinements: compact hero and scenario cards; originals only for shifted curves; legend below plot with a reserved second row; E1/E2 point labels and a separate two-decimal price/quantity comparison. Shifts precede Original market data and are accessible through Adjust shifts.

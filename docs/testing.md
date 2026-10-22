@@ -103,3 +103,12 @@ Run the full browser suite because the new type also appears in the shared catal
 Clipboard CSV regressions cover comma-separated values, quoted commas/escaped quotes, TSV preference, optional title lines above valid header tables, malformed rows, and both cell-paste and Paste data flows with local restoration.
 
 Equation switching regression: paste the exam CSV, enter f(x), autosave and refresh, then return to Bar and verify all five rows and the original title. Repeat the mode switch. Unit tests validate optional table backups and reject malformed backups.
+
+## Supply-demand templates
+Unit tests verify all six equilibria, interpolation, no crossings, inverse tables, schema validation and comparisons. Browser coverage checks template replacement/cancel, saved settings, baseline visibility, equation-generated schedules, exports and mobile overflow.
+
+Supply-demand draft regression checks preserve edited cells, titles, shifts and monochrome/original settings when opening a second template, switching back, refreshing and deleting a draft. Workspace parsing rejects invalid snapshots, duplicate IDs and excess drafts; a full collection refuses new templates without eviction.
+
+Mobile economics regression covers two-decimal results, original-data cue, Adjust shifts focus, Reset shifts, PNG generation feedback and narrow-screen overflow. Calculation precision remains unchanged.
+
+Supply-demand quick-help coverage checks static headings and answer content, actionable equation/shift links, template draft preservation and mobile reflow. References are concepts, not new graph modes or a general solver.

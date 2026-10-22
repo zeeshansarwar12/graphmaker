@@ -1,0 +1,50 @@
+---
+import SupplyDemandLearning from './SupplyDemandLearning.astro';
+import { supplyDemandTemplates } from '../../content/supplyDemandTemplates';
+const x = (q: number) => 28 + q * 1.75;
+const y = (p: number) => 132 - p * 2.65;
+---
+<section class="page-shell py-14 sm:py-16" id="supply-templates" aria-labelledby="supply-templates-heading">
+  <p class="text-brand text-center text-xs font-bold uppercase tracking-widest">Start with a scenario</p>
+  <h2 class="section-heading mt-2 text-center" id="supply-templates-heading">Supply and demand graph templates and examples</h2>
+  <p class="text-text-muted mx-auto mt-3 max-w-2xl text-center leading-7">Choose the situation you want to explain. Each template loads editable data, labeled curves, and a calculated equilibrium into the graph maker above.</p>
+  <nav aria-label="Supply and demand quick resources" class="mt-5 flex flex-wrap justify-center gap-2 text-sm"><a class="button-secondary" href="#supply-templates">Examples</a><a class="button-secondary" href="#supply-shift-guide">Curve shifts</a><a class="button-secondary" href="#supply-equations-help">Equations</a><a class="button-secondary" href="#supply-practice">Practice questions</a></nav>
+  <div class="supply-template-grid mt-6 grid gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+    {supplyDemandTemplates.map(t=>{
+      const shifted=!!(t.demandShift||t.supplyShift);
+      const price=(80+t.demandShift-t.supplyShift)/4;
+      const quantity=100+t.demandShift-2*price;
+      return <article class="border-border overflow-hidden rounded-lg border" id={`supply-template-${t.id}`}>
+        <div class="bg-surface-subtle p-4"><svg viewBox="0 0 280 165" class="h-40 w-full" role="img" aria-label={`${t.name}: equilibrium price ${price}, quantity ${quantity}`}>
+          <defs><clipPath id={`clip-${t.id}`}><rect x="28" y="10" width="235" height="122"/></clipPath></defs>
+          <path d="M28 10V132H263" fill="none" stroke="#94a3b8"/>
+          <g clip-path={`url(#clip-${t.id})`}>
+            {shifted&&<g stroke-dasharray="5 4" opacity=".4"><path d={`M${x(100)} ${y(0)}L${x(20)} ${y(40)}`} stroke="#2563eb" stroke-width="2"/><path d={`M${x(20)} ${y(0)}L${x(100)} ${y(40)}`} stroke="#e11d48" stroke-width="2"/><circle cx={x(60)} cy={y(20)} r="3" fill="#64748b"/></g>}
+            <path d={`M${x(100+t.demandShift)} ${y(0)}L${x(20+t.demandShift)} ${y(40)}`} stroke="#2563eb" stroke-width="2.5"/>
+            <path d={`M${x(20+t.supplyShift)} ${y(0)}L${x(100+t.supplyShift)} ${y(40)}`} stroke="#e11d48" stroke-width="2.5"/>
+            <path d={`M28 ${y(price)}H${x(quantity)}V132`} stroke="#94a3b8" stroke-dasharray="3 4" fill="none"/>
+            <circle cx={x(quantity)} cy={y(price)} r="4" fill="#10213a"/>
+          </g>
+          <text x={x(quantity)+7} y={y(price)-7} font-size="11" fill="#10213a">{shifted?'E₂':'E'}</text>
+          <text x="140" y="157" text-anchor="middle" font-size="11" fill="#52627a">Quantity</text>
+          <text x="15" y="77" text-anchor="middle" transform="rotate(-90 15 77)" font-size="11" fill="#52627a">Price</text>
+        </svg></div>
+        <div class="flex flex-col p-5"><h3 class="font-bold">{t.name}</h3><p class="text-text-muted mt-2 text-sm leading-6">{t.description}</p><p class="text-text-muted mt-2 text-xs leading-5">{t.explanation}</p><a class="button-secondary mt-4 justify-center" href={`#supply-template-${t.id}`} aria-label={`Use template: ${t.name}`}>Use template →</a></div>
+      </article>;
+    })}
+  </div>
+</section>
+<SupplyDemandLearning />
+
+<style>
+@media(max-width:639px){
+ .supply-template-grid article{display:grid;grid-template-columns:88px minmax(0,1fr)}
+ .supply-template-grid article > div:first-child{padding:.35rem;display:flex;align-items:center}
+ .supply-template-grid svg{height:90px}
+ .supply-template-grid article > div:last-child{padding:.75rem}
+ .supply-template-grid h3{font-size:.875rem}
+ .supply-template-grid p{font-size:.75rem;line-height:1.45}
+ .supply-template-grid p.text-xs{display:none}
+ .supply-template-grid a{margin-top:.5rem;min-height:40px}
+}
+</style>

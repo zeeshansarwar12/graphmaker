@@ -1,0 +1,45 @@
+---
+const shifts = [
+  { name:'Demand increases', direction:'Demand → right', result:'Price ↑ · Quantity ↑', template:'demand-increase' },
+  { name:'Demand decreases', direction:'Demand → left', result:'Price ↓ · Quantity ↓', template:'demand-decrease' },
+  { name:'Supply increases', direction:'Supply → right', result:'Price ↓ · Quantity ↑', template:'supply-increase' },
+  { name:'Supply decreases', direction:'Supply → left', result:'Price ↑ · Quantity ↓', template:'supply-decrease' },
+];
+const questions = [
+  { question:'Find equilibrium: Qd = 100 − 2P, Qs = 20 + 2P.', answer:'Set Qd = Qs: 80 = 4P. Price = 20; quantity = 60.', template:'equilibrium' },
+  { question:'Demand rises by 20 units at every price. What changes?', answer:'For this example, price rises to 25 and quantity to 70; supply stays unchanged.', template:'demand-increase' },
+  { question:'Demand decreases and supply increases. Does quantity rise?', answer:'Price falls in the standard model. Quantity depends on the relative shifts. Our equal-shift example keeps it at 60.', template:'simultaneous' },
+  { question:'At price 10 in the basic example, is there a shortage?', answer:'Quantity demanded is 80; quantity supplied is 40. The shortage is 40 units.', template:'equilibrium' },
+];
+---
+<section class="border-border bg-surface-subtle border-y py-10" id="supply-quick-help" aria-label="Quick supply and demand help">
+  <div class="page-shell">
+    <div class="mb-6"><h2 class="text-xl font-bold">How does a supply and demand graph work?</h2><p class="text-text-muted mt-2 max-w-3xl text-sm leading-6">Quantity is horizontal; price is vertical. Supply and demand meet at equilibrium. Use the examples above, or try a question below.</p></div>
+    <div class="grid gap-5 lg:grid-cols-2">
+      <section class="border-border bg-surface min-w-0 rounded-lg border p-4 sm:p-5" id="supply-shift-guide" aria-labelledby="supply-shift-guide-heading">
+        <h2 class="text-lg font-bold" id="supply-shift-guide-heading">Supply and demand curve shifts</h2>
+        <p class="text-text-muted mt-2 text-xs leading-5">Other curve unchanged; standard upward supply and downward demand.</p>
+        <div class="mt-3 space-y-2">{shifts.map(s=><a class="border-border hover:border-brand grid grid-cols-[1fr_auto] items-center gap-2 rounded-md border p-3 text-sm" href={`#supply-template-${s.template}`}><span><strong class="block">{s.name}</strong><span class="text-text-muted text-xs">{s.direction} · {s.result}</span></span><span class="text-brand text-xs font-semibold">Try →</span></a>)}</div>
+        <details class="mt-3 text-sm"><summary class="cursor-pointer font-semibold">Shift or movement along a curve?</summary><p class="text-text-muted mt-2 leading-6">A change in the good’s own price moves along a curve. Income, tastes, technology, or input costs can shift it.</p></details>
+        <a class="text-brand mt-3 inline-block min-h-10 text-sm font-semibold underline" href="#supply-shifts">Open shift controls ↑</a>
+      </section>
+      <section class="border-border bg-surface min-w-0 rounded-lg border p-4 sm:p-5" id="supply-equations-help" aria-labelledby="supply-equations-heading">
+        <h2 class="text-lg font-bold" id="supply-equations-heading">Supply and demand equations</h2>
+        <p class="text-text-muted mt-2 text-sm leading-6">Enter coefficients to generate an editable price schedule.</p>
+        <dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 rounded-md bg-surface-subtle p-3 text-sm"><dt class="font-semibold">Demand</dt><dd>Qd = a − bP</dd><dt class="font-semibold">Supply</dt><dd>Qs = c + dP</dd><dt class="font-semibold">Price</dt><dd>P* = (a − c) / (b + d)</dd></dl>
+        <p class="text-text-muted mt-3 text-sm leading-6">Example: a = 100, b = 2, c = 20, d = 2 → price 20, quantity 60.</p>
+        <div class="mt-3 flex flex-wrap gap-2"><a class="button-primary" href="#supply-equations">Open equation inputs ↑</a><a class="button-secondary" href="#supply-template-equilibrium">Edit example graph</a></div>
+        <details class="mt-3 text-sm"><summary class="cursor-pointer font-semibold">How do functions map to the graph?</summary><p class="text-text-muted mt-2 leading-6">Qd and Qs give quantity at price P. The graph still puts quantity on X and price on Y. Slopes b and d are nonnegative; b + d must be positive. Only a nonnegative intersection within the plotted range is reported.</p></details>
+      </section>
+    </div>
+    <section class="mt-8" id="supply-practice" aria-labelledby="supply-practice-heading"><h2 class="text-xl font-bold" id="supply-practice-heading">Supply and demand graph practice problems</h2><p class="text-text-muted mt-2 text-sm">Check an answer, then try it in the graph maker.</p><div class="mt-4 grid gap-3 sm:grid-cols-2">{questions.map((q,i)=><details class="border-border bg-surface rounded-lg border p-4"><summary class="cursor-pointer text-sm font-semibold">{i+1}. {q.question}</summary><p class="text-text-muted mt-3 text-sm leading-6">{q.answer}</p><a class="text-brand mt-2 inline-block min-h-10 text-sm font-semibold underline" href={`#supply-template-${q.template}`}>Try this graph ↑</a></details>)}</div></section>
+    <details class="border-border bg-surface mt-6 rounded-lg border p-4"><summary class="cursor-pointer font-semibold">Quick supply-curve questions</summary><div class="mt-4 grid gap-4 text-sm sm:grid-cols-2">
+      <div><h3 class="font-semibold">Why is supply usually positively sloped?</h3><p class="text-text-muted mt-1 leading-6">Higher prices can make additional output worthwhile as marginal costs rise. This is the standard model, not a rule for every market.</p></div>
+      <div><h3 class="font-semibold">Can supply slope downward?</h3><p class="text-text-muted mt-1 leading-6">Special models can differ. Do not interpret a downward curve as ordinary upward-sloping competitive supply.</p></div>
+      <div><h3 class="font-semibold">What is an industry supply curve?</h3><p class="text-text-muted mt-1 leading-6">Add the quantities supplied by firms at each price to form market supply.</p></div>
+      <div><h3 class="font-semibold">Why is land supply drawn vertically?</h3><p class="text-text-muted mt-1 leading-6">A fixed amount of land in a location is modeled as perfectly inelastic. Land available for a particular use can change.</p></div>
+      <div><h3 class="font-semibold">Is a supply schedule the same as a curve?</h3><p class="text-text-muted mt-1 leading-6">A schedule is a table of prices and quantities. The supply curve plots that relationship.</p></div>
+      <div><h3 class="font-semibold">Does demand create supply?</h3><p class="text-text-muted mt-1 leading-6">Higher demand may encourage more output, but a demand shift does not automatically shift the supply curve.</p></div>
+    </div><p class="text-text-muted mt-4 text-xs">Concept references: <a class="text-brand underline" href="https://openstax.org/books/principles-economics-3e/pages/3-introduction-to-demand-and-supply" target="_blank" rel="noreferrer">OpenStax</a>, <a class="text-brand underline" href="https://www.econgraphs.org/textbooks/intermediate_micro/competitive_equilibrium/partial_equilibrium/market_supply" target="_blank" rel="noreferrer">EconGraphs market supply</a>, and <a class="text-brand underline" href="https://www.govinfo.gov/content/pkg/ERP-2018/pdf/ERP-2018.pdf" target="_blank" rel="noreferrer">Economic Report of the President, 2018</a>.</p></details>
+  </div>
+</section>

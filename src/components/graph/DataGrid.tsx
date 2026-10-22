@@ -21,6 +21,7 @@ import { ImportPreview } from './ImportPreview';
 
 interface DataGridProps {
   headingId?: string;
+  headingLabel?: string;
   data: TabularData;
   isSampleData: boolean;
   onChange: (data: TabularData, intent?: 'edit' | 'replace' | 'structure', title?: string) => void;
@@ -67,7 +68,7 @@ function clipboardReadErrorMessage(error: unknown): string {
   return 'The clipboard could not be read. Paste directly into a selected cell, or try the Paste data button again.';
 }
 
-export function DataGrid({ data, isSampleData, onChange, headingId = 'data-heading' }: DataGridProps) {
+export function DataGrid({ data, isSampleData, onChange, headingId = 'data-heading', headingLabel = 'Data' }: DataGridProps) {
   const csvInputRef = useRef<HTMLInputElement>(null);
   const excelInputRef = useRef<HTMLInputElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -259,7 +260,7 @@ export function DataGrid({ data, isSampleData, onChange, headingId = 'data-headi
   return (
     <div ref={gridRef}>
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h3 className="text-lg font-bold" id={headingId}>Data</h3>
+        <h3 className="text-lg font-bold" id={headingId}>{headingLabel}</h3>
         <div className="flex items-center gap-3 text-sm">
           {isSampleData && <span className="text-brand font-semibold">Sample data</span>}
           <button className="text-text-muted hover:text-text font-medium" onClick={() => commit(clearData(data), 'structure')} type="button">Clear</button>

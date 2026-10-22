@@ -1225,9 +1225,9 @@ export const supplyDemandToolPageConfig = {
   beforeComparisonSections: [
     {
       id: 'equilibrium',
-      intro: 'The editor compares the vertical difference between demand and supply at each quantity and interpolates only across adjacent supplied points when that difference changes sign.',
+      intro: 'The graph maker intersects the straight segments between your entered points. It supports inverse-price tables and price schedules, with optional horizontal quantity shifts. Only a unique nonnegative intersection inside the supplied curves is reported.',
       items: [
-        { title: 'Exact match', description: 'When demand and supply have the same value in a row, that quantity and value are reported directly as equilibrium.' },
+        { title: 'Exact match', description: 'When the supplied curves meet at an entered point, that price and quantity are reported directly, provided the intersection is unique.' },
         { title: 'Between two rows', description: 'When the curves cross between adjacent quantities, the tool estimates the intersection using straight-line interpolation.' },
         { title: 'No in-range crossing', description: 'If the supplied curves never meet or cross, the graph reports that no equilibrium appears in the entered range.' },
       ],
@@ -1237,12 +1237,12 @@ export const supplyDemandToolPageConfig = {
   canonical: '/supply-and-demand-graph-maker/',
   comparison: {
     first: {
-      body: 'The demand curve shows the value buyers associate with each quantity. A downward-sloping curve means demand values decrease as quantity increases.',
+      body: 'A demand curve shows how much buyers are willing and able to buy at different prices, holding other factors constant. It typically slopes downward.',
       title: 'Read the demand curve',
     },
     intro: 'Read both curves against the numeric quantity axis, then compare their vertical positions and intersection.',
     second: {
-      body: 'The supply curve shows the value sellers associate with each quantity. An upward-sloping curve means supply values increase as quantity increases. Their intersection is the estimated equilibrium.',
+      body: 'A supply curve shows how much sellers are willing and able to sell at different prices, holding other factors constant. It typically slopes upward. The curves intersect at equilibrium.',
       title: 'Read the supply curve',
     },
     title: 'How to read supply and demand curves',
@@ -1266,18 +1266,24 @@ export const supplyDemandToolPageConfig = {
     slug: '/supply-and-demand-graph-maker/',
   },
   example: {
-    caption: 'Use one numeric quantity column followed by demand and supply values. Equivalent headers can be remapped inside Customize.',
+    caption: 'This inverse-price example uses quantity followed by demand price and supply price. Its straight-line segments intersect at quantity 45 and price 55. Templates use the alternative textbook schedule: price with quantities demanded and supplied.',
     headers: ['Quantity', 'Demand', 'Supply'],
     rows: supplyDemandSampleData.rows.map((row) => [...row.cells]),
   },
   faqs: [
+    { question: 'Can I create a graph from a supply and demand template?', answer: 'Yes. Choose one of six editable examples: equilibrium, demand increases or decreases, supply increases or decreases, and simultaneous demand decrease and supply increase. Each template opens as a new graph. Return to previous data, labels, shifts, and styling through My graphs.' },
+    { question: 'Can I enter supply and demand equations?', answer: 'Open Generate from linear equations and enter coefficients for Qd = a − bP and Qs = c + dP. Applying generates a sampled price schedule that becomes your editable, saved source. This is a bounded linear model, not a general equation solver.' },
+    { question: 'Does this supply and demand graph maker use AI?', answer: 'No. This economics graph maker plots the values you enter or import. Intersections are calculated from those supplied values; no AI prompt generation is used.' },
+    { question: 'Why keep the original curves when showing a shift?', answer: 'Original and shifted curves make it easier to compare E₁ and E₂. You can hide the original curves when you only need the updated graph. A basic equilibrium template starts with just one curve pair.' },
     { question: 'Is this supply and demand graph maker free?', answer: 'Yes. The free supply and demand graph maker works online without signup or a watermark.' },
-    { question: 'How should I arrange my data?', answer: 'Use three numeric columns for quantity, demand, and supply. Headers such as Q, Buyers, and Sellers are detected, and you can change every mapping in Customize.' },
-    { question: 'How is equilibrium calculated?', answer: 'An exact matching row is used directly. If demand and supply cross between adjacent quantities, the supply demand graph generator uses straight-line interpolation between those supplied points.' },
+    { question: 'How should I arrange my data?', answer: 'Choose Quantity + demand and supply prices for inverse tables, or Price + quantities for textbook schedules. Select the matching format before importing or pasting. The format selector reinterprets values rather than converting them. Map columns in Customize.' },
+    { question: 'How is equilibrium calculated?', answer: 'The supply demand graph generator intersects the straight-line segments connecting your data. It uses an entered intersection or interpolates between points, reporting only a unique nonnegative in-range equilibrium. Parallel, coincident, and multiple-intersection curves do not have a unique reported answer.' },
     { question: 'What if the curves never cross?', answer: 'No equilibrium is displayed outside your data. The editor reports that no equilibrium appears within the supplied quantity range.' },
     { question: 'Can I paste or upload economics data?', answer: 'Yes. Paste a spreadsheet table or upload CSV and Excel files. Processing and local saving remain in your browser.' },
   ],
   features: [
+    { title: 'Editable graph templates', description: 'Start from six original supply and demand examples, then change the data and labels.' },
+    { title: 'Before and after curve comparisons', description: 'Shift either curve horizontally, keep optional original curves, and compare equilibrium values. Use black-and-white styling for printed assignments.' },
     { title: 'Explicit curve mapping', description: 'Choose the quantity, demand, and supply columns without silently merging numeric series.' },
     { title: 'True numeric quantity axis', description: 'Preserve proportional spacing for regular or irregular quantity values.' },
     { title: 'Equilibrium detection', description: 'Report exact or interpolated intersections only when they occur inside the entered range.' },
@@ -1287,12 +1293,12 @@ export const supplyDemandToolPageConfig = {
   ],
   h1: 'Supply and Demand Graph Maker',
   howTo: [
-    { title: 'Add quantity and curve values', description: 'Enter three columns, paste a spreadsheet table, or import a CSV or Excel file.' },
-    { title: 'Confirm the column mapping', description: 'Open Customize to select the quantity axis, demand series, and supply series when headers differ.' },
-    { title: 'Review equilibrium and export', description: 'Check the in-range intersection, adjust axis titles, and download the graph as PNG or SVG.' },
+    { title: 'Choose a template or add data', description: 'Load an editable example, or select the input format matching your three-column table before pasting or importing data.' },
+    { title: 'Confirm the column mapping', description: 'Open Customize to select the price or quantity input column, demand series, and supply series when headers differ.' },
+    { title: 'Compare equilibrium and export', description: 'Optionally shift a curve, compare original and new equilibrium, adjust axis titles, and download PNG or SVG.' },
   ],
-  intro: 'Create supply and demand curves on a true numeric quantity axis, map your columns, and estimate an in-range equilibrium with this online supply and demand graph maker.',
-  metaDescription: 'Create a supply and demand graph online. Map quantity, demand, and supply, detect in-range equilibrium, import Excel or CSV, and export free.',
+  intro: 'Create a supply and demand graph online for free. Start with an editable template or your own data, compare curve shifts, estimate equilibrium, and download your graph without signup.',
+  metaDescription: 'Free supply and demand curve generator with editable templates. Plot schedules, compare shifts, detect in-range equilibrium, and export PNG or SVG.',
   relatedHeading: 'Related economics and graph tools',
   relatedTools: [
     { name: 'Line Graph Maker', description: 'Compare multiple connected series across categories or dates.', href: '/line-graph-maker/' },
@@ -1308,7 +1314,7 @@ export const supplyDemandToolPageConfig = {
     howTo: 'How to make a supply and demand graph',
   },
   slug: '/supply-and-demand-graph-maker/',
-  title: 'Supply and Demand Graph Maker — Free Online | GraphMaker',
+  title: 'Supply and Demand Curve Generator — Free | GraphMaker',
   useCases: {
     intro: 'Use this online supply and demand graph maker when two value curves need to be compared against a shared quantity scale.',
     items: [

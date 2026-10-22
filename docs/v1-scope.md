@@ -113,3 +113,6 @@ Add a working `/equation-graph-maker/` for explicit real-valued functions, using
 
 ## Approved tree extension — DEC-019
 A simple hierarchy tool at `/tree-graph-maker/`: node labels and parents, automatic layout, left-to-right/top-to-bottom direction, local autosave, JSON backups, and PNG/SVG export. Exactly one root, up to 50 nodes and 10 levels. No general network editor, probability calculation, or genealogy model.
+
+## Approved supply-demand extension — DEC-022
+Six scenario presets, price schedules, optional horizontal shifts and baseline comparison, monochrome styling and bounded linear coefficients sampled into the existing table. Existing inverse tables remain the migration default.
