@@ -130,10 +130,11 @@ describe('Bar tool page configuration', () => {
       shape: 'category-series',
     });
     expect(barToolPageConfig.relatedTools.map((tool) => tool.href)).toEqual([
-      '/tree-graph-maker/',
+      '/grouped-bar-chart-maker/',
+      '/stacked-bar-graph-maker/',
+      '/horizontal-bar-graph-maker/',
       '/line-graph-maker/',
       '/pie-chart-maker/',
-      '/histogram-maker/',
     ]);
   });
 });

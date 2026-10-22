@@ -94,6 +94,27 @@ describe('bar chart configuration', () => {
     });
   });
 
+  it('reserves separate category-label and axis-title bands on narrow charts', () => {
+    let data = createSampleData();
+    data = updateCell(data, 'row-1', 'column-1', 'Parks and recreation');
+    for (const orientation of ['vertical', 'horizontal'] as const) {
+      const view = createBarChartView(data, { ...createDefaultGraphSettings(), orientation });
+      if (view.status !== 'ready') throw new Error('Expected a ready chart');
+      const option = view.options as { grid: { containLabel: boolean }; media: Array<{ option: { grid: { left: number; bottom: number }; xAxis: { nameGap: number; splitNumber: number; axisLabel: { width: number; hideOverlap: boolean } }; yAxis: { nameGap: number; axisLabel: { width: number } } } }> };
+      expect(option.grid.containLabel).toBe(false);
+      const mobile = option.media[0].option;
+      if (orientation === 'horizontal') {
+        expect(mobile.yAxis.nameGap).toBeGreaterThan(mobile.yAxis.axisLabel.width + 16);
+        expect(mobile.grid.left).toBeGreaterThan(mobile.yAxis.nameGap + 12);
+        expect(mobile.xAxis.splitNumber).toBe(2);
+        expect(mobile.xAxis.axisLabel.hideOverlap).toBe(true);
+      } else {
+        expect(mobile.xAxis.nameGap).toBeGreaterThan(mobile.xAxis.axisLabel.width);
+        expect(mobile.grid.bottom).toBeGreaterThan(mobile.xAxis.nameGap + 20);
+      }
+    }
+  });
+
   it('returns an empty state when the grid is cleared or rows are deleted', () => {
     const settings = createDefaultGraphSettings();
     expect(createBarChartView(clearData(createSampleData()), settings)).toMatchObject({

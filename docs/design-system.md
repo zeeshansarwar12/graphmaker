@@ -198,3 +198,8 @@ Tree templates now open a separate draft on selection (DEC-021). My diagrams swi
 Six static graph previews below the existing workspace pair economics concept names with scenario descriptions, numeric explanations and Use template links. The existing input pane gains progressively disclosed economics controls. Original curves use dashed/dotted styling with E1/E2; optional monochrome remains readable without color.
 
 Supply-demand mobile refinements: compact hero and scenario cards; originals only for shifted curves; legend below plot with a reserved second row; E1/E2 point labels and a separate two-decimal price/quantity comparison. Shifts precede Original market data and are accessible through Adjust shifts.
+
+## Focused specialist toolbar — 22 October 2026
+DEC-027: homepage retains the twelve-type desktop strip and mobile select. Specialist pages replace that strip with a compact current-mode label and secondary Change chart type native selector, accessible on desktop and mobile. Bar mode includes a separate Bar orientation control; multiple numeric series are identified as Grouped bars. Other tool controls remain near their inputs or in Customize. Never show unavailable layouts.
+
+Bar orientation refinement (22 October 2026): use native Vertical and Horizontal radio buttons within a labeled fieldset in the specialist toolbar. Keep Change chart type as a select. Native arrow-key behavior and a minimum 44px label target preserve accessibility.

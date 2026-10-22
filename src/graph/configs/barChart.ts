@@ -55,20 +55,26 @@ export function createBarChartView(data: TabularData, settings: GraphSettings): 
   const showLegend = settings.showLegend && allSeries.length > 1;
   const barSeries: BarSeriesOption[] = allSeries.map((item) => ({
     barMaxWidth: 64,
+    ...(settings.barLayout === 'stacked' ? { stack: 'total', stackStrategy: 'samesign' as const } : {}),
     data: item.values,
     emphasis: {
       focus: 'series',
     },
     label: {
-      color: '#10213a',
+      color: settings.barLayout === 'stacked' ? '#ffffff' : '#10213a',
       fontSize: 12,
-      position: settings.orientation === 'vertical' ? 'top' : 'right',
+      position: settings.barLayout === 'stacked' ? 'inside' : settings.orientation === 'vertical' ? 'top' : 'right',
       show: settings.showValueLabels && interpretation.pointCount <= 15,
     },
+    ...(settings.barLayout === 'stacked' ? { labelLayout: { hideOverlap: true } } : {}),
     name: item.name,
     type: 'bar',
   }));
 
+  const isVertical = settings.orientation === 'vertical';
+  const rotatedLabels = isVertical && (categories.length > 12 || categories.some((category) => category.length > 14));
+  // Axis names sit outside the label band; containLabel does not reserve this space.
+  const categoryNameGap = isVertical ? (rotatedLabels ? 86 : 38) : 156;
   const categoryAxis = {
     axisLabel: {
       color: '#52627a',
@@ -87,7 +93,7 @@ export function createBarChartView(data: TabularData, settings: GraphSettings): 
     type: 'category' as const,
   };
   const valueAxis = {
-    axisLabel: { color: '#52627a', fontSize: 12 },
+    axisLabel: { color: '#52627a', fontSize: 12, hideOverlap: true },
     axisLine: { show: false },
     splitLine: {
       lineStyle: { color: '#e2e8f0' },
@@ -99,7 +105,6 @@ export function createBarChartView(data: TabularData, settings: GraphSettings): 
     nameLocation: 'middle' as const,
     nameTextStyle: { color: '#52627a', fontSize: 12 },
   };
-  const isVertical = settings.orientation === 'vertical';
 
   const options: EChartsOption = {
     animationDuration: 250,
@@ -110,10 +115,10 @@ export function createBarChartView(data: TabularData, settings: GraphSettings): 
     color: allSeries.map((_, seriesIndex) => settings.seriesColors[seriesIndex]
       ?? defaultSeriesColors[seriesIndex % defaultSeriesColors.length]),
     grid: {
-      bottom: isVertical && (categories.length > 12 || categories.some((category) => category.length > 14)) ? 76 : 56,
-      containLabel: true,
-      left: isVertical ? 48 : 64,
-      right: 16,
+      bottom: isVertical && rotatedLabels ? 116 : 60,
+      containLabel: false,
+      left: isVertical ? 64 : (settings.yAxisTitle ? 184 : 152),
+      right: 36,
       top: showLegend ? 52 : 26,
     },
     legend: {
@@ -131,6 +136,22 @@ export function createBarChartView(data: TabularData, settings: GraphSettings): 
       },
       top: 8,
     },
+    media: [{
+      query: { maxWidth: 450 },
+      option: {
+        grid: {
+          left: isVertical ? 58 : (settings.yAxisTitle ? 146 : 118),
+          right: 32,
+          bottom: isVertical ? (rotatedLabels ? 120 : 62) : 60,
+        },
+        xAxis: isVertical
+          ? { axisLabel: { width: Math.max(28, Math.min(72, 160 / categories.length)), fontSize: 11, lineHeight: 14, overflow: 'break', rotate: 0, hideOverlap: false }, nameGap: rotatedLabels ? 88 : 38 }
+          : { splitNumber: 2, axisLabel: { hideOverlap: true, fontSize: 11 } },
+        yAxis: isVertical
+          ? { splitNumber: 4 }
+          : { axisLabel: { width: 102, fontSize: 11, lineHeight: 14, overflow: 'break' }, nameGap: 126 },
+      },
+    }],
     series: barSeries,
     tooltip: {
       axisPointer: { type: 'shadow' },
@@ -138,11 +159,11 @@ export function createBarChartView(data: TabularData, settings: GraphSettings): 
       trigger: 'axis',
     },
     xAxis: isVertical
-      ? { ...categoryAxis, ...commonAxisName, name: settings.xAxisTitle, nameGap: categories.length > 6 ? 50 : 34 }
+      ? { ...categoryAxis, ...commonAxisName, name: settings.xAxisTitle, nameGap: categoryNameGap }
       : { ...valueAxis, ...commonAxisName, name: settings.xAxisTitle, nameGap: 34 },
     yAxis: isVertical
       ? { ...valueAxis, ...commonAxisName, name: settings.yAxisTitle, nameGap: 36 }
-      : { ...categoryAxis, ...commonAxisName, name: settings.yAxisTitle, nameGap: 48 },
+      : { ...categoryAxis, ...commonAxisName, name: settings.yAxisTitle, nameGap: categoryNameGap },
   };
 
   const summaryParts = series.map((item) => `${item.name}: ${categories.map(
@@ -154,6 +175,6 @@ export function createBarChartView(data: TabularData, settings: GraphSettings): 
     options,
     series,
     status: 'ready',
-    summary: `${settings.title.trim() || 'Untitled graph'}. ${settings.orientation} bar graph with ${categories.length} categor${categories.length === 1 ? 'y' : 'ies'} and ${series.length} series. X axis: ${settings.xAxisTitle || 'untitled'}. Y axis: ${settings.yAxisTitle || 'untitled'}. ${summaryParts.join('. ')}`,
+    summary: `${settings.title.trim() || 'Untitled graph'}. ${settings.orientation} ${settings.barLayout === 'stacked' ? 'stacked ' : ''}bar graph with ${categories.length} categor${categories.length === 1 ? 'y' : 'ies'} and ${series.length} series. X axis: ${settings.xAxisTitle || 'untitled'}. Y axis: ${settings.yAxisTitle || 'untitled'}. ${summaryParts.join('. ')}`,
   };
 }

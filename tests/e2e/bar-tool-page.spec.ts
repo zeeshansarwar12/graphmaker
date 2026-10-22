@@ -10,7 +10,7 @@ test('serves a complete crawlable Bar tool page with grouped sample series', asy
   await expect(page.getByRole('heading', { level: 1, name: 'Bar Graph Maker' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Bar Graph Maker');
 
-  await expect(page.getByRole('radio', { exact: true, name: 'Bar' })).toHaveAttribute('aria-checked', 'true');
+  await expect(page.getByRole('combobox', { name: 'Change chart type' })).toHaveValue('bar');
   await expect(page.getByLabel('Category, row 1')).toHaveValue('Jan');
   await expect(page.getByLabel('Sales, row 3')).toHaveValue('240');
   await expect(page.getByLabel('Profit, row 4')).toHaveValue('63');
@@ -36,7 +36,7 @@ test('serves a complete crawlable Bar tool page with grouped sample series', asy
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();
   }
 
-  await expect(page.getByRole('link', { name: /Line Graph Maker/ }).first()).toHaveAttribute('href', '/line-graph-maker/');
+  await expect(page.getByRole('link', { name: /Line Chart Maker/ }).first()).toHaveAttribute('href', '/line-graph-maker/');
   await expect(page.getByRole('link', { name: /Pie Chart Maker/ }).first()).toHaveAttribute('href', '/pie-chart-maker/');
   await expect(page.getByRole('link', { name: /Histogram Maker/ }).first()).toHaveAttribute('href', '/histogram-maker/');
 });

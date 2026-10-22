@@ -130,3 +130,24 @@ Keep /supply-and-demand-graph-maker/ canonical. Cover curve generator, maker/plo
 
 ## Compact supply-demand learning — 21 October 2026
 Owner requested remaining educational intent with minimal writing. Keep examples, shift reference, linear equations/functions, four practice problems and deeper supply questions on the existing tool URL. All useful references connect to real templates or existing inputs through fragments. No new guide routes or thin informational pages; no AI/trading/Word/Excel targeting.
+
+## Bar cluster: grouped comparison — 22 October 2026
+Owner approved building the discussed bar cluster one page at a time. First page: /grouped-bar-chart-maker/ owns grouped, double, clustered, side-by-side, triple, quadruple and multiple bar graph/chart intent. The /bar-graph-maker/ pillar retains its URL and metadata and links to this workflow. Use one shared Bar editor with a matched-unit class-score example, explicit series instructions and page-isolated local saving. Register the workflow in allGraphTools for the directory, footer and sitemap, without creating another chart engine or duplicate editor selector. Graph/chart synonyms share this canonical. No AI or Excel keyword pages; no unpublished stacked/percentage links.
+
+## Graph/chart wording — 22 October 2026
+Owner approved natural chart wording in the homepage SEO title, intro, description and contextual bar/line links. Keep GraphMaker as the WebSite/Organization name and retain all H1s and URLs. The homepage working tool has WebApplication schema; its alternateName Free Online Chart Maker is supported by visible FAQ copy. Bar, line and grouped tools use explicit graph/chart alternateName values supported by visible text. No keyword lists, brand renaming or duplicate routes. Schema reflects page content; it is not a ranking guarantee.
+
+## Connected homepage schema — 22 October 2026
+Owner requested homepage enrichment first. Stable #website, #organization, #webpage, #application and #primaryimage IDs connect WebSite, Organization, WebPage, WebApplication and ImageObject. The page references its application, site, publisher and existing 1200x630 social image. The application declares verified features, JavaScript/browser requirements, language, free access, publisher and the existing creator identity. Use the maintained page modification date. No fabricated ratings/reviews, new routes or unsupported actions. Other page schemas remain unchanged in this step.
+
+## Horizontal bar workflow — 22 October 2026
+Owner resumed the agreed bar cluster. /horizontal-bar-graph-maker/ owns horizontal bar graph/chart maker and sideways bar intent. Reuse the Bar engine with horizontal orientation, an ordered single-series ranking sample, grouped-series instructions, independent local saving and shared exports. Add reciprocal links with the bar pillar and grouped page, and include in the directory, footer and sitemap. Keep fourteen workflow tools but twelve engine choices. This new page opts into connected WebPage/WebApplication schema referencing the homepage website and publisher; existing tools remain unchanged. No stacked/percentage claims or AI/Excel keyword targeting.
+
+## Bar templates — 22 October 2026
+Three original static preview cards on each bar cluster page link to #bar-template-ID fragments. Each opens editable data in the shared editor with its own title, orientation and series. No new template routes. Visible grouped H1 is Grouped Bar Graph Maker; retain /grouped-bar-chart-maker/ and chart/graph synonyms.
+
+## Stacked bar workflow
+/stacked-bar-graph-maker/ covers stacked and segmented graph/chart maker intent using the shared Bar engine. Raw values only; 100% normalization remains separate work.
+
+## Bar parent and child hierarchy
+Bar Graph Maker is the parent of the Grouped, Horizontal and Stacked workflow pages. Child breadcrumbs are Home > Bar Graph Maker > current page; visible directory/footer navigation nests children under Bar. Connected WebPage schema links child isPartOf to the bar parent, whose hasPart references the three children. Flat canonical URLs remain unchanged.

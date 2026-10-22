@@ -11,7 +11,7 @@ test('serves a complete Radar page with a percentage-scaled multi-series preset'
   await expect(page.getByRole('heading', { level: 1, name: 'Radar Chart Maker' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Radar Chart Maker');
 
-  await expect(page.getByRole('radio', { exact: true, name: 'Radar' })).toHaveAttribute('aria-checked', 'true');
+  await expect(page.getByRole('combobox', { name: 'Change chart type' })).toHaveValue('radar');
   await expect(page.getByLabel('Metric, row 1', { exact: true })).toHaveValue('Speed');
   await expect(page.getByLabel('Team A, row 5')).toHaveValue('92');
   await expect(page.getByLabel('Team B, row 5')).toHaveValue('89');

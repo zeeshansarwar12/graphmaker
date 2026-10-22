@@ -1,3 +1,5 @@
+import { readBarWorkspace, writeBarWorkspace, barDraftLimit } from '../../lib/storage/barDrafts';
+import type { BarTemplate } from '../../content/barTemplates';
 import {readTreeWorkspace, writeTreeWorkspace, treeRememberKey, treeDraftLimit} from '../../lib/storage/treeDrafts';
 import type {TreeDraft} from '../../lib/storage/treeDrafts';
 import type {GraphProject} from '../../lib/storage/graphProject';
@@ -58,6 +60,7 @@ import { DataGrid } from './DataGrid';
 import { GraphCanvas } from './GraphCanvas';
 import type { GraphCanvasHandle } from './GraphCanvas';
 
+const BarTemplateControls = lazy(() => import('./BarTemplateControls'));
 const SupplyDemandResults = lazy(() => import('./SupplyDemandResults'));
 const SupplyDemandInput = lazy(() => import('./SupplyDemandInput'));
 const TreeInput = lazy(() => import('./TreeInput'));
@@ -101,6 +104,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
   const [data, setData] = useState(() => createConfiguredData(config));
   const isTreePage=config.graphType==='tree';
   const isSupplyPage=config.graphType==='supplydemand';
+  const isBarPage=['/bar-graph-maker/','/grouped-bar-chart-maker/','/horizontal-bar-graph-maker/','/stacked-bar-graph-maker/'].includes(config.slug);
   const [rememberTrees,setRememberTrees]=useState(true);
   const rememberTreesRef=useRef(true);
   const draftsRef=useRef<TreeDraft[]>([]);
@@ -113,13 +117,14 @@ export function GraphEditor({ config }: GraphEditorProps) {
     if(index<0) draftsRef.current=[...draftsRef.current,draft];else draftsRef.current=draftsRef.current.map((item,i)=>i===index?draft:item);
   },[]);
   const persistProject=useCallback(async (project:GraphProject)=>{
+    if(isBarPage){storeDraft(project);return writeBarWorkspace(config.slug,{activeId:activeDraftRef.current,drafts:draftsRef.current});}
     if(isSupplyPage){storeDraft(project);return writeSupplyWorkspace({activeId:activeDraftRef.current,drafts:draftsRef.current});}
     if(!isTreePage) return saveCurrentProject(project,config.slug);
     storeDraft(project);
     if(rememberTreesRef.current) await writeTreeWorkspace({activeId:activeDraftRef.current,drafts:draftsRef.current});
-  },[isTreePage,isSupplyPage,config.slug,storeDraft]);
+  },[isTreePage,isSupplyPage,isBarPage,config.slug,storeDraft]);
   function restoreDraft(project:GraphProject){setIsSampleData(false);tableBackupRef.current=project.tableBackup;setData(project.data);dispatchSettings({type:'replace-settings',value:project.settings});setSelectedChartType(project.graphType);createdAtRef.current=project.createdAt;setTreeFitRequest(value=>value+1);setSavedState(null);}
-  function openDraft(id:string){storeDraft(snapshotTree());const draft=draftsRef.current.find(item=>item.id===id);if(!draft)return;activeDraftRef.current=id;restoreDraft(draft.project);setDraftRevision(value=>value+1);if(isSupplyPage)void persistProject(draft.project).catch(()=>setProjectError('Could not save your graph collection. Download a project backup to keep your work.'));}
+  function openDraft(id:string){storeDraft(snapshotTree());const draft=draftsRef.current.find(item=>item.id===id);if(!draft)return;activeDraftRef.current=id;restoreDraft(draft.project);setDraftRevision(value=>value+1);if(isSupplyPage||isBarPage)void persistProject(draft.project).catch(()=>setProjectError('Could not save your graph collection. Download a project backup to keep your work.'));}
   async function changeRemember(checked:boolean){
     rememberTreesRef.current=checked;setRememberTrees(checked);
     try{localStorage.setItem(treeRememberKey,String(checked));if(checked)await persistProject(snapshotTree());else{await writeTreeWorkspace(null);await deleteCurrentProject(config.slug);}setIsStorageAvailable(true);}
@@ -142,6 +147,20 @@ export function GraphEditor({ config }: GraphEditorProps) {
     config,
     createConfiguredSettings,
   );
+
+  function applyBarTemplate(template: BarTemplate) {
+    if(!isBarPage||template.page!==config.slug)return;
+    storeDraft(snapshotTree());
+    if(draftsRef.current.length>=barDraftLimit){setProjectError('You have 20 graphs on this page. Delete a graph from My graphs before opening another template.');return;}
+    const next=createProjectSnapshot({createdAt:new Date().toISOString(),graphType:'bar',
+      data:{columns:template.data.columns.map(column=>({...column})),rows:template.data.rows.map(row=>({...row,cells:[...row.cells]}))},
+      settings:{...createDefaultGraphSettings(),title:template.name,orientation:template.orientation,barLayout:template.page==='/stacked-bar-graph-maker/'?'stacked':'grouped',xAxisTitle:template.xAxisTitle,yAxisTitle:template.yAxisTitle,showLegend:true,showValueLabels:true}});
+    activeDraftRef.current=crypto.randomUUID();restoreDraft(next);storeDraft(next);setDraftRevision(value=>value+1);
+    window.history.replaceState(null,'','#editor');
+    setProjectError(null);setProjectNotice(`Opened ${template.name}. Your previous graph is available in My graphs.`);
+    void persistProject(next).catch(()=>setProjectError('Your graphs remain available this session, but saving failed. Download project backups to keep them.'));
+    window.requestAnimationFrame(()=>previewSectionRef.current?.scrollIntoView({behavior:'smooth',block:'start'}));
+  }
 
   function scrollToEditorSection(section: 'customize' | 'data' | 'preview') {
     if (section === 'customize') {
@@ -375,6 +394,11 @@ export function GraphEditor({ config }: GraphEditorProps) {
 
     void (async () => {
       try {
+        if(isBarPage){
+          const workspace=await readBarWorkspace(config.slug);
+          if(cancelled)return;
+          if(workspace){draftsRef.current=workspace.drafts;activeDraftRef.current=workspace.activeId;const project=workspace.drafts.find(d=>d.id===workspace.activeId)!.project;tableBackupRef.current=project.tableBackup;setData(project.data);dispatchSettings({type:'replace-settings',value:project.settings});setSelectedChartType(project.graphType);createdAtRef.current=project.createdAt;setIsSampleData(false);setDraftRevision(value=>value+1);setSaveStatus('saving');return;}
+        }
         if(isSupplyPage){
           const workspace=await readSupplyWorkspace();
           if(cancelled)return;
@@ -431,7 +455,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     return () => {
       cancelled = true;
     };
-  }, [config,isTreePage,isSupplyPage]);
+  }, [config,isTreePage,isSupplyPage,isBarPage]);
 
   useEffect(() => {
     if (!isProjectReady || !isStorageAvailable) return;
@@ -647,6 +671,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
 
       <fieldset className="contents" disabled={!isProjectReady}>
 
+      {config.slug === '/' ? <>
       <label className="border-border block border-b p-3 text-sm font-semibold lg:hidden">
         Chart type
         <select className="border-border focus:border-brand mt-2 min-h-11 w-full rounded-md border bg-white px-3" value={selectedChartType} onChange={(event) => selectChartType(event.target.value as RenderedChartType)}>
@@ -686,6 +711,51 @@ export function GraphEditor({ config }: GraphEditorProps) {
         })}
       </div>
 
+      </> : (
+        <div className={`border-border flex min-w-0 flex-wrap items-end justify-between gap-3 border-b p-3 ${isBarPage ? 'bar-mobile-toolbar' : ''}`} data-specialist-toolbar>
+          <div className="flex min-w-0 flex-wrap items-end gap-4">
+            <p className="self-center text-sm font-semibold" aria-live="polite">
+              {selectedChartType === 'bar' && interpretation.seriesColumnIndexes.length > 1
+                ? (settings.barLayout === 'stacked' ? 'Stacked bars' : 'Grouped bars')
+                : graphTools.find(tool => tool.type === selectedChartType)?.name}
+            </p>
+            {selectedChartType === 'bar' && (
+              <fieldset className="min-w-0 text-sm">
+                <legend className="font-semibold">Bar orientation</legend>
+                <div className="mt-1 flex flex-wrap gap-x-4">
+                  {(['vertical', 'horizontal'] as const).map(orientation => (
+                    <label key={orientation} className="flex min-h-11 cursor-pointer items-center gap-2">
+                      <input type="radio" name="bar-orientation" value={orientation}
+                        className="accent-brand h-4 w-4"
+                        checked={settings.orientation === orientation}
+                        onChange={() => dispatchSettings({ type: 'set-orientation', value: orientation })} />
+                      {orientation === 'vertical' ? 'Vertical' : 'Horizontal'}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
+          </div>
+          {selectedChartType === 'bar' && <fieldset className="min-w-0 text-sm">
+            <legend className="font-semibold">Bar layout</legend>
+            <div className="mt-1 flex flex-wrap gap-x-4">
+              {(['grouped', 'stacked'] as const).map(layout => <label key={layout} className="flex min-h-11 cursor-pointer items-center gap-2">
+                <input type="radio" name="bar-layout" className="accent-brand h-4 w-4" checked={(settings.barLayout ?? 'grouped') === layout}
+                  onChange={() => dispatchSettings({ type: 'set-bar-layout', value: layout })} />
+                {layout === 'grouped' ? 'Grouped' : 'Stacked'}
+              </label>)}
+            </div>
+          </fieldset>}
+          <label className="text-text-muted w-full text-sm font-medium sm:w-auto">
+            Change chart type
+            <select className="border-border text-text focus:border-brand mt-1 block min-h-11 w-full rounded-md border bg-white px-3 sm:w-52"
+              value={selectedChartType} onChange={event => selectChartType(event.target.value as RenderedChartType)}>
+              {graphTools.map(tool => <option key={tool.type} value={tool.type}>{tool.label}</option>)}
+            </select>
+          </label>
+        </div>
+      )}
+
       <nav aria-label="Editor sections" className="border-border bg-surface sticky top-0 z-10 grid grid-cols-3 border-b p-2 lg:hidden">
         <button className="text-text hover:bg-surface-subtle min-h-10 rounded-md px-2 text-sm font-semibold" onClick={() => scrollToEditorSection('preview')} type="button">
           Preview
@@ -700,6 +770,11 @@ export function GraphEditor({ config }: GraphEditorProps) {
 
       <div className="grid min-w-0 lg:grid-cols-[2fr_3fr]">
         <section aria-labelledby="data-heading" className="border-border order-2 min-w-0 scroll-mt-14 border-t p-4 sm:p-5 lg:order-1 lg:border-t-0 lg:border-r" id="data-editor" ref={dataSectionRef}>
+          {isBarPage && <Suspense fallback={<p role="status">Loading bar templates…</p>}><BarTemplateControls page={config.slug} ready={isProjectReady} drafts={draftsRef.current} activeId={activeDraftRef.current} title={settings.title} onApply={applyBarTemplate} onOpen={openDraft} onDelete={()=>{
+            if(draftsRef.current.length<2||!window.confirm('Delete this graph from My graphs? Download a project backup first if needed.'))return;
+            draftsRef.current=draftsRef.current.filter(d=>d.id!==activeDraftRef.current);const next=draftsRef.current[0];activeDraftRef.current=next.id;restoreDraft(next.project);setDraftRevision(value=>value+1);
+            void persistProject(next.project).catch(()=>setProjectError('Could not update saved graphs. Download a project backup.'));
+          }} /></Suspense>}
           {isSupplyPage && <div className="border-border bg-surface-subtle mb-4 rounded-md border p-3" data-draft-revision={draftRevision}>
             <label className="block text-sm font-semibold">My graphs<select aria-label="My graphs" className="border-border mt-2 min-h-10 w-full rounded-md border bg-white px-3" value={activeDraftRef.current} onChange={event=>openDraft(event.target.value)}>
               {!draftsRef.current.length && <option value={activeDraftRef.current}>{settings.title}</option>}
@@ -748,7 +823,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
         <section aria-labelledby="preview-heading" className="order-1 min-w-0 scroll-mt-14 p-4 sm:p-5 lg:order-2" ref={previewSectionRef}>
           <h3 className="sr-only" id="preview-heading">Graph preview</h3>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 data-print-title className="min-w-0 flex-1 truncate text-lg font-bold">
+            <h3 data-print-title className="min-w-0 flex-1 break-words text-lg leading-6 font-bold sm:truncate">
               {settings.title.trim() || 'Untitled graph'}
             </h3>
             <div className="flex flex-wrap items-center gap-3">

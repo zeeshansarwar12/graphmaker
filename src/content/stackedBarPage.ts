@@ -1,0 +1,53 @@
+import type { ToolPageConfig } from './toolPages';
+export const stackedBarToolPageConfig: ToolPageConfig = {
+  canonical: '/stacked-bar-graph-maker/', slug: '/stacked-bar-graph-maker/', connectedSchema: true,
+  h1: 'Stacked Bar Graph Maker', alternateName: ['Stacked Bar Chart Maker', 'Segmented Bar Graph Maker'],
+  title: 'Stacked Bar Graph Maker — Free Chart Tool | GraphMaker',
+  metaDescription: 'Create a stacked bar chart online for free. Compare totals and component values, switch orientation, edit templates, and download PNG or SVG.',
+  intro: 'Use this free stacked bar chart maker to show how components contribute to each total. Edit a segmented bar graph, switch between vertical and horizontal bars, and download PNG or SVG.',
+  editor: { graphType: 'bar', slug: '/stacked-bar-graph-maker/',
+    sampleData: { columns: [{id:'column-1',kind:'label',name:'Quarter'},{id:'column-2',kind:'number',name:'Staff'},{id:'column-3',kind:'number',name:'Materials'},{id:'column-4',kind:'number',name:'Other'}],
+      rows: [{id:'row-1',cells:['Q1','60','25','15']},{id:'row-2',cells:['Q2','65','30','20']},{id:'row-3',cells:['Q3','70','35','20']}] },
+    initialSettings: { barLayout:'stacked',orientation:'vertical',title:'Quarterly Costs',xAxisTitle:'Quarter',yAxisTitle:'Cost (USD thousands)',showLegend:true,showValueLabels:true } },
+  howTo: [
+    {title:'Add components in separate columns',description:'Put category names in the first column and one numeric component in each following column. Use components measured in the same unit.'},
+    {title:'Choose your layout',description:'Keep Stacked selected under Bar layout. Use Vertical or Horizontal for orientation. Add series for another component, or edit the legend labels in the table headers.'},
+    {title:'Review totals and download',description:'Read each segment as a component value and the full positive bar as its total. Customize colors and titles, then download PNG or SVG.'},
+  ],
+  definition: [
+    'A stacked bar graph joins component values into one bar for each category. Each colored segment represents a part, and the combined bar shows the total when all components are nonnegative.',
+    'Stacked bar charts are also called segmented bar graphs. They help compare overall totals and their composition. Middle segments do not share a baseline, so use grouped bars when precise component comparisons matter more.',
+    'This tool uses raw values rather than normalizing bars to 100%. Positive and negative values stack separately around zero; a mixed-sign bar is not a single part-to-whole total. Missing cells create no segment and are not imputed.',
+  ],
+  example: {headers:['Quarter','Staff','Materials','Other','Total'],rows:[['Q1','60','25','15','100'],['Q2','65','30','20','115'],['Q3','70','35','20','125']],caption:'Illustrative quarterly costs in thousands of dollars. Q1 totals 100 and Q3 totals 125. The Total column here explains the example; do not add it as a component in the editor or you would double-count the values.'},
+  comparison: {title:'Stacked vs grouped bar charts',intro:'Choose whether totals or separate component comparisons matter most.',first:{title:'Stacked: totals and composition',body:'Join additive components into one bar. Compare total quarterly costs while showing staff, materials and other spending within each total.'},second:{title:'Grouped: individual comparisons',body:'Place series side by side on a common baseline. Use the Bar layout radios to compare individual values without changing your table.'}},
+  useCases:{title:'When to use a stacked bar graph',intro:'Use additive components with consistent units and clearly named series.',items:[
+    {title:'Budget breakdowns',description:'Compare spending totals and their component costs across periods or departments.'},
+    {title:'Sales channels',description:'Show how online and store sales contribute to each regional sales total.'},
+    {title:'Project effort',description:'Combine planning, build and review hours to compare project workloads.'},
+  ]},
+  features:[
+    {title:'Real stacked segments',description:'Numeric series share a stack within each category instead of appearing side by side.'},
+    {title:'Vertical and horizontal',description:'Choose columns for short categories or sideways bars for longer labels.'},
+    {title:'Grouped comparison',description:'Switch between Grouped and Stacked without replacing your data.'},
+    {title:'Editable templates',description:'Start with quarterly costs, sales channels or project hours and keep your current graph in My graphs.'},
+    {title:'Local saving',description:'Keep up to 20 graphs on this page in the current browser, separate from the other bar pages.'},
+    {title:'PNG and SVG export',description:'Download the current chart without a watermark, or export CSV values and a project backup.'},
+  ],
+  faqs:[
+    {question:'How do I make a stacked bar graph?',answer:'Enter categories in the first column and component values in the following columns. Select Stacked under Bar layout, then customize and download your chart.'},
+    {question:'Is a segmented bar graph the same as a stacked bar chart?',answer:'Segmented bar graph commonly describes the same divided-bar layout. This page stacks raw values; it does not automatically convert them to percentages.'},
+    {question:'Does this create a 100% stacked chart?',answer:'No. Bars use the original numeric values and may have different totals. Automatic 100% normalization is not included.'},
+    {question:'Can I stack bars horizontally?',answer:'Yes. Choose Horizontal under Bar orientation. Components extend sideways within each category.'},
+    {question:'Can I use negative or missing values?',answer:'Positive and negative values stack separately on opposite sides of zero. Missing cells produce no segment. For a part-to-whole comparison, use complete nonnegative values.'},
+    {question:'How do I read the segment labels?',answer:'Labels show original component values, not cumulative totals. Use the tooltip to inspect values, especially when a segment is too small to read.'},
+    {question:'Is the stacked bar maker free?',answer:'Yes. Create and download charts without signup or a watermark. Graphs are stored in this browser; download a project backup for safekeeping.'},
+  ],
+  relatedTools:[
+    {name:'Bar Graph Maker',href:'/bar-graph-maker/',description:'Start with general category comparisons.'},
+    {name:'Grouped Bar Chart Maker',href:'/grouped-bar-chart-maker/',description:'Compare individual series side by side.'},
+    {name:'Horizontal Bar Graph Maker',href:'/horizontal-bar-graph-maker/',description:'Read rankings and longer category labels.'},
+    {name:'Pie Chart Maker',href:'/pie-chart-maker/',description:'Show the composition of a single whole.'},
+  ],
+  sectionHeadings:{howTo:'How to make a stacked bar chart',definition:'What is a stacked bar graph?',example:'Stacked bar chart example',features:'Stacked bar graph maker features',faq:'Stacked and segmented bar graph questions',faqIntro:'Answers about component totals, orientation, missing values and downloads.'},
+};

@@ -112,3 +112,13 @@ Supply-demand draft regression checks preserve edited cells, titles, shifts and 
 Mobile economics regression covers two-decimal results, original-data cue, Adjust shifts focus, Reset shifts, PNG generation feedback and narrow-screen overflow. Calculation precision remains unchanged.
 
 Supply-demand quick-help coverage checks static headings and answer content, actionable equation/shift links, template draft preservation and mobile reflow. References are concepts, not new graph modes or a general solver.
+
+## Grouped bar workflow — 22 October 2026
+The grouped-bar browser test verifies adding a third series, editing, local restore, SVG download, separation from the main bar page, crawlable explanations and mobile overflow. SEO architecture includes the new workflow route while the editor retains twelve engine choices. Built HTML audit expects thirteen tool pages and eighteen pages including legal routes.
+
+## Focused chart selection
+Specialist tests use Change chart type instead of desktop radios. SEO tests and built HTML audit verify the homepage strip and twelve options in the specialist native selector. specialist-selector.spec.ts checks desktop/mobile switching, data retention, independent bar orientation, keyboard use and overflow.
+
+Horizontal bar tests cover horizontal defaults, ordered categories, editing, a second series, switching orientation, local restoration, SVG export, separation from the bar pillar, mobile overflow and connected schema. HTML audit expects fourteen tool routes and nineteen normal HTML routes, plus the 404 page.
+
+Bar template regressions validate all nine datasets, clone isolation and bounded workspace parsing. Browser tests cover static galleries, click/select/direct-fragment loading after restoration, preservation of edited titles/data/orientation across draft switching and refresh, deletion, page isolation and mobile overflow.

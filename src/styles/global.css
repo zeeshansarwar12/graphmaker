@@ -124,3 +124,20 @@ button:disabled {
   [data-print-title], [data-print-title] *, [data-print-graph], [data-print-graph] * { visibility: visible; }
   [data-print-graph] [data-chart-canvas] { height: 11cm !important; }
 }
+
+/* Keep both bar choices visible without stacking three full-width control rows. */
+@media (max-width: 639px) {
+  .bar-mobile-toolbar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 6px 12px;
+    padding: 8px 12px;
+  }
+  .bar-mobile-toolbar > div { display: contents; }
+  .bar-mobile-toolbar > div > p { display: none; }
+  .bar-mobile-toolbar fieldset > div { flex-direction: column; gap: 0; margin-top: 0; }
+  .bar-mobile-toolbar fieldset label { min-height: 36px; }
+  .bar-mobile-toolbar > label { grid-column: 1 / -1; font-size: 12px; }
+  .bar-mobile-toolbar select { min-height: 40px; margin-top: 2px; }
+}

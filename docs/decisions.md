@@ -147,3 +147,21 @@ Accepted: owner approval, 21 October 2026. Improve narrow-screen graph legibilit
 
 ## DEC-025 — Tool-first supply-demand learning
 Accepted: owner instruction, 21 October 2026. Replace the earlier prose learning block with compact actionable reference cards and expandable answers on the same canonical tool page. Add direct equation/shift input links, four practice problems, short slope/market/land/schedule explanations and primary-source references. No additional article URLs or broad feature claims.
+
+## DEC-026 — Bar cluster, first grouped workflow page
+Accepted: owner instruction, 22 October 2026. Build the agreed cluster sequentially, starting with /grouped-bar-chart-maker/. It covers grouped/double/clustered/multiple comparisons with the shared Bar engine and separate page-scoped local saving. Keep graph/chart synonyms on one URL. Add workflow pages to the public catalog separately from the twelve engine choices. Preserve existing bar-page behavior; explain matched units, missing values and grouped-versus-stacked meaning. The owner excluded AI and Excel keyword targeting. Publication remains separate from local implementation.
+
+## DEC-027 — Focus specialist editor navigation
+Accepted: owner instruction, 22 October 2026. Keep the full desktop chart strip and mobile Chart type selector on the homepage. Specialist pages use one secondary Change chart type native selector at all widths; keep all twelve engines accessible through the existing data-preserving switch handler. Bar mode exposes orientation separately from series grouping. Do not display unimplemented stacked/percentage modes. This supersedes the all-pages strip guidance in the 20 October editor usability update. Existing page links, storage and chart adapters remain shared.
+
+## DEC-028 — Horizontal bar cluster page
+Accepted: owner instruction to continue the agreed pages, 22 October 2026. Build the horizontal workflow next using the shared bar editor, separate page storage, ranking example and natural chart/graph synonyms. Preserve table order; do not imply automatic sorting. Use connected page/application schema for the new tool. Stacked and percentage pages remain subsequent work.
+
+## DEC-029 — Bar template galleries and preserved drafts
+Accepted: owner instruction, 22 October 2026. Add three original templates each to Bar, Grouped and Horizontal pages. Static previews and fragment links stay on those tool URLs. Templates open new graphs, preserving current tables, settings and chart type in a page-specific collection. Keep up to twenty drafts without silent eviction; migrate legacy page saves and serialize IndexedDB writes. Grouped uses Graph Maker in its visible H1; chart stays in SEO title and schema alias. Homepage and other tool storage remain unchanged.
+
+## DEC-030 — Stacked bar workflow
+Accepted: owner request, 22 October 2026. Add a dedicated stacked/segmented bar page using the shared Bar engine, grouped/stacked layout radios, both orientations, three templates, page-specific drafts and connected schema. Persist the optional layout setting with legacy grouped fallback. Positive and negative stacks are separate. Do not imply automatic percentage normalization.
+
+## DEC-031 — Bar page hierarchy
+Accepted: owner request, 22 October 2026. Express Bar as the parent of Grouped, Horizontal and Stacked through breadcrumbs, nested directory/footer links and connected WebPage relationships. Retain existing URLs, self-canonicals, editors and saved data.

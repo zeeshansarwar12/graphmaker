@@ -15,6 +15,7 @@ export interface GraphSettings {
   histogramBinCount: number | null;
   histogramSeriesColumnId: string | null;
   orientation: GraphOrientation;
+  barLayout?: 'grouped' | 'stacked';
   pieSeriesColumnId: string | null;
   radarFilled: boolean;
   scatterXColumnId: string | null;
@@ -48,6 +49,7 @@ export type GraphSettingsAction =
   | { type: 'set-grid'; value: boolean }
   | { type: 'set-legend'; value: boolean }
   | { type: 'set-orientation'; value: GraphOrientation }
+  | { type: 'set-bar-layout'; value: 'grouped' | 'stacked' }
   | { type: 'set-outliers'; value: boolean }
   | { type: 'set-pie-series'; value: string }
   | { type: 'set-radar-filled'; value: boolean }
@@ -90,6 +92,7 @@ export function createDefaultGraphSettings(): GraphSettings {
     histogramBinCount: null,
     histogramSeriesColumnId: null,
     orientation: 'vertical',
+    barLayout: 'grouped',
     pieSeriesColumnId: null,
     radarFilled: true,
     scatterXColumnId: null,
@@ -134,6 +137,8 @@ export function graphSettingsReducer(
       return { ...settings, showGrid: action.value };
     case 'set-legend':
       return { ...settings, showLegend: action.value };
+    case 'set-bar-layout':
+      return { ...settings, barLayout: action.value };
     case 'set-orientation':
       if (action.value === settings.orientation) return settings;
       return {

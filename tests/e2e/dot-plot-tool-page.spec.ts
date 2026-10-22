@@ -10,7 +10,7 @@ test('serves a complete Dot Plot page with the shared raw-observation preset', a
   await expect(page.getByRole('heading', { level: 1, name: 'Dot Plot Maker' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Dot Plot Maker');
 
-  await expect(page.getByRole('radio', { exact: true, name: 'Dot Plot' })).toHaveAttribute('aria-checked', 'true');
+  await expect(page.getByRole('combobox', { name: 'Change chart type' })).toHaveValue('dotplot');
   await expect(page.getByLabel('Value, row 1', { exact: true })).toHaveValue('12');
   await expect(page.getByLabel('Value, row 20')).toHaveValue('24');
   const chart = page.locator('[data-rendered-chart-type="dotplot"] [data-chart-status="ready"]');

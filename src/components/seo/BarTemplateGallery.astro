@@ -1,0 +1,42 @@
+---
+import { templatesForBarPage } from '../../content/barTemplates';
+interface Props { page: string }
+const templates=templatesForBarPage(Astro.props.page);
+function labelLines(label: string): string[] {
+  const lines: string[] = [''];
+  for (const word of label.split(' ')) {
+    const last = lines.length - 1;
+    if (lines[last] && (lines[last] + ' ' + word).length > 18) lines.push(word);
+    else lines[last] += (lines[last] ? ' ' : '') + word;
+  }
+  return lines;
+}
+const colors=['#2563eb','#0d9488','#7c3aed'];
+---
+<section class="page-shell py-10 sm:py-14" aria-labelledby="bar-templates-heading" id="bar-templates">
+  <h2 class="section-heading text-center" id="bar-templates-heading">Start with a bar graph template</h2>
+  <p class="text-text-muted mx-auto mt-3 max-w-2xl text-center leading-7">Choose an editable example. Each template opens a new graph and keeps your current work in My graphs. All values are illustrative.</p>
+  <div class="mt-7 grid gap-5 md:grid-cols-3">
+    {templates.map(t=>{
+      const horizontal=t.orientation==='horizontal';
+      const stacked=t.page==='/stacked-bar-graph-maker/';
+      const series=t.data.columns.length-1;
+      const max=Math.max(...t.data.rows.flatMap(row=>stacked?[row.cells.slice(1).reduce((sum,v)=>sum+Number(v),0)]:row.cells.slice(1).map(Number)))*1.12;
+      const group=horizontal?104/t.data.rows.length:230/t.data.rows.length;
+      const barSize=group*.68/(stacked?1:series);
+      return <article class="border-border overflow-hidden rounded-lg border" id={`bar-template-${t.id}`}>
+        <div class="bg-surface-subtle p-3 sm:p-4"><svg viewBox="0 0 300 180" role="img" aria-label={`${t.name}: ${horizontal?'horizontal':'vertical'} bars with ${series} ${series===1?'series':'series'}`} class="h-44 w-full">
+          <path d={horizontal?'M120 28V142H282':'M38 24V142H278'} fill="none" stroke="#94a3b8"/>
+          {t.data.rows.map((row,i)=><g>
+            {horizontal?<text x="113" y={30+i*group+group*.5} text-anchor="end" dominant-baseline="middle" font-size="12" fill="#52627a">{labelLines(row.cells[0]).map((line, lineIndex, lines) => <tspan x="113" dy={lineIndex === 0 ? -(lines.length - 1) * 6.5 : 13}>{line}</tspan>)}</text>:<text x={43+i*group+group*.38} y="156" text-anchor="middle" font-size="12" fill="#52627a">{row.cells[0]}</text>}
+            {row.cells.slice(1).map((value,j)=>horizontal
+              ? <rect x={120+(stacked?row.cells.slice(1,j+1).reduce((sum,v)=>sum+Number(v),0)/max*155:0)} y={30+i*group+(stacked?0:j*barSize)} width={Number(value)/max*155} height={barSize-2} fill={colors[j]}/>
+              : <rect x={43+i*group+(stacked?0:j*barSize)} y={142-(Number(value)+(stacked?row.cells.slice(1,j+1).reduce((sum,v)=>sum+Number(v),0):0))/max*104} width={barSize-2} height={Number(value)/max*104} fill={colors[j]}/>) }
+          </g>)}
+          {t.data.columns.slice(1).map((column,j)=><g><rect x={38+j*86} y="8" width="8" height="8" fill={colors[j]}/><text x={49+j*86} y="15" font-size="12" fill="#52627a">{column.name}</text></g>)}
+        </svg></div>
+        <div class="p-5"><h3 class="font-bold">{t.name}</h3><p class="text-text-muted mt-2 text-sm leading-6">{t.description}</p><p class="text-text-muted mt-2 text-xs leading-5">{t.explanation}</p><a class="button-secondary mt-4" href={`#bar-template-${t.id}`} aria-label={`Use template: ${t.name}`}>Use template →</a></div>
+      </article>;
+    })}
+  </div>
+</section>
