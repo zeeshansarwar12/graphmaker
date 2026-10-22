@@ -1,0 +1,54 @@
+import {test,expect} from '@playwright/test';
+import {openPage,reloadPage} from './navigation';
+
+test('templates preserve edited data and settings across switching and reload',async({page})=>{
+  await openPage(page,'/supply-and-demand-graph-maker/');
+  await page.getByLabel('Demand, row 1',{exact:true}).fill('96');
+  await page.getByRole('button',{name:'Customize',exact:true}).click();
+  await page.getByLabel('Graph title',{exact:true}).fill('My original market');
+  await page.getByText('Compare curve shifts (optional)',{exact:true}).click();
+  await page.getByLabel('Demand shift',{exact:true}).fill('7');
+  await page.getByLabel('Black-and-white print style').check();
+  const selector=page.getByLabel('My graphs',{exact:true});
+  const original=await selector.inputValue();
+  await page.getByLabel('Supply and demand template',{exact:true}).selectOption('demand-increase');
+  const second=await selector.inputValue();expect(second).not.toBe(original);
+  await expect(selector.locator('option')).toHaveCount(2);
+  await expect(page.getByLabel('Quantity demanded, row 1',{exact:true})).toHaveValue('100');
+  await page.getByLabel('Quantity demanded, row 1',{exact:true}).fill('120');
+  await selector.selectOption(original);
+  await expect(page.getByLabel('Demand, row 1',{exact:true})).toHaveValue('96');
+  await expect(page.getByLabel('Graph title',{exact:true})).toHaveValue('My original market');
+  await expect(page.getByLabel('Demand shift',{exact:true})).toHaveValue('7');
+  await expect(page.getByLabel('Black-and-white print style')).toBeChecked();
+  await selector.selectOption(second);
+  await expect(page.getByLabel('Quantity demanded, row 1',{exact:true})).toHaveValue('120');
+  await page.getByRole('button',{name:'Save locally',exact:true}).click();
+  await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
+  await reloadPage(page);
+  await expect(selector).toHaveValue(second);
+  await expect(selector.locator('option')).toHaveCount(2);
+  await selector.selectOption(original);
+  await expect(page.getByLabel('Demand, row 1',{exact:true})).toHaveValue('96');
+  await expect(page.getByLabel('Demand shift',{exact:true})).toHaveValue('7');
+  await selector.selectOption(second);
+  page.once('dialog',d=>d.dismiss());await page.getByRole('button',{name:'Delete current graph',exact:true}).click();
+  await expect(selector.locator('option')).toHaveCount(2);
+  page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'Delete current graph',exact:true}).click();
+  await expect(selector.locator('option')).toHaveCount(1);
+  await page.getByRole('button',{name:'Save locally',exact:true}).click();
+  await reloadPage(page);await expect(selector.locator('option')).toHaveCount(1);
+  await expect(page.getByLabel('Demand, row 1',{exact:true})).toHaveValue('96');
+});
+
+test('full graph collection refuses another template without evicting values',async({page})=>{
+  await openPage(page,'/supply-and-demand-graph-maker/');
+  await page.getByLabel('Demand, row 1',{exact:true}).fill('123');
+  const selector=page.getByLabel('My graphs',{exact:true});const first=await selector.inputValue();
+  for(let i=0;i<19;i++)await page.getByLabel('Supply and demand template',{exact:true}).selectOption('equilibrium');
+  await expect(selector.locator('option')).toHaveCount(20);const active=await selector.inputValue();
+  await page.getByLabel('Supply and demand template',{exact:true}).selectOption('supply-increase');
+  await expect(selector).toHaveValue(active);await expect(selector.locator('option')).toHaveCount(20);
+  await expect(page.getByText('You have 20 graphs. Delete a graph from My graphs before opening another template.')).toBeVisible();
+  await selector.selectOption(first);await expect(page.getByLabel('Demand, row 1',{exact:true})).toHaveValue('123');
+});

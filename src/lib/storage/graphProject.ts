@@ -102,6 +102,9 @@ function isGraphSettings(value: unknown): value is GraphSettings {
     && (value.scatterYColumnId === undefined
       || value.scatterYColumnId === null
       || typeof value.scatterYColumnId === 'string')
+    && (value.supplyDemandInputMode === undefined || value.supplyDemandInputMode === 'inverse' || value.supplyDemandInputMode === 'schedule')
+    && ['supplyDemandDemandShift','supplyDemandSupplyShift'].every(key => value[key] === undefined || (typeof value[key] === 'number' && Number.isFinite(value[key]) && Math.abs(value[key] as number) <= 1000000))
+    && ['supplyDemandShowOriginal','supplyDemandMonochrome'].every(key => value[key] === undefined || typeof value[key] === 'boolean')
     && (value.supplyDemandDemandColumnId === undefined
       || value.supplyDemandDemandColumnId === null
       || typeof value.supplyDemandDemandColumnId === 'string')
@@ -197,6 +200,11 @@ export function parseGraphProject(value: unknown): ProjectParseResult {
         scatterYColumnId: project.settings.scatterYColumnId ?? null,
         showEquilibrium: project.settings.showEquilibrium ?? true,
         showOutliers: project.settings.showOutliers ?? true,
+        supplyDemandInputMode: project.settings.supplyDemandInputMode ?? 'inverse',
+        supplyDemandDemandShift: project.settings.supplyDemandDemandShift ?? 0,
+        supplyDemandSupplyShift: project.settings.supplyDemandSupplyShift ?? 0,
+        supplyDemandShowOriginal: project.settings.supplyDemandShowOriginal ?? true,
+        supplyDemandMonochrome: project.settings.supplyDemandMonochrome ?? false,
         supplyDemandDemandColumnId: project.settings.supplyDemandDemandColumnId ?? null,
         supplyDemandSupplyColumnId: project.settings.supplyDemandSupplyColumnId ?? null,
         supplyDemandXColumnId: project.settings.supplyDemandXColumnId ?? null,

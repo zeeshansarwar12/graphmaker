@@ -124,3 +124,9 @@ Aim for meaningful pages to remain within roughly 2–3 clicks of the homepage.
 Retain `/tree-graph-maker/` as the single canonical tool URL. Prioritize tree diagram / tree diagram maker in the title, H1, definition and template gallery. Support tree chart, tree diagram generator, create tree diagram, tree diagram creator and tree graph maker naturally in explanations and FAQs. Tree draw has mixed intent; use natural draw-a-tree-diagram wording without creating a botanical or genealogy landing page. Six original presets have static, crawlable on-page previews and fragment links, not separate indexable template pages. Do not claim probability calculations or multiple-parent genealogy support. The owner's 10k Semrush volume is user-provided; additional API metrics were unavailable. See `docs/tree-diagram-research.md`.
 
 The tree page includes an accessible static labeled project diagram beside its import table, with root/branch/leaf explanations and an edit-template link. Feature and how-to copy reflects direct label editing, draft-preserving template selection, pan, zoom and fitting; the FAQ heading uses natural wording.
+
+## Supply and demand cluster — 21 October 2026
+Keep /supply-and-demand-graph-maker/ canonical. Cover curve generator, maker/plotter/chart/free/online variants naturally on this page. Six crawlable scenario previews link into the shared editor using fragments. Add worked equilibrium, movement-versus-shift and practice explanations. AI remains unsupported. No Word/Excel guide routes.
+
+## Compact supply-demand learning — 21 October 2026
+Owner requested remaining educational intent with minimal writing. Keep examples, shift reference, linear equations/functions, four practice problems and deeper supply questions on the existing tool URL. All useful references connect to real templates or existing inputs through fragments. No new guide routes or thin informational pages; no AI/trading/Word/Excel targeting.

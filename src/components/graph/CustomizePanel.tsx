@@ -60,7 +60,7 @@ export function CustomizePanel({
       {chartType === 'equation' && <label className="flex items-center gap-2 my-3 text-sm"><input type="checkbox" checked={settings.showLegend} onChange={event => dispatch({type:'set-legend',value:event.target.checked})} />Show legend</label>}
       {chartType === 'scatter' && <label className="flex items-center gap-2 my-3 text-sm font-semibold"><input type="checkbox" checked={settings.showTrendline} onChange={event => dispatch({type:'replace-settings',value:{...settings,showTrendline:event.target.checked}})} />Linear trendline and R²</label>}
       <div className="grid gap-4 sm:grid-cols-3">
-        {chartType !== 'radar' && chartType !== 'supplydemand' && <label className="text-sm font-semibold">
+        {chartType !== 'radar' && <label className="text-sm font-semibold">
           Graph title
           <input
             className={fieldClassName}
@@ -192,7 +192,7 @@ export function CustomizePanel({
           <legend className="text-sm font-semibold">Supply and demand columns</legend>
           <div className="mt-3 grid gap-4 sm:grid-cols-3">
             {([
-              ['x', 'Quantity / X column', supplyDemandMapping.xColumnId],
+              ['x', settings.supplyDemandInputMode === 'schedule' ? 'Price column' : 'Quantity / X column', supplyDemandMapping.xColumnId],
               ['demand', 'Demand series', supplyDemandMapping.demandColumnId],
               ['supply', 'Supply series', supplyDemandMapping.supplyColumnId],
             ] as const).map(([role, label, selectedId]) => (

@@ -1,6 +1,8 @@
 import {readTreeWorkspace, writeTreeWorkspace, treeRememberKey, treeDraftLimit} from '../../lib/storage/treeDrafts';
 import type {TreeDraft} from '../../lib/storage/treeDrafts';
 import type {GraphProject} from '../../lib/storage/graphProject';
+import {readSupplyWorkspace, writeSupplyWorkspace} from '../../lib/storage/supplyDrafts';
+import {createSupplyDemandTemplateData} from '../../content/supplyDemandTemplates';
 import { createTreeTemplateData } from '../../content/treeTemplates';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { xyColumns, xyLabels } from '../../graph/transforms/xy';
@@ -56,6 +58,8 @@ import { DataGrid } from './DataGrid';
 import { GraphCanvas } from './GraphCanvas';
 import type { GraphCanvasHandle } from './GraphCanvas';
 
+const SupplyDemandResults = lazy(() => import('./SupplyDemandResults'));
+const SupplyDemandInput = lazy(() => import('./SupplyDemandInput'));
 const TreeInput = lazy(() => import('./TreeInput'));
 const EquationInput = lazy(() => import('./EquationInput'));
 
@@ -96,6 +100,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
   const createdAtRef = useRef(new Date().toISOString());
   const [data, setData] = useState(() => createConfiguredData(config));
   const isTreePage=config.graphType==='tree';
+  const isSupplyPage=config.graphType==='supplydemand';
   const [rememberTrees,setRememberTrees]=useState(true);
   const rememberTreesRef=useRef(true);
   const draftsRef=useRef<TreeDraft[]>([]);
@@ -108,12 +113,13 @@ export function GraphEditor({ config }: GraphEditorProps) {
     if(index<0) draftsRef.current=[...draftsRef.current,draft];else draftsRef.current=draftsRef.current.map((item,i)=>i===index?draft:item);
   },[]);
   const persistProject=useCallback(async (project:GraphProject)=>{
+    if(isSupplyPage){storeDraft(project);return writeSupplyWorkspace({activeId:activeDraftRef.current,drafts:draftsRef.current});}
     if(!isTreePage) return saveCurrentProject(project,config.slug);
     storeDraft(project);
     if(rememberTreesRef.current) await writeTreeWorkspace({activeId:activeDraftRef.current,drafts:draftsRef.current});
-  },[isTreePage,config.slug,storeDraft]);
-  function restoreDraft(project:GraphProject){tableBackupRef.current=project.tableBackup;setData(project.data);dispatchSettings({type:'replace-settings',value:project.settings});setSelectedChartType(project.graphType);createdAtRef.current=project.createdAt;setTreeFitRequest(value=>value+1);setSavedState(null);}
-  function openDraft(id:string){storeDraft(snapshotTree());const draft=draftsRef.current.find(item=>item.id===id);if(!draft)return;activeDraftRef.current=id;restoreDraft(draft.project);setDraftRevision(value=>value+1);}
+  },[isTreePage,isSupplyPage,config.slug,storeDraft]);
+  function restoreDraft(project:GraphProject){setIsSampleData(false);tableBackupRef.current=project.tableBackup;setData(project.data);dispatchSettings({type:'replace-settings',value:project.settings});setSelectedChartType(project.graphType);createdAtRef.current=project.createdAt;setTreeFitRequest(value=>value+1);setSavedState(null);}
+  function openDraft(id:string){storeDraft(snapshotTree());const draft=draftsRef.current.find(item=>item.id===id);if(!draft)return;activeDraftRef.current=id;restoreDraft(draft.project);setDraftRevision(value=>value+1);if(isSupplyPage)void persistProject(draft.project).catch(()=>setProjectError('Could not save your graph collection. Download a project backup to keep your work.'));}
   async function changeRemember(checked:boolean){
     rememberTreesRef.current=checked;setRememberTrees(checked);
     try{localStorage.setItem(treeRememberKey,String(checked));if(checked)await persistProject(snapshotTree());else{await writeTreeWorkspace(null);await deleteCurrentProject(config.slug);}setIsStorageAvailable(true);}
@@ -369,6 +375,11 @@ export function GraphEditor({ config }: GraphEditorProps) {
 
     void (async () => {
       try {
+        if(isSupplyPage){
+          const workspace=await readSupplyWorkspace();
+          if(cancelled)return;
+          if(workspace){draftsRef.current=workspace.drafts;activeDraftRef.current=workspace.activeId;const project=workspace.drafts.find(item=>item.id===workspace.activeId)!.project;tableBackupRef.current=project.tableBackup;setData(project.data);dispatchSettings({type:'replace-settings',value:project.settings});setSelectedChartType(project.graphType);createdAtRef.current=project.createdAt;setIsSampleData(false);setDraftRevision(value=>value+1);setSaveStatus('saving');return;}
+        }
         if(isTreePage){
           const remember=localStorage.getItem(treeRememberKey)!=='false';rememberTreesRef.current=remember;setRememberTrees(remember);
           if(!remember){setSaveStatus('saved');return;}
@@ -420,7 +431,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     return () => {
       cancelled = true;
     };
-  }, [config,isTreePage]);
+  }, [config,isTreePage,isSupplyPage]);
 
   useEffect(() => {
     if (!isProjectReady || !isStorageAvailable) return;
@@ -481,7 +492,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
         : null;
       dispatchSettings({
         type: 'replace-settings',
-        value: { ...adaptiveSettings, ...boxPlotLabels, ...dotPlotLabels, ...supplyDemandLabels, ...(selectedChartType === 'xy' ? xyLabels(nextData) : {}), ...(pastedTitle ? {title:pastedTitle} : {}) },
+        value: { ...adaptiveSettings, ...boxPlotLabels, ...dotPlotLabels, ...supplyDemandLabels, ...(selectedChartType === 'supplydemand' && settings.supplyDemandInputMode === 'schedule' ? {xAxisTitle:'Quantity',yAxisTitle:'Price'} : {}), ...(selectedChartType === 'xy' ? xyLabels(nextData) : {}), ...(pastedTitle ? {title:pastedTitle} : {}) },
       });
     } else if (intent === 'structure' || settings.title === 'Untitled Graph') {
       const suggested = selectedChartType === 'xy' ? xyLabels(data) : selectedChartType === 'supplydemand'
@@ -539,14 +550,13 @@ export function GraphEditor({ config }: GraphEditorProps) {
 
   async function exportGraph(type: 'png' | 'svg') {
     if (selectedChartType === 'equation' && equationBusy) { setProjectError('Wait for the equation graph to finish updating before exporting.'); return; }
-    const dataUrl = await graphCanvasRef.current?.exportImage(type);
-    if (!dataUrl) {
-      setProjectError('Add valid data before exporting the graph.');
-      return;
-    }
-
-    setProjectError(null);
-    downloadDataUrl(dataUrl, createDownloadFilename(settings.title, type));
+    try {
+      const dataUrl = await graphCanvasRef.current?.exportImage(type);
+      if (!dataUrl) {setProjectError('Add valid data before exporting the graph.');return;}
+      downloadDataUrl(dataUrl, createDownloadFilename(settings.title, type));
+      setProjectError(null);
+      setProjectNotice(`${type.toUpperCase()} generated—check your downloads.`);
+    } catch {setProjectError(`${type.toUpperCase()} export failed. Try again or choose another format.`);}
   }
 
   function exportCsv() {
@@ -690,6 +700,14 @@ export function GraphEditor({ config }: GraphEditorProps) {
 
       <div className="grid min-w-0 lg:grid-cols-[2fr_3fr]">
         <section aria-labelledby="data-heading" className="border-border order-2 min-w-0 scroll-mt-14 border-t p-4 sm:p-5 lg:order-1 lg:border-t-0 lg:border-r" id="data-editor" ref={dataSectionRef}>
+          {isSupplyPage && <div className="border-border bg-surface-subtle mb-4 rounded-md border p-3" data-draft-revision={draftRevision}>
+            <label className="block text-sm font-semibold">My graphs<select aria-label="My graphs" className="border-border mt-2 min-h-10 w-full rounded-md border bg-white px-3" value={activeDraftRef.current} onChange={event=>openDraft(event.target.value)}>
+              {!draftsRef.current.length && <option value={activeDraftRef.current}>{settings.title}</option>}
+              {draftsRef.current.map((draft,index)=><option key={draft.id} value={draft.id}>{draft.id===activeDraftRef.current?settings.title:draft.project.settings.title} · {index+1}</option>)}
+            </select></label>
+            <p className="text-text-muted mt-2 text-xs leading-5">Templates keep previous graphs. Up to 20 saved in this browser.</p>
+            {draftsRef.current.length>1 && <button className="text-text-muted mt-2 text-sm underline" type="button" onClick={()=>{if(!window.confirm('Delete this graph from My graphs? Download a project backup first if needed.'))return;draftsRef.current=draftsRef.current.filter(d=>d.id!==activeDraftRef.current);const next=draftsRef.current[0];activeDraftRef.current=next.id;restoreDraft(next.project);setDraftRevision(value=>value+1);void persistProject(next.project).catch(()=>setProjectError('Could not update saved graphs. Download a project backup.'));}}>Delete current graph</button>}
+          </div>}
           {isTreePage && <div className="border-border mb-4 rounded-md border p-3" data-draft-revision={draftRevision}>
             <label className="flex items-start gap-2 text-sm font-semibold"><input type="checkbox" disabled={!isProjectReady} className="mt-1" checked={rememberTrees} onChange={event=>{void changeRemember(event.target.checked);}}/>Remember my diagrams on this device</label>
             <p className="text-text-muted mt-2 text-xs leading-5">Saves diagrams in this browser. Uncheck to remove saved tree copies and keep drafts only until this page closes. No cloud backup.</p>
@@ -712,6 +730,17 @@ export function GraphEditor({ config }: GraphEditorProps) {
             }} /></Suspense>
             : selectedChartType === 'equation'
             ? <Suspense fallback={<p role="status">Loading equation input…</p>}><EquationInput settings={settings} dispatch={dispatchSettings} onData={setEquationData} onBusy={setEquationBusy} /></Suspense>
+            : selectedChartType === 'supplydemand'
+            ? <Suspense fallback={<p role="status">Loading economics controls…</p>}><SupplyDemandInput key={activeDraftRef.current} data={data} settings={settings} isReady={isProjectReady} isSampleData={isSampleData} onChange={updateData} onSettings={value=>dispatchSettings({type:'replace-settings',value})} onApplyTemplate={template=>{
+              if(!isSupplyPage){setProjectError('Open the Supply and Demand Graph Maker page to use templates with saved drafts. Your current graph is unchanged.');return false;}
+              storeDraft(snapshotTree());
+              if(draftsRef.current.length>=treeDraftLimit){setProjectError('You have 20 graphs. Delete a graph from My graphs before opening another template.');return false;}
+              activeDraftRef.current=crypto.randomUUID();
+              const next=createProjectSnapshot({createdAt:new Date().toISOString(),data:createSupplyDemandTemplateData(),graphType:'supplydemand',settings:{...settings,title:template.name,xAxisTitle:'Quantity',yAxisTitle:'Price',supplyDemandInputMode:'schedule',supplyDemandDemandShift:template.demandShift,supplyDemandSupplyShift:template.supplyShift,supplyDemandShowOriginal:true,supplyDemandDemandColumnId:null,supplyDemandSupplyColumnId:null,supplyDemandXColumnId:null}});
+              storeDraft(next);restoreDraft(next);setDraftRevision(value=>value+1);setIsSampleData(true);setProjectNotice('Opened a new graph. Your previous graph is available in My graphs.');
+              if(isSupplyPage)void persistProject(next).catch(()=>setProjectError('Your graphs are available for this session, but saving failed. Download project backups to keep them.'));
+              return true;
+            }}/></Suspense>
             : <><DataGrid data={data} isSampleData={isSampleData} onChange={updateData} />{selectedChartType === 'xy' && <div className="mt-3"><p className="text-sm text-text-muted">Use X followed by one or more Y columns. Optional point names appear with coordinate labels.</p>{!data.columns.some(column => column.kind === 'label') && <button className="button-secondary mt-2" onClick={addPointNames} type="button">Add point names</button>}</div>}</>}
 
         </section>
@@ -827,6 +856,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
             </p>
           )}
 
+          {selectedChartType === 'supplydemand' && <a className="text-brand mt-3 inline-block min-h-10 text-sm font-semibold underline" href="#supply-shifts" onClick={()=>{requestAnimationFrame(()=>{const target=document.getElementById('supply-shifts') as HTMLDetailsElement|null;if(target){target.open=true;target.scrollIntoView({block:'start',behavior:'smooth'});target.querySelector('input')?.focus({preventScroll:true});}});}}>Adjust shifts →</a>}
           <div data-print-graph className="mt-2 w-full overflow-hidden">
             <GraphCanvas
               onRetryChart={() => { if(isTreePage && !rememberTreesRef.current){setProjectError('Download a project backup before reloading. Session-only diagrams will be lost when this page closes.');return;} void saveNow().then(saved => {if(saved) window.location.reload();}); }}
@@ -846,6 +876,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
             />
           </div>
 
+          {selectedChartType === 'supplydemand' && <Suspense fallback={null}><SupplyDemandResults data={data} settings={settings}/></Suspense>}
           <div className="border-border flex flex-wrap items-center justify-between gap-3 border-t pt-4">
             <div className="flex flex-wrap gap-2">
               <button className="button-secondary" onClick={() => exportGraph('png')} type="button"><ButtonIcon>▧</ButtonIcon>PNG</button>
@@ -854,7 +885,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
             </div>
             <div className="flex flex-wrap gap-2">
               <button className="button-secondary" disabled={isTreePage && !rememberTrees} onClick={saveNow} type="button"><ButtonIcon>♡</ButtonIcon>Save locally</button>
-              <button className="button-primary" onClick={() => exportGraph('png')} type="button"><ButtonIcon>↓</ButtonIcon>Download</button>
+              <button className="button-primary" onClick={() => exportGraph('png')} type="button"><ButtonIcon>↓</ButtonIcon>{selectedChartType === 'supplydemand' ? 'Download PNG' : 'Download'}</button>
             </div>
           </div>
 

@@ -6,6 +6,7 @@ import SiteFooter from '../navigation/SiteFooter.astro';
 import SiteHeader from '../navigation/SiteHeader.astro';
 import type { ToolPageConfig } from '../../content/toolPages';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import SupplyDemandTemplates from './SupplyDemandTemplates.astro';
 import TreeTemplateGallery from './TreeTemplateGallery.astro';
 import TreeDiagramExample from './TreeDiagramExample.astro';
 import ProductBenefitChecks from '../ui/ProductBenefitChecks.astro';
@@ -34,7 +35,7 @@ const applicationSchema = {
 <BaseLayout title={config.title} description={config.metaDescription} canonical={config.canonical} structuredData={applicationSchema} breadcrumbs={breadcrumbs}>
   <SiteHeader />
 
-  <main id="main-content">
+  <main id="main-content" class:list={{"supply-page":config.editor.graphType === "supplydemand"}}>
     <section class="bg-surface-blue border-border border-b pb-12">
       <div class="page-shell pt-5 sm:pt-7">
         <Breadcrumbs items={breadcrumbs} />
@@ -52,6 +53,7 @@ const applicationSchema = {
     </section>
 
     {config.editor.graphType === 'tree' && <TreeTemplateGallery />}
+    {config.editor.graphType === 'supplydemand' && <SupplyDemandTemplates />}
 
     <section aria-labelledby="how-to-heading" class="page-shell py-14 sm:py-16">
       <div class="mx-auto max-w-5xl">
@@ -215,3 +217,11 @@ const applicationSchema = {
 
   <SiteFooter />
 </BaseLayout>
+<style>
+  @media(max-width:639px){
+    .supply-page :global(.mx-auto.mt-5.max-w-3xl){margin-top:.75rem}
+    .supply-page :global(h1){font-size:1.5rem;line-height:1.2}
+    .supply-page :global(.mx-auto.mt-5.max-w-3xl > p){font-size:.875rem;line-height:1.45;margin-top:.5rem}
+    .supply-page :global(#editor){margin-top:1rem}
+  }
+</style>

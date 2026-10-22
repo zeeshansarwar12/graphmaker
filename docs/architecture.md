@@ -177,3 +177,8 @@ ECharts chart families load on demand through cached dynamic imports. The shared
 Tree-page drafts use a separate IndexedDB workspace record containing up to 20 validated schema-v1 snapshots and an active draft ID. Writes are serialized and snapshot-cloned. A small localStorage preference persists the remember choice; disabling it deletes the workspace and legacy tree-page snapshot while keeping the in-memory drafts. Other graph pages keep their existing saving behavior. Initial template links wait for saved draft restoration.
 
 Equation mode preserves a validated optional tableBackup (table and settings) in schema-v1 snapshots, including local saves and project exports. Leaving equation mode restores it; reset/import replaces it explicitly. Older snapshots remain compatible.
+
+## Supply-demand scenario controls
+SupplyDemandInput is lazy-loaded within GraphEditor. Optional validated settings preserve format, two horizontal shifts, baseline visibility and print styling in schema-v1 projects. The adapter builds baseline/shifted ECharts series from at most 300 valid rows; a pure segment-intersection model reports only a unique nonnegative in-range intersection. Linear coefficient generation writes a sampled textbook schedule into the existing DataGrid. Existing import, IndexedDB save and export paths remain shared.
+
+Supply-demand drafts use a separate graph-maker-supply-drafts IndexedDB database. Snapshot the current graph before creating or switching drafts; persist the complete collection and active ID immediately as well as through shared autosave. Restore the collection before processing template fragments. Existing single-project records migrate on first collection save.

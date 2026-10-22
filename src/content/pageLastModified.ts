@@ -15,5 +15,5 @@ export const pageLastModified: Readonly<Record<string, string>> = {
   '/radar-chart-maker/': '2026-10-20',
   '/dot-plot-maker/': '2026-10-20',
   '/tree-graph-maker/': '2026-10-20',
-  '/supply-and-demand-graph-maker/': '2026-10-20',
+  '/supply-and-demand-graph-maker/': '2026-10-21',
 };

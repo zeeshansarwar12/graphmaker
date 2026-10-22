@@ -14,9 +14,9 @@
 | /pie-chart-maker/ | 55 | 136 | https://graphmaker.site/pie-chart-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /radar-chart-maker/ | 60 | 151 | https://graphmaker.site/radar-chart-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /scatter-plot-maker/ | 58 | 133 | https://graphmaker.site/scatter-plot-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
-| /supply-and-demand-graph-maker/ | 56 | 141 | https://graphmaker.site/supply-and-demand-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
+| /supply-and-demand-graph-maker/ | 53 | 147 | https://graphmaker.site/supply-and-demand-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /tree-graph-maker/ | 50 | 140 | https://graphmaker.site/tree-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /xy-graph-maker/ | 56 | 134 | https://graphmaker.site/xy-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 
-Checked 650 internal links.
+Checked 673 internal links.
 All built HTML assertions passed. Zero broken internal links.

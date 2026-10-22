@@ -50,6 +50,7 @@ interface GraphCanvasProps {
 }
 
 interface EChartProps {
+  compactInsight?: boolean;
   onRetryChart?: () => void;
   engine: ChartEngine;
   treeFitRequest?: number;
@@ -74,7 +75,7 @@ interface EChartProps {
 }
 
 function EChart({
-  onRetryChart, engine, treeFitRequest, treeNodes, onRenameTreeNode, canvasHeight, canvasWidth, axes, onPlotPoint, onViewportChange, snap,
+  compactInsight, onRetryChart, engine, treeFitRequest, treeNodes, onRenameTreeNode, canvasHeight, canvasWidth, axes, onPlotPoint, onViewportChange, snap,
   axisType,
   chartRef,
   insight,
@@ -216,7 +217,7 @@ function EChart({
     <div data-axis-type={axisType} data-chart-status={chartReady ? 'ready' : 'loading'} data-label-interval={labelInterval} data-series-count={seriesCount}>
       {!chartReady && <p role={engineError ? 'alert' : 'status'} className="text-text-muted mb-2 text-sm">{engineError ? <>The chart renderer could not load. <button type="button" className="text-brand underline" onClick={onRetryChart}>Save and reload editor</button></> : 'Loading chart…'}</p>}
       {warning && <p className="mb-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900" role="status">{warning}</p>}
-      {insight && <p className="border-border bg-surface-subtle mb-2 rounded-md border px-3 py-2 text-sm font-semibold" data-chart-insight role="status">{insight}</p>}
+      {insight && <p className={compactInsight ? "sr-only" : "border-border bg-surface-subtle mb-2 rounded-md border px-3 py-2 text-sm font-semibold"} data-chart-insight role="status">{insight}</p>}
       {treeNodes && <label className="text-text-muted mb-2 block text-xs">Edit a node
         <select ref={nodePickerRef} aria-label="Edit a node in preview" className="border-border ml-2 max-w-full rounded-md border bg-white p-2 text-sm" value="" onChange={event => {
           const node = treeNodes.find(node => node.id === event.target.value);
@@ -421,6 +422,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
           ? 'value'
           : chartType === 'line' && interpretation.shape === 'date-series' ? 'time' : 'category'}
         chartRef={chartRef}
+        compactInsight={chartType === 'supplydemand'}
         insight={'insight' in view && typeof view.insight === 'string' ? view.insight : undefined}
         labelInterval={labelInterval}
         legendSeries={legendSeries}

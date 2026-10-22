@@ -135,3 +135,15 @@ Keep the existing tree URL and shared editor. Promote Tree Diagram Maker as its 
 
 ## DEC-021 — Preserve tree drafts when opening templates
 Accepted: owner request, 20 October 2026. Supersedes destructive template replacement in DEC-020. Selection or gallery links open a new draft immediately; no Load template button or replacement dialog. Keep up to 20 diagrams, never silently discard older drafts, and expose My diagrams and explicit deletion. Remember my diagrams on this device is checked by default as a storage preference, not affirmative consent. Unchecking removes persistent tree workspace and legacy tree copies; drafts remain only in memory until the page closes. Store validated schema-v1 snapshots in IndexedDB with serialized writes and a small localStorage preference. No cloud storage or new dependency.
+
+## DEC-022 — Supply and demand templates and comparisons
+**Status:** Accepted (owner instruction, 21 October 2026). Extend the existing shared GraphEditor and ECharts adapter with six editable scenario presets, optional baseline curves/equilibrium, horizontal quantity shifts, textbook price schedules, bounded coefficient-to-table generation, and monochrome styling. Preserve legacy inverse-table defaults and schema-v1 saves. All data stays client-side. One canonical tool URL; no AI, Word/Excel guides, new backend, or separate app.
+
+## DEC-023 — Preserve supply-demand graphs when selecting templates
+Accepted: owner request, 21 October 2026. Templates open new drafts rather than replacing current work. My graphs switches complete snapshots (table, title, shifts, appearance). Separate validated IndexedDB workspace, serialized writes and a 20-graph limit preserve earlier graphs across refreshes. Migrate the legacy single saved graph when no collection exists. Never evict silently; explicit deletion is confirmed. Other graph pages keep their existing storage.
+
+## DEC-024 — Supply-demand user walkthrough refinements
+Accepted: owner approval, 21 October 2026. Improve narrow-screen graph legibility and control proximity without changing model math or saved project structure. Keep price/quantity values in a comparison table, reduce duplicate original series and numerical label clutter, expose original-data/shift relationship, compact mobile discovery, and report export generation/failure without claiming a file was saved.
+
+## DEC-025 — Tool-first supply-demand learning
+Accepted: owner instruction, 21 October 2026. Replace the earlier prose learning block with compact actionable reference cards and expandable answers on the same canonical tool page. Add direct equation/shift input links, four practice problems, short slope/market/land/schedule explanations and primary-source references. No additional article URLs or broad feature claims.

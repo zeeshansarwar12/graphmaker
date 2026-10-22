@@ -4,7 +4,7 @@ import { expect, test } from '@playwright/test';
 test('serves a complete Supply and Demand page with equilibrium on numeric axes', async ({ page }) => {
   await openPage(page, '/supply-and-demand-graph-maker/');
 
-  await expect(page).toHaveTitle('Supply and Demand Graph Maker — Free Online | GraphMaker');
+  await expect(page).toHaveTitle('Supply and Demand Curve Generator — Free | GraphMaker');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /detect in-range equilibrium/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/supply-and-demand-graph-maker\/$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Supply and Demand Graph Maker' })).toBeVisible();
@@ -18,9 +18,9 @@ test('serves a complete Supply and Demand page with equilibrium on numeric axes'
   await expect(chart).toHaveAttribute('data-axis-type', 'value');
   await expect(chart).toHaveAttribute('data-series-count', '2');
   await expect(chart).toContainText('7 quantity points');
-  await expect(page.locator('[data-chart-insight]')).toHaveText('Equilibrium: quantity 45, value 55.');
+  await expect(page.locator('[data-chart-insight]')).toHaveText('Equilibrium: quantity 45.00, price 55.00.');
 
-  for (const name of ['Paste data', 'Upload CSV', 'Upload Excel', 'Save locally', 'Download']) {
+  for (const name of ['Paste data', 'Upload CSV', 'Upload Excel', 'Save locally', 'Download PNG']) {
     await expect(page.getByRole('button', { name, exact: true })).toBeVisible();
   }
   for (const heading of [
@@ -48,7 +48,7 @@ test('serves a complete Supply and Demand page with equilibrium on numeric axes'
   await reloadPage(page);
   await page.getByRole('button', { name: 'Customize' }).click();
   await expect(page.getByLabel('Show equilibrium marker')).not.toBeChecked();
-  await expect(page.locator('[data-chart-insight]')).toHaveText('Equilibrium: quantity 45, value 55.');
+  await expect(page.locator('[data-chart-insight]')).toHaveText('Equilibrium: quantity 45.00, price 55.00.');
 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(chart.locator('canvas')).toBeVisible();
