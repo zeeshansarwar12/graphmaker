@@ -1,0 +1,39 @@
+name: Linux canvas diagnostic
+
+on:
+  push:
+    branches: ['codex/diagnose-linux-canvas']
+
+permissions:
+  contents: read
+  checks: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Install existing Chromium and Linux dependencies
+        run: npx playwright install --with-deps chromium
+      - name: Capture four fresh immutable-preview sessions without retries
+        run: node scripts/canvas-diagnostic.mjs
+      - name: Preserve every session and failure
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: canvas-diagnostic-${{ github.run_id }}-${{ github.run_attempt }}
+          path: canvas-diagnostic-evidence/
+          if-no-files-found: error
+          retention-days: 14
