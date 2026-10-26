@@ -34,8 +34,7 @@ for(const mode of ['autosave','manual save'] as const) {
     await expect(page.getByRole('alert')).toHaveText(exportError);
   });
 
-  for(const delayedObservation of mode==='autosave'?[false,true]:[false]) {
-  test(`${mode} completion preserves capacity feedback and all drafts${delayedObservation?' despite a delayed stale observation':''}`,async({page},testInfo)=>{
+  test(`${mode} completion preserves capacity feedback and all drafts`,async({page},testInfo)=>{
     await instrumentStorage(page);await openPage(page,'/supply-and-demand-graph-maker/');
     await page.getByLabel('Demand, row 1',{exact:true}).fill('123');
     const selector=page.getByLabel('My graphs',{exact:true});const first=await selector.inputValue();
@@ -45,16 +44,7 @@ for(const mode of ['autosave','manual save'] as const) {
     const target={kind:'workspace' as const,activeId:active,value:'124'};
     if(mode==='autosave') {
       await holdNext(page,target);
-      // Recreate the old mechanism: sample before the write, then delay only
-      // delivery to the test driver. Browser writes/timers continue normally.
-      const sampled=delayedObservation?await page.evaluate(()=>({at:Date.now(),held:window.feedbackStorageGate.snapshot().held})):null;
-      const delayed=sampled?new Promise<typeof sampled>(resolve=>setTimeout(()=>resolve(sampled),6000)):null;
       await page.getByLabel('Quantity demanded, row 1',{exact:true}).fill('124');
-      if(delayed){
-        const stale=await delayed;
-        expect(stale.held).toBeNull();
-        await testInfo.attach('synthetic-delayed-observation',{body:JSON.stringify({...stale,returnedAt:Date.now(),delayMs:6000}),contentType:'application/json'});
-      }
     } else {
       await page.getByLabel('Quantity demanded, row 1',{exact:true}).fill('124');await settle(page);
       await holdNext(page,target);await page.getByRole('button',{name:'Save locally',exact:true}).click();
@@ -71,7 +61,6 @@ for(const mode of ['autosave','manual save'] as const) {
     await selector.selectOption(first);
     await expect(page.getByLabel('Demand, row 1',{exact:true})).toHaveValue('123');
   });
-  }
 }
 
 for(const withExportWarning of [false,true]) {

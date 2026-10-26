@@ -3,9 +3,13 @@ import {instrumentStorage,holdNext,waitHeld,attachStorageTelemetry} from './stor
 
 test.afterEach(async({page})=>{await attachStorageTelemetry(page);});
 
-test('storage barrier ignores another draft and an older value, then latches only the intended transaction',async({page})=>{
+test('storage barrier ignores another draft and an older value despite a delayed stale observation',async({page},testInfo)=>{
   await instrumentStorage(page);await page.goto('/privacy/',{waitUntil:'domcontentloaded'});
   const generation=await holdNext(page,{kind:'workspace',activeId:'intended',value:'124'});
+  // Delay delivery of a known pre-write sample, while native IndexedDB continues.
+  // Keep this protocol control separate from the six complete UI regressions.
+  const sampled=await page.evaluate(()=>({at:Date.now(),held:window.feedbackStorageGate.snapshot().held}));
+  const delayed=new Promise<typeof sampled>(resolve=>setTimeout(()=>resolve(sampled),6000));
   await page.evaluate(async()=>{
     const db=await new Promise<IDBDatabase>((resolve,reject)=>{
       const open=indexedDB.open('graph-maker-supply-drafts',1);
@@ -22,7 +26,12 @@ test('storage barrier ignores another draft and an older value, then latches onl
     }
     db.close();
   });
+  const stale=await delayed;
+  expect(stale.held).toBeNull();
+  await testInfo.attach('synthetic-delayed-observation',{body:JSON.stringify({...stale,returnedAt:Date.now(),delayMs:6000}),contentType:'application/json'});
   const held=await waitHeld(page);
+  expect(held.committedAt).toBeGreaterThanOrEqual(sampled.at);
+  expect(held.committedAt).toBeLessThan(held.resolvedAt);
   expect(held.generation).toBe(generation);
   const before=await page.evaluate(()=>window.feedbackStorageGate.snapshot());
   expect(before.events.filter(event=>event.event==='matched-write')).toHaveLength(1);

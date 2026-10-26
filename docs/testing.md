@@ -160,10 +160,13 @@ which remains bounded by the test timeout. Attachments record transaction IDs,
 native commit, callback arrival, browser wait resolution and driver return times.
 Events are captured before reload as well as after each test, including failures.
 
-The added capacity control delays delivery of a pre-write observation by 6000 ms
-while browser timers and IndexedDB continue. It must preserve warning, draft count,
-active value `124` after reload and earlier value `123`. `storage-barrier.spec.ts`
-also checks wrong-draft/older-value rejection and the missing-completion deadline.
+The focused transaction control in `storage-barrier.spec.ts` delays delivery of a
+pre-write observation by 6000 ms while IndexedDB continues. Its twenty-draft
+snapshot must match the intended active draft's value `124`, rejecting another
+draft and the older value `123`. It also checks the missing-completion deadline.
+The six UI regressions separately preserve warning, draft count, active value `124`
+after reload and the earlier draft's value `123`, without duplicating their full
+walkthrough merely to inject driver latency.
 Run these with `npx playwright test save-feedback storage-barrier --workers=4 --retries=0`.
 This hardens observation; it does not establish the historic timeout's root cause
 or clear the separate unresolved Linux rendering risk.
