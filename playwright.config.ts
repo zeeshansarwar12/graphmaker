@@ -7,7 +7,7 @@ export default defineConfig({
   globalSetup: deployedBaseURL ? undefined : './tests/e2e/global-setup.ts',
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
-  retries: process.env.CI ? 2 : 0,
+  retries: 0,
   reporter: 'html',
   use: {
     baseURL: deployedBaseURL ?? 'http://127.0.0.1:4321',
@@ -15,7 +15,20 @@ export default defineConfig({
   },
   projects: [
     {
+      name: 'seo-snapshots',
+      testMatch: 'seo-snapshots.spec.ts',
+      outputDir: './test-results/seo-snapshots',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'seo-aggregate',
+      testMatch: 'seo-aggregate.spec.ts',
+      dependencies: ['seo-snapshots'],
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
       name: 'chromium',
+      testIgnore: ['seo-snapshots.spec.ts', 'seo-aggregate.spec.ts'],
       use: { ...devices['Desktop Chrome'] },
     },
   ],

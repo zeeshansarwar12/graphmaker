@@ -129,3 +129,16 @@ Specialist tests use Change chart type instead of desktop radios. SEO tests and 
 Horizontal bar tests cover horizontal defaults, ordered categories, editing, a second series, switching orientation, local restoration, SVG export, separation from the bar pillar, mobile overflow and connected schema. HTML audit expects fourteen tool routes and nineteen normal HTML routes, plus the 404 page.
 
 Bar template regressions validate all nine datasets, clone isolation and bounded workspace parsing. Browser tests cover static galleries, click/select/direct-fragment loading after restoration, preservation of edited titles/data/orientation across draft switching and refresh, deletion, page isolation and mobile overflow.
+
+## Hydrated SEO route coverage
+SEO hero, related-tool/schema and footer/selector checks run independently by route.
+`seo-snapshots` captures all 20 linked routes after the shared hydration/inert waits,
+including the original metadata checks for exactly 18 indexable routes. The dependent
+`seo-aggregate` project requires the complete fresh result set before checking
+cross-page title/description/H1 uniqueness, internal-link resolution and orphans.
+Playwright clears snapshot output before each invocation; failed collectors publish
+no record and block the dependent gate. See [assertion conservation](seo-test-conservation.md).
+Run the complete SEO group with `npx playwright test seo- --workers=4 --retries=0`
+or `--workers=1`. Retries are disabled for local and CI runs. Keep the default
+30s test / 5s assertion budgets. Do not use
+`--no-deps` for aggregation or reuse records from an earlier invocation.

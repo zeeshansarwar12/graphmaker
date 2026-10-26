@@ -1,77 +1,7 @@
 import { openPage } from './navigation';
 import { expect, test } from '@playwright/test';
 
-const coreToolRoutes = [
-  '/bar-graph-maker/',
-  '/line-graph-maker/',
-  '/pie-chart-maker/',
-  '/xy-graph-maker/',
-  '/equation-graph-maker/',
-  '/scatter-plot-maker/',
-  '/histogram-maker/',
-  '/box-plot-maker/',
-  '/radar-chart-maker/',
-] as const;
-
-const specialistToolRoutes = ['/stacked-bar-graph-maker/', '/horizontal-bar-graph-maker/', '/grouped-bar-chart-maker/', '/tree-graph-maker/', '/dot-plot-maker/', '/supply-and-demand-graph-maker/'] as const;
-const toolRoutes = [...coreToolRoutes, ...specialistToolRoutes] as const;
-const indexableRoutes = ['/', '/tools/', '/about/', ...toolRoutes] as const;
-const allLinkedRoutes = [...indexableRoutes, '/privacy/', '/terms/'] as const;
-const productionOrigin = 'https://graphmaker.site';
-
-test('every indexable page has unique production metadata and one logical H1', async ({ page, request }) => {
-  const titles = new Set<string>();
-  const descriptions = new Set<string>();
-  const h1Texts = new Set<string>();
-
-  for (const route of indexableRoutes) {
-    expect((await request.get(route)).status(), route).toBe(200);
-    await openPage(page, route);
-
-    const title = await page.title();
-    const description = await page.locator('meta[name="description"]').getAttribute('content');
-    const h1 = page.locator('h1');
-    const h1Text = (await h1.innerText()).trim();
-    const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
-
-    expect(title, route).toBeTruthy();
-    expect(description, route).toBeTruthy();
-    expect(await h1.count(), route).toBe(1);
-    expect(canonical, route).toBeTruthy();
-    expect(canonical, route).toBe(new URL(route, productionOrigin).href);
-    expect(await page.locator('meta[name="robots"]').getAttribute('content'), route).toBe('index,follow');
-    if (route === '/') {
-      await expect(page.locator('meta[name="google-site-verification"]')).toHaveAttribute('content', 'r9NYNACi391MLcXqqUd0w48ayLHu3l1TZ4zuUJO6dEY');
-      await expect(page.locator('meta[name="msvalidate.01"]')).toHaveAttribute('content', 'ADA32A2FC73ADC93B80B1231531C0854');
-    } else {
-      await expect(page.locator('meta[name="google-site-verification"],meta[name="msvalidate.01"]')).toHaveCount(0);
-    }
-    expect(title.length, route).toBeLessThanOrEqual(60);
-    expect(description!.length, route).toBeGreaterThanOrEqual(70);
-    expect(description!.length, route).toBeLessThanOrEqual(160);
-    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image');
-    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', `${productionOrigin}/images/graphmaker-social.png`);
-    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute('content', `${productionOrigin}/images/graphmaker-social.png`);
-    expect(await page.locator('meta[property="og:title"]').getAttribute('content'), route).toBe(title);
-    expect(await page.locator('meta[property="og:description"]').getAttribute('content'), route).toBe(description);
-    expect(await page.locator('meta[property="og:url"]').getAttribute('content'), route).toBe(canonical);
-
-    expect(titles.has(title), `duplicate title: ${title}`).toBe(false);
-    expect(descriptions.has(description!), `duplicate description: ${description}`).toBe(false);
-    expect(h1Texts.has(h1Text), `duplicate H1: ${h1Text}`).toBe(false);
-    titles.add(title);
-    descriptions.add(description!);
-    h1Texts.add(h1Text);
-
-    const levels = await page.locator('h1,h2,h3,h4,h5,h6').evaluateAll((headings) => (
-      headings.map((heading) => Number(heading.tagName.slice(1)))
-    ));
-    expect(levels[0], `${route} should begin with H1`).toBe(1);
-    for (let index = 1; index < levels.length; index += 1) {
-      expect(levels[index] - levels[index - 1], `${route} skips a heading level`).toBeLessThanOrEqual(1);
-    }
-  }
-});
+import { allLinkedRoutes, indexableRoutes, productionOrigin, toolRoutes } from './seo-routes';
 
 test('homepage and tools hub expose every graph tool', async ({ page }) => {
   await openPage(page, '/');
@@ -86,8 +16,8 @@ test('homepage and tools hub expose every graph tool', async ({ page }) => {
   await expect(page.locator('a[href="/tools/"]').first()).toBeVisible();
 });
 
-test('every graph-maker hero uses the shared green benefit checks', async ({ page }) => {
-  for (const route of ['/', ...toolRoutes]) {
+for (const route of ['/', ...toolRoutes]) {
+  test(`every graph-maker hero uses the shared green benefit checks — ${route}`, async ({ page }) => {
     await openPage(page, route);
     const benefits = page.locator('[data-product-benefits]');
     await expect(benefits, route).toBeVisible();
@@ -97,11 +27,11 @@ test('every graph-maker hero uses the shared green benefit checks', async ({ pag
     await expect(benefits).toContainText('No watermark');
     await expect(benefits).toContainText('No signup');
     await expect(benefits).toContainText('Data stays in your browser');
-  }
-});
+  });
+}
 
-test('tool pages have distinct related-tool links and valid breadcrumb schema', async ({ page }) => {
-  for (const route of toolRoutes) {
+for (const route of toolRoutes) {
+  test(`tool pages have distinct related-tool links and valid breadcrumb schema — ${route}`, async ({ page }) => {
     await openPage(page, route);
     const related = page.locator('section[aria-labelledby="related-heading"] a[href]');
     const hrefs = await related.evaluateAll((links) => links.map((link) => link.getAttribute('href')));
@@ -125,11 +55,11 @@ test('tool pages have distinct related-tool links and valid breadcrumb schema', 
       expect(webpage.isPartOf).toEqual({ '@id': productionOrigin + '/bar-graph-maker/#webpage' });
     }
     expect(new URL(schema.itemListElement[2].item).pathname).toBe(route);
-  }
-});
+  });
+}
 
-test('homepage shows chart icons, specialist pages use a compact selector, and footers link all tools', async ({ page }) => {
-  for (const route of allLinkedRoutes) {
+for (const route of allLinkedRoutes) {
+  test(`homepage shows chart icons, specialist pages use a compact selector, and footers link all tools — ${route}`, async ({ page }) => {
     await openPage(page, route);
     for (const toolRoute of toolRoutes) await expect(page.locator(`footer a[href="${toolRoute}"]`)).toHaveCount(1);
     if (route === '/' || toolRoutes.includes(route as typeof toolRoutes[number])) {
@@ -146,8 +76,8 @@ test('homepage shows chart icons, specialist pages use a compact selector, and f
         await expect(selector.locator('option')).toHaveCount(12);
       }
     }
-  }
-});
+  });
+}
 
 test('sitemap and robots expose only intended production URLs', async ({ request }) => {
   const sitemap = await (await request.get('/sitemap.xml')).text();
@@ -171,34 +101,6 @@ test('sitemap and robots expose only intended production URLs', async ({ request
   expect(robots).toContain('Allow: /');
   expect(robots).toContain(`Sitemap: ${productionOrigin}/sitemap.xml`);
   expect(robots).not.toContain('Disallow:');
-});
-
-test('all internal links resolve and no production page is orphaned', async ({ page, request }) => {
-  const linksByRoute = new Map<string, Set<string>>();
-
-  for (const route of allLinkedRoutes) {
-    await openPage(page, route);
-    const hrefs = await page.locator('a[href]').evaluateAll((links) => links.map((link) => link.getAttribute('href') ?? ''));
-    const internalPaths = new Set<string>();
-    for (const href of hrefs) {
-      const url = new URL(href, 'http://localhost:4321');
-      if (url.origin !== 'http://localhost:4321') continue;
-      if (url.pathname !== route || !url.hash) internalPaths.add(url.pathname);
-      if (url.pathname === route && url.hash) {
-        expect(await page.locator(url.hash).count(), `${route}${url.hash}`).toBe(1);
-      }
-    }
-    linksByRoute.set(route, internalPaths);
-  }
-
-  const linkedPaths = new Set([...linksByRoute.values()].flatMap((paths) => [...paths]));
-  for (const route of allLinkedRoutes) {
-    expect((await request.get(route)).status(), route).toBe(200);
-    if (route !== '/') expect(linkedPaths.has(route), `${route} is orphaned`).toBe(true);
-  }
-  for (const path of linkedPaths) {
-    expect((await request.get(path)).status(), `broken internal link: ${path}`).toBeLessThan(400);
-  }
 });
 
 test('query strings do not create alternate canonicals and utility routes stay noindex', async ({ page }) => {
