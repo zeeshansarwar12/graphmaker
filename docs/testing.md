@@ -49,6 +49,13 @@ Specialist flows:
 - histogram generation
 
 ## Regression policy
+`secondary-series.spec.ts` verifies cold-document Box Plot outlier marks and Scatter
+regression lines using canvas pixels and actual SVG path geometry / decoded PNG
+pixels. Each runs at desktop and mobile widths, both directly and after another
+chart family was loaded in the same document. Text summaries and regression
+equation/R² are checked alongside rendered output; a ready canvas or an option
+object alone cannot detect an unregistered secondary series.
+
 Every bug in parsing, calculations, persistence, or chart configuration should receive a regression test before or alongside the fix.
 
 ## Build gate
