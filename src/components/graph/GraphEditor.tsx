@@ -124,11 +124,11 @@ export function GraphEditor({ config }: GraphEditorProps) {
     if(rememberTreesRef.current) await writeTreeWorkspace({activeId:activeDraftRef.current,drafts:draftsRef.current});
   },[isTreePage,isSupplyPage,isBarPage,config.slug,storeDraft]);
   function restoreDraft(project:GraphProject){setIsSampleData(false);tableBackupRef.current=project.tableBackup;setData(project.data);dispatchSettings({type:'replace-settings',value:project.settings});setSelectedChartType(project.graphType);createdAtRef.current=project.createdAt;setTreeFitRequest(value=>value+1);setSavedState(null);}
-  function openDraft(id:string){storeDraft(snapshotTree());const draft=draftsRef.current.find(item=>item.id===id);if(!draft)return;activeDraftRef.current=id;restoreDraft(draft.project);setDraftRevision(value=>value+1);if(isSupplyPage||isBarPage)void persistProject(draft.project).catch(()=>setProjectError('Could not save your graph collection. Download a project backup to keep your work.'));}
+  function openDraft(id:string){storeDraft(snapshotTree());const draft=draftsRef.current.find(item=>item.id===id);if(!draft)return;activeDraftRef.current=id;restoreDraft(draft.project);setDraftRevision(value=>value+1);if(isSupplyPage||isBarPage)void persistProject(draft.project).catch(()=>setStorageError('Could not save your graph collection. Download a project backup to keep your work.'));}
   async function changeRemember(checked:boolean){
     rememberTreesRef.current=checked;setRememberTrees(checked);
-    try{localStorage.setItem(treeRememberKey,String(checked));if(checked)await persistProject(snapshotTree());else{await writeTreeWorkspace(null);await deleteCurrentProject(config.slug);}setIsStorageAvailable(true);}
-    catch{setIsStorageAvailable(false);setProjectError('Could not update saved copies. Browser storage may be unavailable. Download a project backup to keep your work.');}
+    try{localStorage.setItem(treeRememberKey,String(checked));if(checked)await persistProject(snapshotTree());else{await writeTreeWorkspace(null);await deleteCurrentProject(config.slug);}setIsStorageAvailable(true);setStorageError(null);}
+    catch{setIsStorageAvailable(false);setStorageError('Could not update saved copies. Browser storage may be unavailable. Download a project backup to keep your work.');}
   }
   const [equationBusy, setEquationBusy] = useState(true);
   const [treeFitRequest, setTreeFitRequest] = useState(0);
@@ -138,6 +138,8 @@ export function GraphEditor({ config }: GraphEditorProps) {
   const [isResetConfirming, setIsResetConfirming] = useState(false);
   const [isStorageAvailable, setIsStorageAvailable] = useState(true);
   const [projectError, setProjectError] = useState<string | null>(null);
+  // Storage completion owns only storage feedback, never export or capacity errors.
+  const [storageError, setStorageError] = useState<string | null>(null);
   const [projectNotice, setProjectNotice] = useState<string | null>(null);
   const [selectedChartType, setSelectedChartType] = useState<RenderedChartType>(config.graphType);
   const [savedState, setSavedState] = useState<{ data: TabularData; settings: ReturnType<typeof createConfiguredSettings>; chartType: RenderedChartType } | null>(null);
@@ -158,7 +160,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     activeDraftRef.current=crypto.randomUUID();restoreDraft(next);storeDraft(next);setDraftRevision(value=>value+1);
     window.history.replaceState(null,'','#editor');
     setProjectError(null);setProjectNotice(`Opened ${template.name}. Your previous graph is available in My graphs.`);
-    void persistProject(next).catch(()=>setProjectError('Your graphs remain available this session, but saving failed. Download project backups to keep them.'));
+    void persistProject(next).catch(()=>setStorageError('Your graphs remain available this session, but saving failed. Download project backups to keep them.'));
     window.requestAnimationFrame(()=>previewSectionRef.current?.scrollIntoView({behavior:'smooth',block:'start'}));
   }
 
@@ -445,7 +447,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
         if (!cancelled) {
           setIsStorageAvailable(false);
           setSaveStatus('error');
-          setProjectError('Local saving is unavailable in this browser. Export a project file to keep a copy.');
+          setStorageError('Local saving is unavailable in this browser. Export a project file to keep a copy.');
         }
       } finally {
         if (!cancelled) setIsProjectReady(true);
@@ -471,14 +473,14 @@ export function GraphEditor({ config }: GraphEditorProps) {
 
       void persistProject(project)
         .then(() => {
-          setProjectError(null);
+          setStorageError(null);
           setSavedState({ data, settings, chartType: selectedChartType });
           setSaveStatus('saved');
         })
         .catch(() => {
           setIsStorageAvailable(false);
           setSaveStatus('error');
-          setProjectError('Local saving is unavailable in this browser. Export a project file to keep a copy.');
+          setStorageError('Local saving is unavailable in this browser. Export a project file to keep a copy.');
         });
     }, 350);
 
@@ -559,7 +561,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
         settings,
       }));
       setIsStorageAvailable(true);
-      setProjectError(null);
+      setStorageError(null);
       setProjectNotice(null);
       setSavedState({ data, settings, chartType: selectedChartType });
       setSaveStatus('saved');
@@ -567,7 +569,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     } catch {
       setIsStorageAvailable(false);
       setSaveStatus('error');
-      setProjectError('Local saving is unavailable in this browser. Export a project file to keep a copy.');
+      setStorageError('Local saving is unavailable in this browser. Export a project file to keep a copy.');
       return false;
     }
   }
@@ -773,7 +775,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
           {isBarPage && <Suspense fallback={<p role="status">Loading bar templates…</p>}><BarTemplateControls page={config.slug} ready={isProjectReady} drafts={draftsRef.current} activeId={activeDraftRef.current} title={settings.title} onApply={applyBarTemplate} onOpen={openDraft} onDelete={()=>{
             if(draftsRef.current.length<2||!window.confirm('Delete this graph from My graphs? Download a project backup first if needed.'))return;
             draftsRef.current=draftsRef.current.filter(d=>d.id!==activeDraftRef.current);const next=draftsRef.current[0];activeDraftRef.current=next.id;restoreDraft(next.project);setDraftRevision(value=>value+1);
-            void persistProject(next.project).catch(()=>setProjectError('Could not update saved graphs. Download a project backup.'));
+            void persistProject(next.project).catch(()=>setStorageError('Could not update saved graphs. Download a project backup.'));
           }} /></Suspense>}
           {isSupplyPage && <div className="border-border bg-surface-subtle mb-4 rounded-md border p-3" data-draft-revision={draftRevision}>
             <label className="block text-sm font-semibold">My graphs<select aria-label="My graphs" className="border-border mt-2 min-h-10 w-full rounded-md border bg-white px-3" value={activeDraftRef.current} onChange={event=>openDraft(event.target.value)}>
@@ -781,7 +783,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
               {draftsRef.current.map((draft,index)=><option key={draft.id} value={draft.id}>{draft.id===activeDraftRef.current?settings.title:draft.project.settings.title} · {index+1}</option>)}
             </select></label>
             <p className="text-text-muted mt-2 text-xs leading-5">Templates keep previous graphs. Up to 20 saved in this browser.</p>
-            {draftsRef.current.length>1 && <button className="text-text-muted mt-2 text-sm underline" type="button" onClick={()=>{if(!window.confirm('Delete this graph from My graphs? Download a project backup first if needed.'))return;draftsRef.current=draftsRef.current.filter(d=>d.id!==activeDraftRef.current);const next=draftsRef.current[0];activeDraftRef.current=next.id;restoreDraft(next.project);setDraftRevision(value=>value+1);void persistProject(next.project).catch(()=>setProjectError('Could not update saved graphs. Download a project backup.'));}}>Delete current graph</button>}
+            {draftsRef.current.length>1 && <button className="text-text-muted mt-2 text-sm underline" type="button" onClick={()=>{if(!window.confirm('Delete this graph from My graphs? Download a project backup first if needed.'))return;draftsRef.current=draftsRef.current.filter(d=>d.id!==activeDraftRef.current);const next=draftsRef.current[0];activeDraftRef.current=next.id;restoreDraft(next.project);setDraftRevision(value=>value+1);void persistProject(next.project).catch(()=>setStorageError('Could not update saved graphs. Download a project backup.'));}}>Delete current graph</button>}
           </div>}
           {isTreePage && <div className="border-border mb-4 rounded-md border p-3" data-draft-revision={draftRevision}>
             <label className="flex items-start gap-2 text-sm font-semibold"><input type="checkbox" disabled={!isProjectReady} className="mt-1" checked={rememberTrees} onChange={event=>{void changeRemember(event.target.checked);}}/>Remember my diagrams on this device</label>
@@ -813,7 +815,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
               activeDraftRef.current=crypto.randomUUID();
               const next=createProjectSnapshot({createdAt:new Date().toISOString(),data:createSupplyDemandTemplateData(),graphType:'supplydemand',settings:{...settings,title:template.name,xAxisTitle:'Quantity',yAxisTitle:'Price',supplyDemandInputMode:'schedule',supplyDemandDemandShift:template.demandShift,supplyDemandSupplyShift:template.supplyShift,supplyDemandShowOriginal:true,supplyDemandDemandColumnId:null,supplyDemandSupplyColumnId:null,supplyDemandXColumnId:null}});
               storeDraft(next);restoreDraft(next);setDraftRevision(value=>value+1);setIsSampleData(true);setProjectNotice('Opened a new graph. Your previous graph is available in My graphs.');
-              if(isSupplyPage)void persistProject(next).catch(()=>setProjectError('Your graphs are available for this session, but saving failed. Download project backups to keep them.'));
+              if(isSupplyPage)void persistProject(next).catch(()=>setStorageError('Your graphs are available for this session, but saving failed. Download project backups to keep them.'));
               return true;
             }}/></Suspense>
             : <><DataGrid data={data} isSampleData={isSampleData} onChange={updateData} />{selectedChartType === 'xy' && <div className="mt-3"><p className="text-sm text-text-muted">Use X followed by one or more Y columns. Optional point names appear with coordinate labels.</p>{!data.columns.some(column => column.kind === 'label') && <button className="button-secondary mt-2" onClick={addPointNames} type="button">Add point names</button>}</div>}</>}
@@ -1001,6 +1003,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
           )}
 
           {projectError && <p className="mt-3 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800" role="alert">{projectError}</p>}
+          {storageError && <p className="mt-3 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800" role="alert">{storageError}</p>}
           {projectNotice && <p className="text-success mt-3 text-sm font-medium" role="status">{projectNotice}</p>}
         </section>
       </div>
