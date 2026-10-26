@@ -1,2 +1,2 @@
-import { BoxplotChart } from 'echarts/charts';
-export default [BoxplotChart];
+import { BoxplotChart, ScatterChart } from 'echarts/charts';
+export default [BoxplotChart, ScatterChart];
