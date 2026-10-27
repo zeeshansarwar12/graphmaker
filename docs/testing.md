@@ -49,6 +49,13 @@ Specialist flows:
 - histogram generation
 
 ## Regression policy
+`secondary-series.spec.ts` verifies cold-document Box Plot outlier marks and Scatter
+regression lines using canvas pixels and actual SVG path geometry / decoded PNG
+pixels. Each runs at desktop and mobile widths, both directly and after another
+chart family was loaded in the same document. Text summaries and regression
+equation/R² are checked alongside rendered output; a ready canvas or an option
+object alone cannot detect an unregistered secondary series.
+
 Every bug in parsing, calculations, persistence, or chart configuration should receive a regression test before or alongside the fix.
 
 ## Build gate
@@ -122,3 +129,44 @@ Specialist tests use Change chart type instead of desktop radios. SEO tests and 
 Horizontal bar tests cover horizontal defaults, ordered categories, editing, a second series, switching orientation, local restoration, SVG export, separation from the bar pillar, mobile overflow and connected schema. HTML audit expects fourteen tool routes and nineteen normal HTML routes, plus the 404 page.
 
 Bar template regressions validate all nine datasets, clone isolation and bounded workspace parsing. Browser tests cover static galleries, click/select/direct-fragment loading after restoration, preservation of edited titles/data/orientation across draft switching and refresh, deletion, page isolation and mobile overflow.
+
+## Hydrated SEO route coverage
+SEO hero, related-tool/schema and footer/selector checks run independently by route.
+`seo-snapshots` captures all 20 linked routes after the shared hydration/inert waits,
+including the original metadata checks for exactly 18 indexable routes. The dependent
+`seo-aggregate` project requires the complete fresh result set before checking
+cross-page title/description/H1 uniqueness, internal-link resolution and orphans.
+Playwright clears snapshot output before each invocation; failed collectors publish
+no record and block the dependent gate. See [assertion conservation](seo-test-conservation.md).
+Run the complete SEO group with `npx playwright test seo- --workers=4 --retries=0`
+or `--workers=1`. Retries are disabled for local and CI runs. Keep the default
+30s test / 5s assertion budgets. Do not use
+`--no-deps` for aggregation or reuse records from an earlier invocation.
+
+## Save-feedback storage barrier
+
+`save-feedback.spec.ts` retains the six warning/capacity/storage-recovery regressions.
+The test-only `storage-gate.ts` observes native IndexedDB commit and callback arrival,
+then withholds only the matched application's completion notification until release.
+Capacity cases match the active draft, twenty drafts and edited value `124`; cleared
+homepage cases match the cleared grid snapshot. Unrelated writes cannot satisfy a
+barrier. Native aborts still exercise the application's rejection/recovery path.
+
+The browser-local event is latched, so a delayed driver response cannot turn an
+earlier sampled zero into a false storage timeout. Missing completion still rejects
+after 5000 ms of browser waiting; the overall test remains 30 seconds, with zero
+retries. This separates the storage deadline from protocol/driver response latency,
+which remains bounded by the test timeout. Attachments record transaction IDs,
+native commit, callback arrival, browser wait resolution and driver return times.
+Events are captured before reload as well as after each test, including failures.
+
+The focused transaction control in `storage-barrier.spec.ts` delays delivery of a
+pre-write observation by 6000 ms while IndexedDB continues. Its twenty-draft
+snapshot must match the intended active draft's value `124`, rejecting another
+draft and the older value `123`. It also checks the missing-completion deadline.
+The six UI regressions separately preserve warning, draft count, active value `124`
+after reload and the earlier draft's value `123`, without duplicating their full
+walkthrough merely to inject driver latency.
+Run these with `npx playwright test save-feedback storage-barrier --workers=4 --retries=0`.
+This hardens observation; it does not establish the historic timeout's root cause
+or clear the separate unresolved Linux rendering risk.
