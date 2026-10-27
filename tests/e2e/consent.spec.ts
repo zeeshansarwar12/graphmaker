@@ -110,6 +110,19 @@ test('another tab receives withdrawal without losing its editor state', async ({
   await expect.poll(() => other.evaluate(() => window['ga-disable-G-JM5S5JGFJJ'])).toBe(true);
   expect(await other.evaluate(() => window.adsbygoogle?.pauseAdRequests)).toBe(1);
   await expect(other.getByLabel('Sales, row 1', { exact: true })).toHaveValue('88');
+  await other.evaluate(() => window.addEventListener('storage', event => {
+    if (event.key === 'graphmaker-privacy-refusal-v1' && event.newValue === null) {
+      document.documentElement.dataset.consentRestrictionCleared = 'true';
+    }
+  }));
+  await page.getByRole('button', { name: 'Manage Google consent', exact: true }).click();
+  await setConsent(page, consented, Object.fromEntries(Object.keys(allGranted).map(key => [key, 2])));
+  await expect(other.locator('html')).toHaveAttribute('data-consent-restriction-cleared', 'true');
+  expect(await page.evaluate(() => localStorage.getItem('graphmaker-privacy-refusal-v1'))).toBeNull();
+  // This tab still has an earlier CMP grant cached. A restriction being removed
+  // in another tab is not evidence of a fresh grant here.
+  expect(await other.evaluate(() => window['ga-disable-G-JM5S5JGFJJ'])).toBe(true);
+  expect(await other.evaluate(() => window.adsbygoogle?.pauseAdRequests)).toBe(1);
 });
 
 test('blocked preference storage keeps page-only refusal and the editor available', async ({ page }) => {

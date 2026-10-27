@@ -166,6 +166,8 @@ The shared layout queues four denied Consent Mode v2 defaults before any GA conf
 
 The external CMP can contact Google and perform delivery/ad-block detection before the site's gated SDKs load. Basic GA mode is not a claim of zero CMP/advertising-domain network traffic. In the observed non-applicable callback, Google omits TCF eventStatus; that omission is accepted only with explicit gdprApplies=false and loaded CMP state. Consent-required visitors still require a settled TCF event and purpose permission. The integration and simulated tests cannot certify actual geographic enforcement.
 
+Device restrictions propagate to other open tabs immediately. Clearing a restriction in one tab does not resume another tab from cached CMP values; that tab must review its choices or reload to obtain current CMP state.
+
 
 ## Explicit equation input mode
 `GraphEditor` lazy-loads `EquationInput` only for equation mode. A module worker compiles a restricted arithmetic AST and adaptively samples the visible X domain. Expressions, axis bounds, colors and visibility remain in validated local project settings. Sampled values use the existing tabular data shape and shared XY chart adapter, with blank rows marking discontinuities. Equation graphs suppress point markers and resample on viewport changes. A four-second worker timeout and bounded expression/sampling work protect the main thread.

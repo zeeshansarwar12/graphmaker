@@ -158,8 +158,10 @@ function startPrivacy({ analyticsId, publisherId }: { analyticsId: string; publi
     cmp.callbackQueue.push({ CONSENT_API_READY: () => cmp.showRevocationMessage?.() });
   });
   window.addEventListener('storage', event => {
-    if (event.key !== refusalKey) return;
-    refused = event.newValue === 'denied';
+    if (event.key !== refusalKey || event.newValue !== 'denied') return;
+    // A restriction propagates immediately. Removing it elsewhere must not
+    // resume this tab using a cached CMP grant: review here or reload first.
+    refused = true;
     apply();
   });
   apply();
