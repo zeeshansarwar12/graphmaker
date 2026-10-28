@@ -123,6 +123,13 @@ const webpageSchema = config.connectedSchema ? {
               </tbody>
             </table>
           </div>
+          {config.example.walkthrough && <div class="mt-5 border-border border-t pt-4" aria-labelledby="example-walkthrough-heading">
+            <h3 class="font-bold" id="example-walkthrough-heading">{config.example.walkthrough.title}</h3>
+            <ol class="text-text-muted mt-3 list-decimal space-y-3 pl-5 text-sm leading-6">
+              {config.example.walkthrough.steps.map(step => <li>{step}</li>)}
+            </ol>
+            <a class="button-secondary mt-4" href="#editor">{config.example.walkthrough.action}</a>
+          </div>}
         </div>
       </div>
     </section>
