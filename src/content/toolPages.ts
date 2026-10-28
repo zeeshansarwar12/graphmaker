@@ -45,6 +45,7 @@ export interface ToolPageConfig {
     caption: string;
     headers: string[];
     rows: string[][];
+    walkthrough?: { title: string; steps: string[]; action: string };
   };
   faqs: ToolPageFaq[];
   features: ToolPageFeature[];
@@ -265,6 +266,15 @@ export const xyToolPageConfig = {
     caption: 'Paste these three columns to compare two Y series against one shared X column. The first row plots (-2, -4) for Y1 and (-2, 3) for Y2. Zero and positive coordinates work the same way. This worked example is separate from the initial sample above.',
     headers: ['X', 'Y1', 'Y2'],
     rows: [['-2', '-4', '3'], ['0', '0', '5'], ['3', '6', '7']],
+    walkthrough: {
+      title: 'Plot the X and Y coordinates in this table',
+      steps: [
+        'Read each row across: X comes first. The first row gives the Y1 point (-2, -4) and the Y2 point (-2, 3). Both points share X = -2, but sit at different heights.',
+        'Locate (-2, -4) by moving 2 units left of the origin and 4 units down. The other Y1 points are (0, 0) and (3, 6). From X = 0 to X = 3, the horizontal gap is 3 units; from X = -2 to X = 0, it is 2 units.',
+        'Copy the table with its headers and paste it into the first X cell above. Each Y column becomes its own series. Leave Connect points on for a path in row order, or turn it off for separate points. Use Customize → Coordinate plane to include the origin.',
+      ],
+      action: 'Back to graph editor',
+    },
   },
   faqs: [
     {
