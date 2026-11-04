@@ -2,6 +2,7 @@ import { openPage } from './navigation';
 import { expect, test } from '@playwright/test';
 
 import { allLinkedRoutes, indexableRoutes, productionOrigin, toolRoutes } from './seo-routes';
+import { mockCmp } from './consent-fixture';
 
 test('homepage and tools hub expose every graph tool', async ({ page }) => {
   await openPage(page, '/');
@@ -143,35 +144,35 @@ test('editor controls are semantic and static information pages do not hydrate J
     expect(
       await page.locator('script[src]').evaluateAll(scripts => scripts.filter(script => new URL((script as HTMLScriptElement).src).origin === window.location.origin).length),
       route,
-    ).toBe(0);
+    ).toBe(1); // Shared consent controls; static pages still have no editor island.
+    await expect(page.locator('astro-island')).toHaveCount(0);
     const unsizedImages = await page.locator('img:not([width]), img:not([height])').count();
     expect(unsizedImages, route).toBe(0);
   }
 });
 
 test('Google Analytics uses the production GA4 measurement ID with privacy limits', async ({ page }) => {
+  await mockCmp(page);
   await openPage(page, '/');
   const analyticsScript = page.locator('script[src^="https://www.googletagmanager.com/gtag/js?id="]');
-  await expect(analyticsScript).toHaveAttribute(
-    'src',
-    'https://www.googletagmanager.com/gtag/js?id=G-JM5S5JGFJJ',
-  );
+  await expect(analyticsScript).toHaveCount(0);
+  expect(JSON.parse(await page.locator('#google-privacy-config').textContent() ?? '{}').analyticsId).toBe('G-JM5S5JGFJJ');
   const inlineScripts = await page.locator('head script:not([src])').evaluateAll((scripts) => (
     scripts.map((script) => script.textContent ?? '').join('\n')
   ));
-  expect(inlineScripts).toContain("gtag('config', \"G-JM5S5JGFJJ\"");
-  expect(inlineScripts).toContain('allow_ad_personalization_signals');
-  expect(inlineScripts).toContain('allow_google_signals');
+  expect(inlineScripts).toContain("gtag('consent', 'default'");
+  expect(inlineScripts).toContain("analytics_storage: 'denied'");
 });
 
 test('advertising disclosures and ads.txt use the configured publisher', async ({ page, request }) => {
+  await mockCmp(page);
   await openPage(page, '/privacy/');
   await expect(page.getByRole('heading', { name: 'Google advertising services' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'My Ad Center', exact: true })).toHaveAttribute('href', 'https://myadcenter.google.com/');
   await expect(page.getByRole('link', { name: 'YourAdChoices', exact: true })).toHaveAttribute('href', 'https://www.aboutads.info/choices/');
   const script = page.locator('head script[src*="adsbygoogle.js"]');
-  await expect(script).toHaveCount(1);
-  await expect(script).toHaveAttribute('src', 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8860671021606762');
+  await expect(script).toHaveCount(0);
+  expect(JSON.parse(await page.locator('#google-privacy-config').textContent() ?? '{}').publisherId).toBe('pub-8860671021606762');
   const ads = await request.get('/ads.txt');
   expect(ads.status()).toBe(200);
   expect(ads.headers()['content-type']).toContain('text/plain');

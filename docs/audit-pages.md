@@ -21,5 +21,5 @@
 | /tree-graph-maker/ | 50 | 140 | https://graphmaker.site/tree-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 | /xy-graph-maker/ | 56 | 134 | https://graphmaker.site/xy-graph-maker/ | index,follow | yes | WebApplication, BreadcrumbList |
 
-Checked 862 internal links.
+Checked 883 internal links.
 All built HTML assertions passed. Zero broken internal links.

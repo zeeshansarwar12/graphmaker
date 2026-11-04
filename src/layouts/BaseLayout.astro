@@ -32,11 +32,10 @@ const googleAnalyticsId = normalizeGoogleAnalyticsId(import.meta.env.PUBLIC_GOOG
 const googleAnalyticsBootstrap = googleAnalyticsId
   ? `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', ${JSON.stringify(googleAnalyticsId)}, {
-  allow_ad_personalization_signals: false,
-  allow_google_signals: false,
-  anonymize_ip: true
+window[${JSON.stringify(`ga-disable-${googleAnalyticsId}`)}] = true;
+gtag('consent', 'default', {
+  analytics_storage: 'denied', ad_storage: 'denied',
+  ad_user_data: 'denied', ad_personalization: 'denied'
 });`
   : null;
 ---
@@ -45,7 +44,9 @@ gtag('config', ${JSON.stringify(googleAnalyticsId)}, {
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <script is:inline async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8860671021606762" crossorigin="anonymous"></script>
+    {googleAnalyticsBootstrap && <script is:inline set:html={googleAnalyticsBootstrap}></script>}
+    <script is:inline type="application/json" id="google-privacy-config" set:html={JSON.stringify({ analyticsId: googleAnalyticsId, publisherId: 'pub-8860671021606762' }).replaceAll('<', '\\u003c')} />
+    <script>import '../lib/analytics/consent-browser';</script>
     <meta name="description" content={description} />
     <meta name="robots" content={robots} />
     {canonical === '/' && <meta name="google-site-verification" content="r9NYNACi391MLcXqqUd0w48ayLHu3l1TZ4zuUJO6dEY" />}
@@ -67,8 +68,6 @@ gtag('config', ${JSON.stringify(googleAnalyticsId)}, {
     <meta name="twitter:image:alt" content="GraphMaker — turn your data into a clear graph" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     {schemas.length > 0 && <script is:inline type="application/ld+json" set:html={JSON.stringify(schemas).replaceAll('<', '\\u003c')} />}
-    {googleAnalyticsId && <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(googleAnalyticsId)}`}></script>}
-    {googleAnalyticsBootstrap && <script is:inline set:html={googleAnalyticsBootstrap}></script>}
     <title>{title}</title>
   </head>
   <body>

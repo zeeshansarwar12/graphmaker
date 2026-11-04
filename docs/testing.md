@@ -170,3 +170,9 @@ walkthrough merely to inject driver latency.
 Run these with `npx playwright test save-feedback storage-barrier --workers=4 --retries=0`.
 This hardens observation; it does not establish the historic timeout's root cause
 or clear the separate unresolved Linux rendering risk.
+
+## Consent QA (Issue #34)
+
+`consent.test.ts` checks purpose mapping and fail-closed invariants. `consent.spec.ts` substitutes the external CMP/GA/AdSense responses to test pending, refusal, grant, independent purposes, inapplicability, unknown/not-configured, callback failure, withdrawal, revisit, cross-tab state, blocked preference storage, and draft/save/reload/export preservation on desktop/mobile. These are simulated API contracts, not actual Google message or geographic enforcement tests. Test fixtures never send analytics events or ad impressions to Google.
+
+Full CI and exact-head Cloudflare preview regressions remain required. Separately inspect the actual CMP and network/storage in a fresh browser; record the available egress region. Real EEA, UK and Swiss testing is NOT VERIFIED until actual regional access exists. A debug URL, language, mock TCF response, published message, or account checkbox does not establish regional enforcement. If the existing message cannot serve the preview host, report that blocker; do not change account messaging/site assignment. Keep production unchanged pending separate release approval.
