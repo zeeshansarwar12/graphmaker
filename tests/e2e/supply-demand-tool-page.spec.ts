@@ -5,7 +5,7 @@ test('serves a complete Supply and Demand page with equilibrium on numeric axes'
   await openPage(page, '/supply-and-demand-graph-maker/');
 
   await expect(page).toHaveTitle('Supply and Demand Curve Generator — Free | GraphMaker');
-  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /detect in-range equilibrium/);
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /equilibrium price and quantity/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/supply-and-demand-graph-maker\/$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Supply and Demand Graph Maker' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Supply and Demand Graph Maker');
