@@ -329,7 +329,7 @@ export const xyToolPageConfig = {
     { title: 'Customize and export', description: 'Name and color your series. Download PNG for slides or the web, choose SVG for scalable graphics, or select Print graph.' },
   ],
   intro: 'Plot X and Y values online for free, with no signup. Enter, paste, or upload paired numeric data and download a clean graph in seconds.',
-  metaDescription: 'Create an XY graph online from paired X and Y values. Free, no signup or watermark, with CSV and Excel import plus PNG and SVG export.',
+  metaDescription: 'Paste X and Y coordinates from a spreadsheet, plot or connect your points, and download a PNG or SVG. Free to use, with no signup.',
   relatedTools: [
     { name: 'Equation Graph Maker', description: 'Enter a mathematical expression instead of coordinate pairs.', href: '/equation-graph-maker/' },
     { name: 'Scatter Plot Maker', description: 'Plot independent observations and explore relationships between two variables.', href: '/scatter-plot-maker/' },
@@ -1314,7 +1314,7 @@ export const supplyDemandToolPageConfig = {
     { title: 'Compare equilibrium and export', description: 'Optionally shift a curve, compare original and new equilibrium, adjust axis titles, and download PNG or SVG.' },
   ],
   intro: 'Create a supply and demand graph online for free. Start with an editable template or your own data, compare curve shifts, estimate equilibrium, and download your graph without signup.',
-  metaDescription: 'Free supply and demand curve generator with editable templates. Plot schedules, compare shifts, detect in-range equilibrium, and export PNG or SVG.',
+  metaDescription: 'Start with a free, editable supply and demand graph template. Shift either curve, see how equilibrium price and quantity change, and download your graph.',
   relatedHeading: 'Related economics and graph tools',
   relatedTools: [
     { name: 'Line Graph Maker', description: 'Compare multiple connected series across categories or dates.', href: '/line-graph-maker/' },

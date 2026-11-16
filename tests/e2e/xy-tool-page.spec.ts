@@ -5,7 +5,7 @@ test('serves a complete crawlable XY tool page with the shared editor preset', a
   await openPage(page, '/xy-graph-maker/');
 
   await expect(page).toHaveTitle('XY Graph Maker — Plot X and Y Values Online | GraphMaker');
-  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /paired X and Y values/);
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /Paste X and Y coordinates/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/xy-graph-maker\/$/);
   await expect(page.getByRole('heading', { level: 1, name: 'XY Graph Maker' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Home/Graph tools/XY Graph Maker');
