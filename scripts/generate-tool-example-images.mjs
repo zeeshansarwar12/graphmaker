@@ -147,8 +147,10 @@ function tree(example) {
       const mid = (y + child.y) / 2;
       edges.push(`<path d="M${x} ${y}V${mid}H${child.x}V${child.y}" fill="none" stroke="${blue}" stroke-width="3"/>`);
     }
+    const level = depth === 0 ? 'Root' : children.length ? 'Branch' : 'Leaf';
     nodes.push(`<rect x="${x - 84}" y="${y - 26}" width="168" height="52" rx="8" fill="#eff6ff" stroke="${blue}" stroke-width="2"/>`
-      + text(x, y + 6, node.name));
+      + text(x, y - 5, level, { fill: muted, size: 15 })
+      + text(x, y + 16, node.name));
     return { x, y };
   }
   place(result.root, 0);

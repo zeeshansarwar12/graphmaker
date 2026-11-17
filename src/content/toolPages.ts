@@ -1383,7 +1383,7 @@ export const equationToolPageConfig = {
 export const treeToolPageConfig = {
   exampleImage: {
     src: '/images/examples/tree-graph-maker.svg',
-    alt: 'Tree diagram showing Project branching into Planning and Development. Planning contains Research and Design, and Development contains Testing.',
+    alt: 'Project tree diagram. The root is Project. Planning and Development are branches. Research and Design are leaves under Planning, and Testing is a leaf under Development.',
   },
   canonical: '/tree-graph-maker/', slug: '/tree-graph-maker/',
   h1: 'Tree Diagram Maker', title: 'Tree Diagram Maker & Generator — Free | GraphMaker',
