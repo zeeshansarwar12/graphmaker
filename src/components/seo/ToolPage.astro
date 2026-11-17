@@ -8,7 +8,7 @@ import SiteHeader from '../navigation/SiteHeader.astro';
 import type { ToolPageConfig } from '../../content/toolPages';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BarTemplateGallery from './BarTemplateGallery.astro';
-import { barWorkflowTools } from '../../content/graphTools';
+import { allGraphTools, barWorkflowTools } from '../../content/graphTools';
 import RelatedGraphMakers from './RelatedGraphMakers.astro';
 import { barTemplatePages } from '../../content/barTemplates';
 import SupplyDemandTemplates from './SupplyDemandTemplates.astro';
@@ -21,6 +21,8 @@ interface Props {
 }
 
 const { config } = Astro.props;
+const tool = allGraphTools.find(({ href }) => href === config.canonical);
+if (!tool) throw new Error(`Missing graph tool catalog entry for ${config.canonical}`);
 const siteBase = Astro.site ?? Astro.url;
 const breadcrumbs = toolBreadcrumbs(config.h1, config.canonical);
 const methodAnchors: Record<string, string> = {
@@ -55,7 +57,15 @@ const webpageSchema = config.connectedSchema ? {
 } : undefined;
 ---
 
-<BaseLayout title={config.title} description={config.metaDescription} canonical={config.canonical} structuredData={webpageSchema ? [applicationSchema, webpageSchema] : applicationSchema} breadcrumbs={breadcrumbs}>
+<BaseLayout
+  title={config.title}
+  description={config.metaDescription}
+  canonical={config.canonical}
+  structuredData={webpageSchema ? [applicationSchema, webpageSchema] : applicationSchema}
+  breadcrumbs={breadcrumbs}
+  socialImage={`/images/social/${tool.slug}.png`}
+  socialImageAlt={`${tool.name} — ${tool.description}`}
+>
   <SiteHeader />
 
   <main id="main-content" class:list={{"supply-page":config.editor.graphType === "supplydemand"}}>

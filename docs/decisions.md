@@ -171,3 +171,6 @@ Accepted: owner approval in chat, 27 October 2026, implementing Issue #34 PM sco
 
 ## DEC-033 — Bar cluster links and pillar focus
 Accepted: Zeeshan approved the scope in chat on 17 November 2026. Link Grouped and Horizontal to Stacked from Related graph makers; replace Bar’s Pie link with Tree to distinguish hierarchies from numeric comparisons. Focus the Bar pillar on general category comparisons and link its grouped-series FAQ to the dedicated Grouped tool, which retains the intent assigned in DEC-026. Preserve metadata, canonical URLs, schema aliases, editor behavior, and sample data. Update only Bar’s modification date to the merge date. Draft PR only.
+
+## DEC-034 — Tool-specific social share images
+Accepted: Zeeshan approved the scope in chat on 17 November 2026. Generate one original 1200×630 PNG per catalog tool using the existing social card style and give tool pages matching Open Graph and Twitter image URLs and alt text. Keep the default card on non-tool pages, preserve page metadata and sitemap dates, and reuse the locked image renderer. Draft PR only.
