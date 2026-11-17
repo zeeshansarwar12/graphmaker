@@ -1,0 +1,30 @@
+---
+interface Props {
+  label: string;
+  points: Array<[number, number]>;
+  connect?: boolean;
+  fit?: Array<[number, number]>;
+  xRange: [number, number];
+  yRange: [number, number];
+  xLabel: string;
+  yLabel: string;
+}
+const { label, points, connect, fit, xRange, yRange, xLabel, yLabel } = Astro.props;
+const x = (value: number) => 48 + 244 * (value - xRange[0]) / (xRange[1] - xRange[0]);
+const y = (value: number) => 130 - 108 * (value - yRange[0]) / (yRange[1] - yRange[0]);
+const coordinates = (values: Array<[number, number]>) => values.map(([a, b]) => `${x(a)},${y(b)}`).join(' ');
+---
+<svg class="block w-full text-text" viewBox="0 0 324 174" role="img" aria-label={label}>
+  <path d="M48 22V130H292" fill="none" stroke="currentColor" />
+  <g fill="currentColor" font-size="10">
+    <text x="48" y="144" text-anchor="middle">{xRange[0]}</text>
+    <text x="292" y="144" text-anchor="middle">{xRange[1]}</text>
+    <text x="42" y="26" text-anchor="end">{yRange[1]}</text>
+    <text x="42" y="133" text-anchor="end">{yRange[0]}</text>
+    <text x="170" y="164" text-anchor="middle">{xLabel}</text>
+    <text x="13" y="76" text-anchor="middle" transform="rotate(-90 13 76)">{yLabel}</text>
+  </g>
+  {connect && <polyline points={coordinates(points)} fill="none" stroke="#1760ad" stroke-width="2" />}
+  {fit && <polyline points={coordinates(fit)} fill="none" stroke="#9c431d" stroke-dasharray="5 3" stroke-width="2" />}
+  {points.map(([a, b]) => <circle cx={x(a)} cy={y(b)} r="3.5" fill="#1760ad" />)}
+</svg>

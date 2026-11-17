@@ -12,7 +12,7 @@ export const coreToolRoutes = [
 
 export const specialistToolRoutes = ['/stacked-bar-graph-maker/', '/horizontal-bar-graph-maker/', '/grouped-bar-chart-maker/', '/tree-graph-maker/', '/dot-plot-maker/', '/supply-and-demand-graph-maker/'] as const;
 export const toolRoutes = [...coreToolRoutes, ...specialistToolRoutes] as const;
-export const indexableRoutes = ['/', '/tools/', '/about/', ...toolRoutes] as const;
+export const indexableRoutes = ['/', '/tools/', '/about/', '/guides/scatter-plot-vs-line-graph/', ...toolRoutes] as const;
 export const allLinkedRoutes = [...indexableRoutes, '/privacy/', '/terms/'] as const;
 export const productionOrigin = 'https://graphmaker.site';
 

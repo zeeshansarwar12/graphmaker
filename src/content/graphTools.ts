@@ -29,5 +29,6 @@ export const indexableRoutes = [
   '/',
   '/tools/',
   '/about/',
+  '/guides/scatter-plot-vs-line-graph/',
   ...allGraphTools.map((tool) => tool.href),
 ] as const;

@@ -58,7 +58,6 @@ export function CustomizePanel({
     <aside aria-label="Customize graph" className="border-border bg-surface-subtle mt-4 scroll-mt-14 rounded-lg border p-4" id="customize-panel">
       {(chartType === 'xy' || chartType === 'scatter' || chartType === 'equation') && <CartesianControls key={JSON.stringify(settings.cartesian)} settings={settings} dispatch={dispatch} equation={chartType === 'equation'} />}
       {chartType === 'equation' && <label className="flex items-center gap-2 my-3 text-sm"><input type="checkbox" checked={settings.showLegend} onChange={event => dispatch({type:'set-legend',value:event.target.checked})} />Show legend</label>}
-      {chartType === 'scatter' && <label className="flex items-center gap-2 my-3 text-sm font-semibold"><input type="checkbox" checked={settings.showTrendline} onChange={event => dispatch({type:'replace-settings',value:{...settings,showTrendline:event.target.checked}})} />Linear trendline and R²</label>}
       <div className="grid gap-4 sm:grid-cols-3">
         {chartType !== 'radar' && <label className="text-sm font-semibold">
           Graph title

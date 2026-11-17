@@ -20,11 +20,11 @@ async function readSnapshots(testInfo: TestInfo) {
 }
 
 // Project dependency ensures every route was freshly hydrated in this invocation.
-test('all 18 hydrated indexable pages have unique titles, descriptions and H1s', async () => {
+test('all hydrated indexable pages have unique titles, descriptions and H1s', async () => {
   const testInfo = test.info();
   const snapshots = (await readSnapshots(testInfo)).filter(snapshot => snapshot.metadata);
   expect(snapshots.map(snapshot => snapshot.route).sort()).toEqual([...indexableRoutes].sort());
-  expect(snapshots).toHaveLength(18);
+  expect(snapshots).toHaveLength(indexableRoutes.length);
   const titles = new Set<string>();
   const descriptions = new Set<string>();
   const h1Texts = new Set<string>();
