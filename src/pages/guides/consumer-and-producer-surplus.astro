@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/navigation/Breadcrumbs.astro';
 import SiteHeader from '../../components/navigation/SiteHeader.astro';
 import SiteFooter from '../../components/navigation/SiteFooter.astro';
+import { siteCreator } from '../../content/site';
 import { pageLastModified } from '../../content/pageLastModified';
 import {
   exampleMarket as market, practiceMarket as practice, formatSurplus as f,
@@ -20,8 +21,19 @@ const article = {
   '@context': 'https://schema.org', '@type': 'Article', headline: h1, description,
   datePublished: date, dateModified: date,
   mainEntityOfPage: new URL(surplusGuideRoute, base).href,
-  author: { '@id': new URL('/about/#creator', base).href },
-  publisher: { '@id': new URL('/#organization', base).href },
+  author: {
+    '@type': 'Person',
+    '@id': new URL('/about/#creator', base).href,
+    name: siteCreator.name,
+    url: new URL('/about/', base).href,
+  },
+  publisher: {
+    '@type': 'Organization',
+    '@id': new URL('/#organization', base).href,
+    name: 'GraphMaker',
+    url: new URL('/', base).href,
+    logo: { '@type': 'ImageObject', url: new URL('/images/graphmaker-logo.svg', base).href },
+  },
   image: new URL(surplusSocialImage, base).href,
 };
 const equation = ({ market: m }: typeof market) => `Qd = ${m.demandIntercept} − ${m.demandSlope}P, Qs = ${m.supplySlope}P − ${Math.abs(m.supplyIntercept)}`;

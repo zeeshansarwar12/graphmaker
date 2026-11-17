@@ -191,7 +191,9 @@ function surplusDiagram(model, key) {
   const maxQ = Math.ceil((Math.max(model.quantity, atPolicy) * 1.18) / 10) * 10;
   const demandEnd = Math.min(maxQ, model.market.demandIntercept);
   const x = scale([0, maxQ], 10, frame.left, frame.right);
-  const y = scale([0, model.demandPrice(0), model.supplyPrice(maxQ)], 10, frame.bottom, frame.top);
+  const maxPrice = model.demandPrice(0);
+  const supplyEnd = Math.min(maxQ, model.supplyQuantity(maxPrice));
+  const y = scale([0, maxPrice], 10, frame.bottom, frame.top);
   const plot = (q, p) => [x.at(q), y.at(p)];
   const region = (vertices, color) => `<polygon points="${vertices.map(([q,p]) => plot(q,p).join(',')).join(' ')}" fill="${color}" fill-opacity=".23" />`;
   const { traded: q, buyer, seller } = result;
@@ -217,9 +219,9 @@ function surplusDiagram(model, key) {
   return axes({...y, ticks: prices}, 'Quantity', 'Price', quantities.map(value => ({position:x.at(value), label:formatSurplus(value)})))
     + areas.map(([,color,vertices]) => region(vertices,color)).join('') + priceGuides.join('') + guides.join('')
     + line(...plot(0, model.demandPrice(0)), ...plot(demandEnd, model.demandPrice(demandEnd)), blue, 3)
-    + line(...plot(0, model.supplyPrice(0)), ...plot(maxQ, model.supplyPrice(maxQ)), green, 3)
+    + line(...plot(0, model.supplyPrice(0)), ...plot(supplyEnd, model.supplyPrice(supplyEnd)), green, 3)
     + text(x.at(demandEnd) - 5, y.at(model.demandPrice(demandEnd)) + 20, 'Demand', {anchor:'end', fill:blue})
-    + text(frame.right - 5, y.at(model.supplyPrice(maxQ)) - 10, 'Supply', {anchor:'end', fill:green})
+    + text(x.at(supplyEnd) - 5, y.at(model.supplyPrice(supplyEnd)) - 10, 'Supply', {anchor:'end', fill:green})
     + point(...plot(eq, price), ink)
     + text(x.at(eq) + 9, y.at(price) - 8, 'E', {anchor:'start', size:15}) + legend;
 }

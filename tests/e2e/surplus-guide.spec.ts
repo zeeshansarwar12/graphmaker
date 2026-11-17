@@ -13,8 +13,15 @@ test('surplus guide connects worked charts and practice to the graph maker', asy
   const schema = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent() ?? '[]');
   expect(schema.map((item: { '@type': string }) => item['@type'])).toEqual(['Article', 'BreadcrumbList']);
   expect(schema[0]).toMatchObject({
-    author: { '@id': 'https://graphmaker.site/about/#creator' },
-    publisher: { '@id': 'https://graphmaker.site/#organization' },
+    author: {
+      '@type': 'Person', '@id': 'https://graphmaker.site/about/#creator',
+      name: 'Zeeshan Sarwar', url: 'https://graphmaker.site/about/',
+    },
+    publisher: {
+      '@type': 'Organization', '@id': 'https://graphmaker.site/#organization',
+      name: 'GraphMaker', url: 'https://graphmaker.site/',
+      logo: { '@type': 'ImageObject', url: 'https://graphmaker.site/images/graphmaker-logo.svg' },
+    },
     datePublished: '2026-11-17', dateModified: '2026-11-17',
     image: 'https://graphmaker.site/images/guides/consumer-and-producer-surplus-social.png',
   });

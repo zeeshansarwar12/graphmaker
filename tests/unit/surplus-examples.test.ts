@@ -32,6 +32,10 @@ describe('surplus guide assets', () => {
   it.each([...surplusScenarios, 'practice'] as const)('includes the labeled %s chart', (scenario) => {
     const svg = readFileSync(new URL(`../../public${surplusChart(scenario)}`, import.meta.url), 'utf8');
     expect(svg).toContain('viewBox="0 0 800 500"');
+    if (scenario !== 'practice') {
+      expect(svg).toMatch(/<text x="78" y="106"[^>]*>40<\/text>/);
+      expect(svg).toMatch(/<text x="78" y="426"[^>]*>0<\/text>/);
+    }
     for (const label of ['Quantity', 'Price', 'Supply', 'Demand', 'Consumer surplus', 'Producer surplus']) {
       expect(svg).toContain(`>${label}</text>`);
     }
