@@ -9,6 +9,8 @@ interface Props {
   title: string;
   description: string;
   robots?: string;
+  socialImage?: string;
+  socialImageAlt?: string;
   structuredData?: Record<string, unknown> | Array<Record<string, unknown>>;
   breadcrumbs?: Breadcrumb[];
 }
@@ -18,11 +20,13 @@ const {
   title,
   description,
   robots = 'index,follow',
+  socialImage = '/images/graphmaker-social.png',
+  socialImageAlt = 'GraphMaker — turn your data into a clear graph',
   structuredData,
   breadcrumbs,
 } = Astro.props;
 const canonicalUrl = canonical ? new URL(canonical, Astro.site ?? Astro.url).href : undefined;
-const socialImageUrl = new URL('/images/graphmaker-social.png', Astro.site ?? Astro.url).href;
+const socialImageUrl = new URL(socialImage, Astro.site ?? Astro.url).href;
 const schemas = [
   ...(Array.isArray(structuredData) ? structuredData : structuredData ? [structuredData] : []),
   ...(breadcrumbs ? [breadcrumbSchema(breadcrumbs, Astro.site ?? Astro.url)] : []),
@@ -61,11 +65,11 @@ gtag('consent', 'default', {
     <meta property="og:image" content={socialImageUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="GraphMaker — turn your data into a clear graph" />
+    <meta property="og:image:alt" content={socialImageAlt} />
     {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={socialImageUrl} />
-    <meta name="twitter:image:alt" content="GraphMaker — turn your data into a clear graph" />
+    <meta name="twitter:image:alt" content={socialImageAlt} />
     <link rel="icon" type="image/png" href="/favicon.png" />
     {schemas.length > 0 && <script is:inline type="application/ld+json" set:html={JSON.stringify(schemas).replaceAll('<', '\\u003c')} />}
     <title>{title}</title>

@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
+import { allGraphTools } from '../../src/content/graphTools';
 import { openPage } from './navigation';
 import { allLinkedRoutes, indexableRoutes, productionOrigin } from './seo-routes';
 
@@ -33,8 +34,6 @@ for (const route of allLinkedRoutes) {
       expect(description!.length, route).toBeGreaterThanOrEqual(70);
       expect(description!.length, route).toBeLessThanOrEqual(160);
       await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image');
-      await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', `${productionOrigin}/images/graphmaker-social.png`);
-      await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute('content', `${productionOrigin}/images/graphmaker-social.png`);
       expect(await page.locator('meta[property="og:title"]').getAttribute('content'), route).toBe(title);
       expect(await page.locator('meta[property="og:description"]').getAttribute('content'), route).toBe(description);
       expect(await page.locator('meta[property="og:url"]').getAttribute('content'), route).toBe(canonical);
@@ -48,6 +47,14 @@ for (const route of allLinkedRoutes) {
       }
       metadata = { title, description: description!, h1Text };
     }
+    const tool = allGraphTools.find(({ href }) => href === route);
+    const image = tool ? `/images/social${route.slice(0, -1)}.png` : '/images/graphmaker-social.png';
+    const alt = tool ? `${tool.name} — ${tool.description}` : 'GraphMaker — turn your data into a clear graph';
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', productionOrigin + image);
+    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute('content', productionOrigin + image);
+    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute('content', alt);
+    await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute('content', alt);
+
     const hrefs = await page.locator('a[href]').evaluateAll((links) => links.map((link) => link.getAttribute('href') ?? ''));
     const internalPaths = new Set<string>();
     for (const href of hrefs) {
