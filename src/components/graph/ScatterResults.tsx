@@ -9,14 +9,14 @@ interface Props {
 }
 
 function format(value: number) {
-  return String(Number(value.toPrecision(6)));
+  return String(Number(value.toPrecision(6))).replaceAll('-', '−');
 }
 
 export function ScatterResults({ points, skipped, xName, yName }: Props) {
   const fit = useMemo(() => linearRegression(points), [points]);
   return (
     <section aria-labelledby="scatter-results-heading" className="border-border bg-surface-subtle my-4 rounded-lg border p-4">
-      <h4 className="font-bold" id="scatter-results-heading">Line of best fit results</h4>
+      <h3 className="font-bold" id="scatter-results-heading">Line of best fit results</h3>
       <p className="text-text-muted mt-1 text-sm">
         {points.length} valid {points.length === 1 ? 'pair' : 'pairs'}{skipped > 0 && ` · ${skipped} skipped (missing or invalid X or Y)`}
       </p>
@@ -37,7 +37,7 @@ export function ScatterResults({ points, skipped, xName, yName }: Props) {
             <li>Average the paired values. x̄ ≈ {format(fit.meanX)} and ȳ ≈ {format(fit.meanY)}.</li>
             <li>Divide the sum of paired deviations by the sum of squared X deviations. m ≈ {format(fit.xy)} ÷ {format(fit.xx)} ≈ {format(fit.slope)}.</li>
             <li>Subtract the slope times the X mean from the Y mean. b ≈ {format(fit.meanY)} − ({format(fit.slope)} × {format(fit.meanX)}) ≈ {format(fit.intercept)}.</li>
-            {fit.rSquared !== null && <li>Divide the squared sum of paired deviations by the product of the two squared-deviation sums. R² ≈ {format(fit.xy)}² ÷ ({format(fit.xx)} × {format(fit.yy)}) ≈ {format(fit.rSquared)}.</li>}
+            {fit.rSquared !== null && <li>Divide the squared sum of paired deviations by the product of the two squared-deviation sums. R² ≈ ({format(fit.xy)})² ÷ ({format(fit.xx)} × {format(fit.yy)}) ≈ {format(fit.rSquared)}.</li>}
           </ol>
         </details>
       </>}

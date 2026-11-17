@@ -45,7 +45,8 @@ Candidates:
 - `/error-bar-graph-maker/`
 - `/standard-deviation-graph-maker/`
 - `/normal-distribution-graph-maker/`
-- `/line-of-best-fit-graph-maker/`
+
+Line-of-best-fit, R², and regression-equation intent belongs on `/scatter-plot-maker/` (DEC-036).
 
 ## Later content/use cases
 Potential pages only after validation:

@@ -182,6 +182,7 @@ const webpageSchema = config.connectedSchema ? {
         <div class="text-center">
           <h2 class="section-heading" id="comparison-heading">{config.comparison.title}</h2>
           <p class="text-text-muted mx-auto mt-2 max-w-2xl leading-7">{config.comparison.intro}</p>
+          {config.editor.graphType === 'scatter' && <p class="text-text-muted mx-auto mt-2 max-w-2xl leading-7">Use the <a class="text-brand underline" href="/line-graph-maker/">Line Graph Maker</a> when connecting measurements in order helps show how they change over time.</p>}
         </div>
         <div class="mt-8 grid gap-5 md:grid-cols-2">
           {[config.comparison.first, config.comparison.second].map((item) => (
@@ -195,10 +196,6 @@ const webpageSchema = config.connectedSchema ? {
         </div>
       </div>
     </section>
-
-    {['scatter', 'xy', 'line'].includes(config.editor.graphType) && <div class="page-shell pb-10 text-center">
-      <a class="text-brand underline" href="/guides/scatter-plot-vs-line-graph/">Read the scatter plot vs. line graph guide</a>
-    </div>}
 
     {config.useCases && (
       <section aria-labelledby="use-cases-heading" class="border-border bg-surface-subtle border-y py-14 sm:py-16">

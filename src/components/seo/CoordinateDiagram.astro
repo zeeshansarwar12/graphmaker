@@ -24,7 +24,7 @@ const coordinates = (values: Array<[number, number]>) => values.map(([a, b]) => 
     <text x="170" y="164" text-anchor="middle">{xLabel}</text>
     <text x="13" y="76" text-anchor="middle" transform="rotate(-90 13 76)">{yLabel}</text>
   </g>
-  {connect && <polyline points={coordinates(points)} fill="none" stroke="#1760ad" stroke-width="2" />}
-  {fit && <polyline points={coordinates(fit)} fill="none" stroke="#9c431d" stroke-dasharray="5 3" stroke-width="2" />}
-  {points.map(([a, b]) => <circle cx={x(a)} cy={y(b)} r="3.5" fill="#1760ad" />)}
+  {connect && <polyline points={coordinates(points)} fill="none" stroke="var(--color-brand)" stroke-width="2" />}
+  {fit && <polyline points={coordinates(fit)} fill="none" stroke="var(--color-brand)" stroke-dasharray="5 3" stroke-width="2" />}
+  {points.map(([a, b]) => <circle cx={x(a)} cy={y(b)} r="3.5" fill="var(--color-brand)" />)}
 </svg>
