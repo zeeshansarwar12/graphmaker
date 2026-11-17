@@ -29,5 +29,6 @@ export const indexableRoutes = [
   '/',
   '/tools/',
   '/about/',
+  '/guides/consumer-and-producer-surplus/',
   ...allGraphTools.map((tool) => tool.href),
 ] as const;

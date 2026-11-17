@@ -3,6 +3,7 @@ import { Buffer } from 'node:buffer';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { URL } from 'node:url';
+import { surplusSocialImage } from '../src/content/guides/surplusExamples.ts';
 import { allGraphTools } from '../src/content/graphTools.ts';
 import { escapeXml } from './svg-helpers.mjs';
 
@@ -54,6 +55,12 @@ const glyphs = {
     + path('M150 49L218 123L209 220L100 211L67 116Z', blue, 5, '#bfdbfe'),
   dotplot: path('M22 252H278 M47 252v10 M99 252v10 M151 252v10 M203 252v10 M255 252v10', grid, 3)
     + [2, 4, 7, 5, 3].map((count, i) => dots(Array.from({ length: count }, (_, j) => [47 + i * 52, 226 - j * 27]))).join(''),
+  surplus: axes
+    + '<path d="M22 53L149.5 138H22Z" fill="#bfdbfe"/>'
+    + '<path d="M22 138H149.5L22 223Z" fill="#a7e4cf"/>'
+    + path('M22 53L277 223')
+    + path('M22 223L277 53', '#079669')
+    + path('M149.5 138V252 M22 138H149.5', '#8ca2bf', 3) + dot(149.5, 138, ink, 9),
   supplydemand: axes + path('M43 222L256 53') + path('M43 53L256 222', '#079669')
     + path('M149.5 138V252 M22 138H149.5', '#8ca2bf', 3) + dot(149.5, 138, ink, 9),
   tree: path('M150 66V103H74V143 M150 103H226V143 M74 181V209H46V230 M74 209H102V230 M226 181V209H198V230 M226 209H254V230', blue, 4)
@@ -75,7 +82,7 @@ function cardSvg(tool) {
   const glyph = glyphs[tool.slug] ?? glyphs[tool.type];
   if (!glyph) throw new Error(`Missing chart glyph for ${tool.slug}`);
 
-  const lines = tool.name.length <= 19 ? [tool.name] : tool.name.split(/ (?=(?:Graph|Chart) Maker$)/);
+  const lines = tool.lines ?? (tool.name.length <= 19 ? [tool.name] : tool.name.split(/ (?=(?:Graph|Chart) Maker$)/));
   const title = lines.map((line, i) => `<tspan x="104" y="${294 + 74 * i}">${escapeXml(line)}</tspan>`).join('');
   const artwork = `
   <g font-family="Arial, sans-serif">
@@ -100,3 +107,7 @@ for (const tool of allGraphTools) {
   }
   await writeFile(file, png);
 }
+const guideFile = new URL(`../public${surplusSocialImage}`, import.meta.url);
+await mkdir(new URL('.', guideFile), { recursive: true });
+const guideCard = cardSvg({ name: 'Surplus', lines: ['Consumer and', 'Producer Surplus'], type: 'surplus' });
+await writeFile(guideFile, await sharp(Buffer.from(guideCard)).png({ palette: true }).toBuffer());

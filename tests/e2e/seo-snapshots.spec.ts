@@ -48,8 +48,9 @@ for (const route of allLinkedRoutes) {
       metadata = { title, description: description!, h1Text };
     }
     const tool = allGraphTools.find(({ href }) => href === route);
-    const image = tool ? `/images/social${route.slice(0, -1)}.png` : '/images/graphmaker-social.png';
-    const alt = tool ? `${tool.name} — ${tool.description}` : 'GraphMaker — turn your data into a clear graph';
+    const guide = route === '/guides/consumer-and-producer-surplus/';
+    const image = guide ? '/images/guides/consumer-and-producer-surplus-social.png' : tool ? `/images/social${route.slice(0, -1)}.png` : '/images/graphmaker-social.png';
+    const alt = guide ? 'GraphMaker guide to consumer and producer surplus with shaded supply and demand areas' : tool ? `${tool.name} — ${tool.description}` : 'GraphMaker — turn your data into a clear graph';
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', productionOrigin + image);
     await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute('content', productionOrigin + image);
     await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute('content', alt);
