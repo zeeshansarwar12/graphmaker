@@ -81,6 +81,7 @@ export const groupedBarToolPageConfig: ToolPageConfig = {
     { question: 'Is this grouped bar graph maker free?', answer: 'Yes. Create and download PNG or SVG charts without signup or a watermark. The grouped page saves its work separately from the main bar graph page, locally in your browser.' },
   ],
   relatedTools: [
+    { name: 'Stacked Bar Graph Maker', href: '/stacked-bar-graph-maker/', description: 'Compare totals and their parts with stacked segments.' },
     { name: 'Horizontal Bar Chart Maker', href: '/horizontal-bar-graph-maker/', description: 'Compare categories with sideways bars and a horizontal value axis.' },
     { name: 'Bar Graph Maker', href: '/bar-graph-maker/', description: 'Start with general category comparisons and explore bar graph layouts.' },
     { name: 'Line Graph Maker', href: '/line-graph-maker/', description: 'Compare series when the main message is change over time.' },

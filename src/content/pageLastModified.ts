@@ -5,7 +5,7 @@ export const pageLastModified: Readonly<Record<string, string>> = {
   '/tools/': '2026-10-22',
   '/about/': '2026-10-06',
   '/stacked-bar-graph-maker/': '2026-10-22',
-  '/bar-graph-maker/': '2026-10-22',
+  '/bar-graph-maker/': '2026-11-17',
   '/grouped-bar-chart-maker/': '2026-10-22',
   '/horizontal-bar-graph-maker/': '2026-10-22',
   '/line-graph-maker/': '2026-10-22',

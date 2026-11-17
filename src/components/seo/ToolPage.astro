@@ -233,7 +233,7 @@ const webpageSchema = config.connectedSchema ? {
             <summary class="flex cursor-pointer list-none items-center justify-between gap-5 py-5 font-bold">
               {faq.question}<span aria-hidden="true" class="text-brand text-xl group-open:rotate-45">＋</span>
             </summary>
-            <p class="text-text-muted max-w-3xl pb-5 text-sm leading-6">{faq.answer}</p>
+            <p class="text-text-muted max-w-3xl pb-5 text-sm leading-6">{faq.answer}{faq.link && <> <a class="text-brand underline" href={faq.link.href}>{faq.link.label}</a>.</>}</p>
           </details>
         ))}
       </div>
