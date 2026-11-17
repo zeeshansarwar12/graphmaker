@@ -120,6 +120,17 @@ const webpageSchema = config.connectedSchema ? {
         <div aria-labelledby="example-heading" class="min-w-0 border-border bg-surface rounded-lg border p-5 shadow-sm">
           <h2 class="text-xl font-bold" id="example-heading">{config.sectionHeadings.example}</h2>
           {config.editor.graphType === 'tree' && <TreeDiagramExample />}
+          {config.exampleImage && (
+            <img
+              class="mt-4 h-auto w-full"
+              src={config.exampleImage.src}
+              alt={config.exampleImage.alt}
+              width="800"
+              height="500"
+              loading="lazy"
+              decoding="async"
+            />
+          )}
           <p class="text-text-muted mt-2 text-sm leading-6">{config.example.caption}</p>
           <div class="border-border mt-4 overflow-x-auto rounded-md border">
             <table class="w-full border-collapse text-left text-sm">

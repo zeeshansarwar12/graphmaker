@@ -19,6 +19,7 @@ export interface RelatedTool {
 }
 
 export interface ToolPageConfig {
+  exampleImage?: { src: string; alt: string };
   connectedSchema?: boolean;
   alternateName?: string[];
   additionalSections?: Array<{
@@ -231,6 +232,10 @@ const supplyDemandSampleData = {
 };
 
 export const xyToolPageConfig = {
+  exampleImage: {
+    src: '/images/examples/xy-graph-maker.svg',
+    alt: 'XY graph connecting three points in each of two series, Y1 and Y2, at X values −2, 0, and 3.',
+  },
   canonical: '/xy-graph-maker/',
   comparison: {
     first: {
@@ -360,6 +365,10 @@ export const xyToolPageConfig = {
 } satisfies ToolPageConfig;
 
 export const scatterToolPageConfig = {
+  exampleImage: {
+    src: '/images/examples/scatter-plot-maker.svg',
+    alt: 'Scatter plot of eight observations showing exam scores rising from 52 to 91 as study time increases from 1 to 8 hours.',
+  },
   canonical: '/scatter-plot-maker/',
   comparison: {
     first: {
@@ -789,6 +798,10 @@ export const pieToolPageConfig = {
 } satisfies ToolPageConfig;
 
 export const boxPlotToolPageConfig = {
+  exampleImage: {
+    src: '/images/examples/box-plot-maker.svg',
+    alt: 'Box plots of test scores for Class A and Class B. The medians are 80.5 and 83, with no outliers in either class.',
+  },
   additionalSections: [
     {
       id: 'quartile-method',
@@ -1240,6 +1253,10 @@ export const dotPlotToolPageConfig = {
 } satisfies ToolPageConfig;
 
 export const supplyDemandToolPageConfig = {
+  exampleImage: {
+    src: '/images/examples/supply-and-demand-graph-maker.svg',
+    alt: 'Supply and demand graph with a rising supply curve and a falling demand curve meeting at quantity 45 and price 55.',
+  },
   beforeComparisonSections: [
     {
       id: 'equilibrium',
@@ -1364,6 +1381,10 @@ export const equationToolPageConfig = {
 
 
 export const treeToolPageConfig = {
+  exampleImage: {
+    src: '/images/examples/tree-graph-maker.svg',
+    alt: 'Tree diagram showing Project branching into Planning and Development. Planning contains Research and Design, and Development contains Testing.',
+  },
   canonical: '/tree-graph-maker/', slug: '/tree-graph-maker/',
   h1: 'Tree Diagram Maker', title: 'Tree Diagram Maker & Generator — Free | GraphMaker',
   metaDescription: 'Create a tree diagram or tree chart from editable templates. Free tree diagram generator with local saving and PNG/SVG downloads. No signup.',

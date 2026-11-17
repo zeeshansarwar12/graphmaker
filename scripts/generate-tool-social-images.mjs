@@ -4,6 +4,7 @@ import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { URL } from 'node:url';
 import { allGraphTools } from '../src/content/graphTools.ts';
+import { escapeXml } from './svg-helpers.mjs';
 
 // Resolve the renderer already installed for Astro.
 const require = createRequire(import.meta.url);
@@ -69,10 +70,6 @@ const glyphs = {
     return rect(x, 252 - h, 26, h) + rect(x + 29, 200 - h, 26, h + 52, light);
   }).join(''),
 };
-
-function escapeXml(text) {
-  return text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-}
 
 function cardSvg(tool) {
   const glyph = glyphs[tool.slug] ?? glyphs[tool.type];
