@@ -174,3 +174,6 @@ Accepted: Zeeshan approved the scope in chat on 17 November 2026. Link Grouped a
 
 ## DEC-034 — Tool-specific social share images
 Accepted: Zeeshan approved the scope in chat on 17 November 2026. Generate one original 1200×630 PNG per catalog tool using the existing social card style and give tool pages matching Open Graph and Twitter image URLs and alt text. Keep the default card on non-tool pages, preserve page metadata and sitemap dates, and reuse the locked image renderer. Draft PR only.
+
+## DEC-035 — Static example images for priority tools
+Accepted: Zeeshan approved the scope in chat on 17 November 2026. Publish original SVG examples for XY, Supply and Demand, Scatter, Box Plot, and Tree using their existing example tables and the editor's box plot statistics. Render them through the shared optional example image field, with explicit dimensions and descriptive alt text. Verify catalog social assets and configured example assets in unit tests. Update only the five affected sitemap dates to the merge date. Draft PR only.

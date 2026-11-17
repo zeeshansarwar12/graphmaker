@@ -8,6 +8,9 @@ const chart = '[data-rendered-chart-type="tree"] [data-chart-status="ready"]';
 test('tree page edits branches, changes layout, restores and exports full diagrams', async ({ page }, testInfo) => {
   await openPage(page, '/tree-graph-maker/');
   await expect(page.getByRole('heading', { level: 1, name: 'Tree Diagram Maker' })).toBeVisible();
+  const example = page.locator('[aria-labelledby="example-heading"]');
+  await expect(example.locator('img, svg')).toHaveCount(1);
+  await expect(example.locator('[data-tree-diagram-example] img')).toHaveAttribute('src', '/images/examples/tree-graph-maker.svg');
   await expect(page.locator(chart)).toContainText('Tree with 6 nodes and 3 levels');
   await page.getByLabel('Node 1 label', { exact: true }).fill('Roadmap');
   await page.getByRole('button', { name: 'Add child to node 1', exact: true }).click();

@@ -30,14 +30,17 @@ test('desktop template gallery uses the shared visual language', async ({ page }
 
 test('tree SEO example is labeled and crawlable with current feature instructions',async ({page,request},testInfo)=>{
   const html=await (await request.get(route)).text();
-  expect(html).toContain('Project tree diagram with a root, branches, and leaves');
+  expect(html).toContain('/images/examples/tree-graph-maker.svg');
   expect(html).toContain('Edit this project tree template');
   expect(html).not.toContain('Scroll large diagrams');
   await openPage(page,route);
   await expect(page.getByRole('heading',{name:'Tree diagram questions',exact:true})).toBeVisible();
   const figure=page.locator('[data-tree-diagram-example]');
-  await expect(figure.getByRole('img')).toHaveAccessibleName('Project tree diagram with a root, branches, and leaves');
-  await expect(figure).toContainText('Development');
+  await expect(figure.getByRole('img')).toHaveAccessibleName('Project tree diagram. The root is Project. Planning and Development are branches. Research and Design are leaves under Planning, and Testing is a leaf under Development.');
+  const imageResponse = await request.get('/images/examples/tree-graph-maker.svg');
+  expect(imageResponse.ok()).toBe(true);
+  const image = await imageResponse.text();
+  for (const label of ['Root', 'Branch', 'Leaf', 'Development']) expect(image).toContain('>' + label + '</text>');
   await figure.scrollIntoViewIfNeeded();await page.screenshot({path:testInfo.outputPath('tree-example-desktop.png')});
   await page.setViewportSize({width:390,height:844});await figure.scrollIntoViewIfNeeded();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
