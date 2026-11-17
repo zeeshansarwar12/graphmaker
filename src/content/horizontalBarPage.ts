@@ -70,6 +70,7 @@ export const horizontalBarToolPageConfig: ToolPageConfig = {
     { question: 'Is this horizontal bar chart maker free?', answer: 'Yes. Create charts without signup and export PNG or SVG without a watermark. Graph data is processed and saved locally in your browser.' },
   ],
   relatedTools: [
+    { name: 'Stacked Bar Graph Maker', href: '/stacked-bar-graph-maker/', description: 'Compare totals and their parts with stacked segments.' },
     { name: 'Bar Graph Maker', href: '/bar-graph-maker/', description: 'Explore general category comparisons and vertical bar graphs.' },
     { name: 'Grouped Bar Chart Maker', href: '/grouped-bar-chart-maker/', description: 'Compare two or more datasets with double or clustered bars.' },
     { name: 'Pie Chart Maker', href: '/pie-chart-maker/', description: 'Show contributions to one whole from nonnegative values.' },

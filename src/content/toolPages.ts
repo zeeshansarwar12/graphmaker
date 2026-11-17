@@ -8,6 +8,7 @@ export interface ToolPageFeature {
 
 export interface ToolPageFaq {
   answer: string;
+  link?: { href: string; label: string };
   question: string;
 }
 
@@ -512,7 +513,8 @@ export const barToolPageConfig = {
       question: 'How should I arrange bar graph data?',
     },
     {
-      answer: 'Yes. Add multiple numeric columns and the bar graph generator displays them as grouped bars with a legend based on your column headers.',
+      answer: 'Yes. Add one numeric column per series. For double or clustered comparisons, use the',
+      link: { href: '/grouped-bar-chart-maker/', label: 'Grouped Bar Chart Maker' },
       question: 'Can I create grouped bars with multiple series?',
     },
     {
@@ -525,7 +527,7 @@ export const barToolPageConfig = {
     },
   ],
   features: [
-    { title: 'Grouped comparisons', description: 'Display multiple numeric columns side by side for every category.' },
+    { title: 'Vertical or horizontal bars', description: 'Switch the bar orientation to suit your category labels and layout.' },
     { title: 'Automatic series legend', description: 'Use actual column headers to identify each series when the table contains more than one.' },
     { title: 'Live updates', description: 'See the graph change immediately as you edit, paste, or replace table values.' },
     { title: 'Readable large datasets', description: 'Reduce crowded axis ticks and hide value labels automatically when the table grows.' },
@@ -538,20 +540,20 @@ export const barToolPageConfig = {
     { title: 'Compare one or more series', description: 'Keep category names in the first column and add a numeric column for each measure you want to compare.' },
     { title: 'Customize and export', description: 'Edit the title, axes, colors, labels, and orientation, then download the graph as PNG or SVG.' },
   ],
-  intro: 'Use this free bar chart maker to compare categories with no signup. Enter, paste, or upload data and display multiple numeric series in a clear grouped bar chart.',
+  intro: 'Use this free bar chart maker to compare categories with no signup. Enter, paste, or upload data and display multiple numeric series in a clear bar chart.',
   metaDescription: 'Create a bar graph online for free. Paste data or import CSV and Excel files, compare multiple series, and export PNG or SVG with no signup.',
   relatedTools: [
     { name: 'Grouped Bar Chart Maker', description: 'Compare two or more datasets with double, clustered, or side-by-side bars.', href: '/grouped-bar-chart-maker/' },
     { name: 'Stacked Bar Graph Maker', description: 'Compare totals and component values with segmented bars.', href: '/stacked-bar-graph-maker/' },
     { name: 'Horizontal Bar Chart Maker', description: 'Compare ranked categories with sideways bars and readable labels.', href: '/horizontal-bar-graph-maker/' },
     { name: 'Line Chart Maker', description: 'Show changes and trends across categories or dates.', href: '/line-graph-maker/' },
-    { name: 'Pie Chart Maker', description: 'Show how one numeric series contributes to a whole.', href: '/pie-chart-maker/' },
+    { name: 'Tree Diagram Maker', description: 'Show parent–child hierarchies instead of comparing numeric values.', href: '/tree-graph-maker/' },
   ],
   sectionHeadings: {
     definition: 'What is a bar graph?',
     example: 'Example bar graph data',
     faq: 'Bar graph maker FAQ',
-    faqIntro: 'Answers to common questions about creating grouped bar graphs from category data.',
+    faqIntro: 'Answers to common questions about creating bar graphs from category data.',
     features: 'Bar graph maker features',
     howTo: 'How to make a bar graph',
   },

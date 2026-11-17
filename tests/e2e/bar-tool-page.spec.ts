@@ -37,7 +37,7 @@ test('serves a complete crawlable Bar tool page with grouped sample series', asy
   }
 
   await expect(page.getByRole('link', { name: /Line Chart Maker/ }).first()).toHaveAttribute('href', '/line-graph-maker/');
-  await expect(page.getByRole('link', { name: /Pie Chart Maker/ }).first()).toHaveAttribute('href', '/pie-chart-maker/');
+  await expect(page.getByRole('region', { name: 'Related graph makers' }).getByRole('link', { name: 'Tree Diagram Maker' })).toHaveAttribute('href', '/tree-graph-maker/');
   await expect(page.getByRole('link', { name: /Histogram Maker/ }).first()).toHaveAttribute('href', '/histogram-maker/');
 });
 

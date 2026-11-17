@@ -134,7 +134,7 @@ describe('Bar tool page configuration', () => {
       '/stacked-bar-graph-maker/',
       '/horizontal-bar-graph-maker/',
       '/line-graph-maker/',
-      '/pie-chart-maker/',
+      '/tree-graph-maker/',
     ]);
   });
 });
