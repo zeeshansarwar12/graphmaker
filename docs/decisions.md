@@ -177,3 +177,11 @@ Accepted: Zeeshan approved the scope in chat on 17 November 2026. Generate one o
 
 ## DEC-035 — Static example images for priority tools
 Accepted: Zeeshan approved the scope in chat on 17 November 2026. Publish original SVG examples for XY, Supply and Demand, Scatter, Box Plot, and Tree using their existing example tables and the editor's box plot statistics. Render them through the shared optional example image field, with explicit dimensions and descriptive alt text. Verify catalog social assets and configured example assets in unit tests. Update only the five affected sitemap dates to the merge date. Draft PR only.
+
+## DEC-036 — Consolidate scatter regression intent
+
+**Status:** Accepted (owner review of PR #42, 17 November 2026).
+
+**Decision:** Keep line-of-best-fit, R², and regression-equation intent on `/scatter-plot-maker/`. The editor, live results, and worked calculation share that URL.
+
+**Reason:** These queries serve the same workflow of fitting and interpreting a line from paired observations. The competitor keyword export shows demand for best-fit queries on the primary scatter tool.

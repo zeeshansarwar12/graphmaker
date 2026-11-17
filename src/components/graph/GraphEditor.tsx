@@ -32,6 +32,7 @@ import {
   detectDataShape,
   hasMixedSeriesScale,
 } from '../../graph/transforms/dataInterpretation';
+import { ScatterResults } from './ScatterResults';
 import { createPieData, createScatterData } from '../../graph/transforms/chartData';
 import { createHistogramData } from '../../graph/transforms/histogram';
 import { createDotPlotData, createDotPlotSuggestedLabels } from '../../graph/transforms/dotPlot';
@@ -632,7 +633,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     }
   }
 
-  async function resetGraph() {
+  async function resetGraph(loadScatterExample = false) {
     const createdAt = new Date().toISOString();
     try {
       await deleteCurrentProject(config.slug);
@@ -642,14 +643,17 @@ export function GraphEditor({ config }: GraphEditorProps) {
 
     tableBackupRef.current = undefined;
     setData(createConfiguredData(config));
-    dispatchSettings({ type: 'replace-settings', value: createConfiguredSettings(config) });
+    dispatchSettings({
+      type: 'replace-settings',
+      value: loadScatterExample ? { ...createConfiguredSettings(config), showTrendline: true } : createConfiguredSettings(config),
+    });
     setSelectedChartType(config.graphType);
     createdAtRef.current = createdAt;
     setIsSampleData(true);
     setIsCustomizeOpen(false);
     setIsResetConfirming(false);
     setProjectError(null);
-    setProjectNotice('Started a new graph.');
+    setProjectNotice(loadScatterExample ? 'Loaded the study-hours example with a line of best fit.' : 'Started a new graph.');
     setSaveStatus('saving');
   }
 
@@ -772,6 +776,15 @@ export function GraphEditor({ config }: GraphEditorProps) {
 
       <div className="grid min-w-0 lg:grid-cols-[2fr_3fr]">
         <section aria-labelledby="data-heading" className="border-border order-2 min-w-0 scroll-mt-14 border-t p-4 sm:p-5 lg:order-1 lg:border-t-0 lg:border-r" id="data-editor" ref={dataSectionRef}>
+          {config.graphType === 'scatter' && <button
+            className="button-secondary mb-3"
+            onClick={() => {
+              if (isSampleData || window.confirm('Replace your current graph with the study-hours example?')) {
+                void resetGraph(true);
+              }
+            }}
+            type="button"
+          >Load example</button>}
           {isBarPage && <Suspense fallback={<p role="status">Loading bar templates…</p>}><BarTemplateControls page={config.slug} ready={isProjectReady} drafts={draftsRef.current} activeId={activeDraftRef.current} title={settings.title} onApply={applyBarTemplate} onOpen={openDraft} onDelete={()=>{
             if(draftsRef.current.length<2||!window.confirm('Delete this graph from My graphs? Download a project backup first if needed.'))return;
             draftsRef.current=draftsRef.current.filter(d=>d.id!==activeDraftRef.current);const next=draftsRef.current[0];activeDraftRef.current=next.id;restoreDraft(next.project);setDraftRevision(value=>value+1);
@@ -844,6 +857,14 @@ export function GraphEditor({ config }: GraphEditorProps) {
                 </label>
               )}
               {selectedChartType === 'xy' && <label className="flex min-h-10 items-center gap-2 text-sm font-semibold"><input type="checkbox" checked={settings.xyPlotOnClick} onChange={event => dispatchSettings({type:'replace-settings',value:{...settings,xyPlotOnClick:event.target.checked}})} />Click to plot</label>}
+              {selectedChartType === 'scatter' && <label className="flex min-h-10 items-center gap-2 text-sm font-semibold">
+                <input
+                  type="checkbox"
+                  checked={settings.showTrendline}
+                  onChange={event => dispatchSettings({ type: 'replace-settings', value: { ...settings, showTrendline: event.target.checked } })}
+                />
+                Linear trendline and R²
+              </label>}
               {selectedChartType === 'xy' && settings.xyPlotOnClick && <label className="flex min-h-10 items-center gap-2 text-sm"><input type="checkbox" checked={settings.xySnapToGrid} onChange={event => dispatchSettings({type:'replace-settings',value:{...settings,xySnapToGrid:event.target.checked}})} />Snap to grid</label>}
               {(selectedChartType === 'xy' || selectedChartType === 'equation') && <button type="button" className="button-secondary graph-print-button" onClick={() => window.print()}>Print graph</button>}
               <button
@@ -953,6 +974,9 @@ export function GraphEditor({ config }: GraphEditorProps) {
             />
           </div>
 
+          {config.graphType === 'scatter' && selectedChartType === 'scatter' && (
+            <ScatterResults points={scatterData.points} skipped={scatterData.skippedRowCount} xName={scatterData.xName} yName={scatterData.yName} />
+          )}
           {selectedChartType === 'supplydemand' && <Suspense fallback={null}><SupplyDemandResults data={data} settings={settings}/></Suspense>}
           <div className="border-border flex flex-wrap items-center justify-between gap-3 border-t pt-4">
             <div className="flex flex-wrap gap-2">
@@ -997,7 +1021,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
               </div>
               <div className="flex gap-2">
                 <button className="button-secondary" onClick={() => setIsResetConfirming(false)} type="button">Cancel</button>
-                <button className="button-primary" onClick={resetGraph} type="button">Reset graph</button>
+                <button className="button-primary" onClick={() => void resetGraph()} type="button">Reset graph</button>
               </div>
             </div>
           )}

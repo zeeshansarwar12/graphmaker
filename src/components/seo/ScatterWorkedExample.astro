@@ -1,0 +1,38 @@
+---
+import { linearRegression } from '../../graph/statistics/regression';
+import CoordinateDiagram from './CoordinateDiagram.astro';
+
+interface Props { rows: string[][] }
+const { rows } = Astro.props;
+const points = rows.map(([x, y]): [number, number] => [Number(x), Number(y)]);
+const fit = linearRegression(points);
+const patterns: Array<{ title: string; points: Array<[number, number]> }> = [
+  { title: 'Positive association', points: [[1, 2], [2, 3], [3, 3.5], [4, 6], [5, 7], [6, 7.5]] },
+  { title: 'Negative association', points: [[1, 7.5], [2, 6], [3, 6.5], [4, 4], [5, 2], [6, 2.5]] },
+  { title: 'Little linear association', points: [[1, 4], [2, 7], [3, 2], [4, 6], [5, 3], [6, 5]] },
+];
+---
+<section class="mt-8" aria-labelledby="line-of-best-fit">
+  <h3 class="text-xl font-bold" id="line-of-best-fit">How to add a line of best fit</h3>
+  <p class="text-text-muted mt-2 leading-7">Choose <a class="text-brand underline" href="#editor">Load example in the editor</a> to try the study-hours data. For your own data, enter or paste two numeric columns, confirm the X and Y mapping in Customize, and turn on <strong>Linear trendline and R²</strong> above the preview.</p>
+  {!('error' in fit) && (
+    <figure class="border-border mt-4 rounded-lg border p-4">
+      <CoordinateDiagram label="Exam scores generally rise with hours studied. A dashed line shows the fitted trend." points={points} fit={fit.points} xRange={[0, 9]} yRange={[40, 100]} xLabel="Hours studied" yLabel="Exam score" />
+      <figcaption class="text-text-muted text-sm leading-6">
+        The fitted equation is <strong>ŷ = {fit.slope.toFixed(2)}x + {fit.intercept.toFixed(2)}</strong> with <strong>R² = {fit.rSquared?.toFixed(3)}</strong>.
+        Each additional hour corresponds to about {fit.slope.toFixed(1)} more points in the fitted scores.
+        The line accounts for about {((fit.rSquared ?? 0) * 100).toFixed(1)}% of the observed variation in scores. The data show an association. Other factors may also affect scores.
+      </figcaption>
+    </figure>
+  )}
+  <h3 class="mt-7 text-lg font-bold">How to read a scatter plot</h3>
+  <p class="text-text-muted mt-2 leading-7">An upward pattern shows a positive association, a downward pattern shows a negative association, and a cloud with no clear tilt shows little linear association. Look for curves and outliers before interpreting a straight trendline.</p>
+  <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+    {patterns.map(pattern => (
+      <figure class="border-border rounded-lg border p-2">
+        <CoordinateDiagram label={pattern.title} points={pattern.points} xRange={[0, 7]} yRange={[0, 9]} xLabel="X" yLabel="Y" />
+        <figcaption class="text-center text-sm font-semibold">{pattern.title}</figcaption>
+      </figure>
+    ))}
+  </div>
+</section>

@@ -26,6 +26,11 @@ export function linearRegression(points: Array<[number, number]>) {
   return {
     slope,
     intercept,
+    meanX,
+    meanY,
+    xx,
+    xy,
+    yy,
     rSquared,
     points: [
       [min, slope * min + intercept],

@@ -13,6 +13,7 @@ import RelatedGraphMakers from './RelatedGraphMakers.astro';
 import { barTemplatePages } from '../../content/barTemplates';
 import SupplyDemandTemplates from './SupplyDemandTemplates.astro';
 import TreeTemplateGallery from './TreeTemplateGallery.astro';
+import ScatterWorkedExample from './ScatterWorkedExample.astro';
 import TreeDiagramExample from './TreeDiagramExample.astro';
 import ProductBenefitChecks from '../ui/ProductBenefitChecks.astro';
 
@@ -116,6 +117,7 @@ const webpageSchema = config.connectedSchema ? {
         <div class="min-w-0 max-w-3xl">
           <h2 class="section-heading" id="definition-heading">{config.sectionHeadings.definition}</h2>
           {config.definition.map((paragraph) => <p class="text-text-muted mt-4 leading-7">{paragraph}</p>)}
+          {config.editor.graphType === 'scatter' && <ScatterWorkedExample rows={config.example.rows} />}
         </div>
         <div aria-labelledby="example-heading" class="min-w-0 border-border bg-surface rounded-lg border p-5 shadow-sm">
           <h2 class="text-xl font-bold" id="example-heading">{config.sectionHeadings.example}</h2>
@@ -180,12 +182,15 @@ const webpageSchema = config.connectedSchema ? {
         <div class="text-center">
           <h2 class="section-heading" id="comparison-heading">{config.comparison.title}</h2>
           <p class="text-text-muted mx-auto mt-2 max-w-2xl leading-7">{config.comparison.intro}</p>
+          {config.editor.graphType === 'scatter' && <p class="text-text-muted mx-auto mt-2 max-w-2xl leading-7">Use the <a class="text-brand underline" href="/line-graph-maker/">Line Graph Maker</a> when connecting measurements in order helps show how they change over time.</p>}
         </div>
         <div class="mt-8 grid gap-5 md:grid-cols-2">
           {[config.comparison.first, config.comparison.second].map((item) => (
             <article class="border-border rounded-lg border p-6">
               <h3 class="text-lg font-bold">{item.title}</h3>
               <p class="text-text-muted mt-2 leading-7">{item.body}</p>
+              {config.editor.graphType === 'scatter' && item === config.comparison.second && <a class="text-brand mt-3 inline-block underline" href="/xy-graph-maker/">Open XY Graph Maker</a>}
+              {config.editor.graphType === 'xy' && item === config.comparison.second && <a class="text-brand mt-3 inline-block underline" href="/scatter-plot-maker/">Open Scatter Plot Maker</a>}
             </article>
           ))}
         </div>

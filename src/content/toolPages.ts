@@ -334,7 +334,7 @@ export const xyToolPageConfig = {
     { title: 'Choose how points display', description: 'Connect points in table order or show them separately. Open Customize for axis bounds, grid spacing, coordinate-plane mode and point labels.' },
     { title: 'Customize and export', description: 'Name and color your series. Download PNG for slides or the web, choose SVG for scalable graphics, or select Print graph.' },
   ],
-  intro: 'Plot X and Y values online for free, with no signup. Enter, paste, or upload paired numeric data and download a clean graph in seconds.',
+  intro: 'Plot X and Y coordinates online. Enter or paste coordinate pairs, connect points in table order, and download your graph as PNG or SVG.',
   metaDescription: 'Paste X and Y coordinates from a spreadsheet, plot or connect your points, and download a PNG or SVG. Free to use, with no signup.',
   relatedTools: [
     { name: 'Equation Graph Maker', description: 'Enter a mathematical expression instead of coordinate pairs.', href: '/equation-graph-maker/' },
@@ -402,7 +402,7 @@ export const scatterToolPageConfig = {
     slug: '/scatter-plot-maker/',
   },
   example: {
-    caption: 'Each row represents one observation. The first numeric column maps to X and the second maps to Y.',
+    caption: 'Each row represents one student. Paste the two columns with their headers, or choose Load example in the editor. Hours Studied maps to X and Exam Score maps to Y.',
     headers: ['Hours Studied', 'Exam Score'],
     rows: scatterSampleData.rows.map((row) => [...row.cells]),
   },
@@ -424,8 +424,16 @@ export const scatterToolPageConfig = {
       question: 'What is the difference between a scatter plot and an XY graph?',
     },
     {
-      answer: 'Yes. Open Customize and enable Linear trendline and R² to calculate a least-squares regression equation and fit measure. Correlation calculations are not included. Constant X cannot be fitted; R² is undefined for constant Y.',
+      answer: 'Yes. The results below the preview show the least-squares equation and R². Enable Linear trendline and R² to draw the fit. Correlation calculations are not included. Constant X cannot be fitted; R² is undefined for constant Y.',
       question: 'Does this tool calculate a trendline or correlation?',
+    },
+    {
+      question: 'How do I find the regression equation from a data table?',
+      answer: 'Paste the paired values and check the X and Y mapping. Read the equation, slope and intercept under Line of best fit results. Expand Show calculation to see the steps for your data.',
+    },
+    {
+      question: 'What does R² mean on a scatter plot?',
+      answer: 'R² is the share of observed Y variation accounted for by the fitted line. For example, R² = 0.80 means the line accounts for 80% of the observed variation in Y.',
     },
   ],
   features: [
@@ -439,11 +447,11 @@ export const scatterToolPageConfig = {
   h1: 'Scatter Plot Maker',
   howTo: [
     { title: 'Add paired numeric data', description: 'Enter two or more numeric columns, paste a table, or upload CSV or Excel data.' },
-    { title: 'Map X and Y', description: 'Choose the numeric column for each axis and confirm the detected headers above the preview.' },
-    { title: 'Customize and export', description: 'Adjust titles, grid, and color, then download the scatter plot as PNG or SVG.' },
+    { title: 'Map X and Y', description: 'Check the detected columns above the preview. To change them, open Customize and use the X column and Y column selectors under Scatter columns.' },
+    { title: 'Add a line of best fit and export', description: 'Read the equation and R² below the preview. Turn on Linear trendline and R² to draw the line. Download PNG or SVG for the chart, CSV for the data, or a project backup to reopen your work.' },
   ],
-  intro: 'Create a scatter plot online from paired numeric data. Paste values or upload CSV and Excel files, with no signup required.',
-  metaDescription: 'Create a scatter plot online from numeric X and Y data. Map columns, import CSV or Excel files, and export PNG or SVG with no signup.',
+  intro: 'Paste paired X and Y values or upload a CSV or Excel file. Add a line of best fit to see its equation and R², then download your scatter plot as PNG or SVG.',
+  metaDescription: 'Make a free scatter plot with a line of best fit, equation, and R². Paste numeric X and Y data or upload CSV or Excel, then export PNG or SVG.',
   relatedTools: [
     { name: 'Equation Graph Maker', description: 'Enter a mathematical expression instead of coordinate pairs.', href: '/equation-graph-maker/' },
     { name: 'XY Graph Maker', description: 'Plot paired numeric values and optionally connect consecutive points.', href: '/xy-graph-maker/' },
@@ -459,7 +467,7 @@ export const scatterToolPageConfig = {
     howTo: 'How to make a scatter plot',
   },
   slug: '/scatter-plot-maker/',
-  title: 'Scatter Plot Maker — Plot X and Y Data Online | GraphMaker',
+  title: 'Free Scatter Plot Maker with Line of Best Fit | GraphMaker',
   useCases: {
     intro: 'Scatter plots work best when each coordinate pair is a separate observation and you want to understand the overall pattern.',
     items: [

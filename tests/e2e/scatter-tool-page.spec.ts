@@ -4,7 +4,7 @@ import { expect, test } from '@playwright/test';
 test('serves a complete scatter page with a points-only shared-editor preset', async ({ page }) => {
   await openPage(page, '/scatter-plot-maker/');
 
-  await expect(page).toHaveTitle('Scatter Plot Maker — Plot X and Y Data Online | GraphMaker');
+  await expect(page).toHaveTitle('Free Scatter Plot Maker with Line of Best Fit | GraphMaker');
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /numeric X and Y data/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/scatter-plot-maker\/$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Scatter Plot Maker' })).toBeVisible();
@@ -23,6 +23,10 @@ test('serves a complete scatter page with a points-only shared-editor preset', a
   await expect(page.getByLabel('X column')).toHaveValue('column-1');
   await expect(page.getByLabel('Y column')).toHaveValue('column-2');
   await page.getByRole('button', { name: 'Customize' }).click();
+  await expect(page.getByLabel('Linear trendline and R²')).not.toBeChecked();
+  await page.getByRole('button', { name: 'Load example' }).click();
+  await expect(page.getByLabel('Linear trendline and R²')).toBeChecked();
+  await expect(page.locator('[data-chart-insight]')).toContainText('R² =');
   await expect(page.getByRole('button', { name: 'Paste data' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Upload CSV' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Upload Excel' })).toBeVisible();
@@ -67,4 +71,13 @@ test('remaps imported numeric columns and stays responsive on mobile', async ({ 
   expect(await page.evaluate(
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
   )).toBe(false);
+
+  page.once('dialog', dialog => dialog.dismiss());
+  await page.getByRole('button', { name: 'Load example' }).click();
+  await expect(page.getByLabel('Height, row 1')).toHaveValue('150');
+
+  page.once('dialog', dialog => dialog.accept());
+  await page.getByRole('button', { name: 'Load example' }).click();
+  await expect(page.getByLabel('Hours Studied, row 1')).toHaveValue('1');
+  await expect(page.getByLabel('Linear trendline and R²')).toBeChecked();
 });
