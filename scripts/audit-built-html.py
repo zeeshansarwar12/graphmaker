@@ -87,11 +87,11 @@ def main():
     parser.add_argument('--inventory', action='store_true')
     args = parser.parse_args()
     tools = sorted('/' + page.stem + '/' for page in (ROOT / 'src/pages').glob('*maker.astro'))
-    routes = ['/', '/tools/', '/about/', '/privacy/', '/terms/', *tools]
+    routes = ['/', '/tools/', '/about/', '/privacy/', '/terms/', '/guides/consumer-and-producer-surplus/', *tools]
     missing = [route for route in routes if not html_path(route).is_file()]
     if missing:
         raise SystemExit('Cannot audit built HTML; build is missing these pages: ' + ', '.join(missing))
-    assert len(routes) == 20 and len(tools) == 15
+    assert len(routes) == 21 and len(tools) == 15
     errors, rows, docs = [], [], {}
 
     def check(condition, message):
@@ -185,6 +185,9 @@ def main():
             check([item.get('name') for item in items] == visible and len(visible) >= 2, f'{route}: breadcrumb schema differs from visible trail')
             bar_children = {'/grouped-bar-chart-maker/', '/horizontal-bar-graph-maker/', '/stacked-bar-graph-maker/'}
             expected_hrefs = ['/', '/bar-graph-maker/', route] if route in bar_children else ['/', '/tools/', route] if route in tools else ['/', route]
+            if route == '/guides/consumer-and-producer-surplus/':
+                expected_hrefs = ['/', '/supply-and-demand-graph-maker/', route]
+                check('Article' in types, f'{route}: missing Article schema')
             check([item.get('item') for item in items] == [ORIGIN + href for href in expected_hrefs], f'{route}: breadcrumb URLs incorrect')
             check([item.get('position') for item in items] == list(range(1, len(items) + 1)), f'{route}: breadcrumb positions incorrect')
         if route == '/tools/':

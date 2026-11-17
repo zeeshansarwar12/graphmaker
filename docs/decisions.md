@@ -185,3 +185,11 @@ Accepted: Zeeshan approved the scope in chat on 17 November 2026. Publish origin
 **Decision:** Keep line-of-best-fit, R², and regression-equation intent on `/scatter-plot-maker/`. The editor, live results, and worked calculation share that URL.
 
 **Reason:** These queries serve the same workflow of fitting and interpreting a line from paired observations. The competitor keyword export shows demand for best-fit queries on the primary scatter tool.
+
+## DEC-037 — Educational guides with a graph-making workflow
+
+**Status:** Accepted (owner approval, 17 November 2026).
+
+**Decision:** Qualifying guides can live at `/guides/<slug>/`. Each must answer a distinct educational question too detailed for a tool page, avoid repeating the tool page, contain substantially deeper original worked examples and charts, have visible breadcrumbs and Article + BreadcrumbList schema, use a self canonical and its own social image, and link contextually in both directions with at least one relevant tool.
+
+**Scope:** This exception supersedes the blanket informational-page and guide-route bans for qualifying guides only. The bans on thin, keyword-variant, modifier, Word/Excel, and AI pages remain. There is no `/guides/` hub. The first approved guide is consumer and producer surplus, paired with Supply and Demand Graph Maker.

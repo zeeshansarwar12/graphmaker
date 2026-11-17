@@ -18,3 +18,7 @@ Planned QA: lint/typecheck/units/build/HTML/audit/reporting; repeated four-worke
 Expression audit: all 131 original matcher expressions are retained across the split files, with two original duplicate HTTP-200 calls consolidated per route and the description non-null assertion becoming unnecessary in the typed snapshot aggregator. Three added completeness checks require all 20 route keys, all 18 metadata route keys and explicit metadata count 18. The new source contains 133 matcher expressions. Each original route remains in the unchanged route sets.
 
 CI inspection found artifact QA invokes Playwright without a retry override, unlike preview QA. Configuration now sets retries to zero in every environment to enforce the owner's no-retry requirement. All recorded local browser runs already used --retries=0; their effective retry configuration is identical. Test/assertion budgets remain unchanged.
+
+## 17 November 2026 — DEC-037
+
+The approved consumer and producer surplus guide adds exactly one route. The fixed hydrated metadata count increases from 18 to 19, and the fixed linked-page inventory from 20 to 21. The sitemap and link checks include the guide, while the tools count, editor selector, and nonindexable inventories remain intact. The guide uses the same SEO snapshot assertions with its own expected social image and alt text.

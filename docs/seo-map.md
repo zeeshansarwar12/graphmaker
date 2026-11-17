@@ -65,6 +65,17 @@ Do not mix these into the V1 IA automatically:
 - graph theory/network diagrams
 - AI graph maker
 
+## Guides
+
+DEC-037 permits `/guides/<slug>/` only when all conditions hold:
+
+1. The guide answers a distinct educational question that would bloat a tool page, without repeating the tool page.
+2. It provides original worked examples and charts with substantially more depth than a tool-page section.
+3. It has visible breadcrumbs, Article and BreadcrumbList schema, a self canonical, and its own social image.
+4. It links to a tool where readers can make the graph, and that tool links back contextually.
+
+Do not create a `/guides/` hub. Thin, keyword-variant, modifier, Word/Excel, and AI pages remain excluded. DEC-037 supersedes the earlier blanket guide ban only for qualifying pages.
+
 ## Internal linking
 Homepage directly links to:
 - all 10 existing graph tools
@@ -130,7 +141,7 @@ The tree page includes an accessible static labeled project diagram beside its i
 Keep /supply-and-demand-graph-maker/ canonical. Cover curve generator, maker/plotter/chart/free/online variants naturally on this page. Six crawlable scenario previews link into the shared editor using fragments. Add worked equilibrium, movement-versus-shift and practice explanations. AI remains unsupported. No Word/Excel guide routes.
 
 ## Compact supply-demand learning — 21 October 2026
-Owner requested remaining educational intent with minimal writing. Keep examples, shift reference, linear equations/functions, four practice problems and deeper supply questions on the existing tool URL. All useful references connect to real templates or existing inputs through fragments. No new guide routes or thin informational pages; no AI/trading/Word/Excel targeting.
+Owner requested remaining educational intent with minimal writing. Keep examples, shift reference, linear equations/functions, four practice problems and deeper supply questions on the existing tool URL. All useful references connect to real templates or existing inputs through fragments. Qualifying original guides may follow DEC-037. No thin informational pages or AI/trading/Word/Excel targeting.
 
 ## Bar cluster: grouped comparison — 22 October 2026
 Owner approved building the discussed bar cluster one page at a time. First page: /grouped-bar-chart-maker/ owns grouped, double, clustered, side-by-side, triple, quadruple and multiple bar graph/chart intent. The /bar-graph-maker/ pillar retains its URL and metadata and links to this workflow. Use one shared Bar editor with a matched-unit class-score example, explicit series instructions and page-isolated local saving. Register the workflow in allGraphTools for the directory, footer and sitemap, without creating another chart engine or duplicate editor selector. Graph/chart synonyms share this canonical. No AI or Excel keyword pages; no unpublished stacked/percentage links.

@@ -1,4 +1,6 @@
 ---
+import { surplusGuideRoute } from '../../content/guides/surplusExamples';
+
 const shifts = [
   { name:'Demand increases', direction:'Demand → right', result:'Price ↑ · Quantity ↑', template:'demand-increase' },
   { name:'Demand decreases', direction:'Demand → left', result:'Price ↓ · Quantity ↓', template:'demand-decrease' },
@@ -15,6 +17,7 @@ const questions = [
 <section class="border-border bg-surface-subtle border-y py-10" id="supply-quick-help" aria-label="Quick supply and demand help">
   <div class="page-shell">
     <div class="mb-6"><h2 class="text-xl font-bold">How does a supply and demand graph work?</h2><p class="text-text-muted mt-2 max-w-3xl text-sm leading-6">Quantity is horizontal; price is vertical. Supply and demand meet at equilibrium. Use the examples above, or try a question below.</p></div>
+    <p class="text-text-muted mb-6 text-sm leading-6">To measure the gains from trade and see how price rules or taxes change them, read <a class="text-brand underline" href={surplusGuideRoute}>Consumer and Producer Surplus</a>.</p>
     <div class="grid gap-5 lg:grid-cols-2">
       <section class="border-border bg-surface min-w-0 rounded-lg border p-4 sm:p-5" id="supply-shift-guide" aria-labelledby="supply-shift-guide-heading">
         <h2 class="text-lg font-bold" id="supply-shift-guide-heading">Supply and demand curve shifts</h2>

@@ -19,4 +19,5 @@ export const pageLastModified: Readonly<Record<string, string>> = {
   '/dot-plot-maker/': '2026-10-22',
   '/tree-graph-maker/': '2026-11-17',
   '/supply-and-demand-graph-maker/': '2026-11-17',
+  '/guides/consumer-and-producer-surplus/': '2026-11-17',
 };

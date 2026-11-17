@@ -12,6 +12,7 @@ const { outputFiles } = await build({
   stdin: {
     contents: `
       export * from './src/content/toolPages.ts';
+      export * from './src/content/guides/surplusExamples.ts';
       export { calculateBoxPlotStatistics } from './src/graph/statistics/boxPlot.ts';
       export { curveIntersection } from './src/graph/transforms/supplyDemandModel.ts';
       export { createTreeData } from './src/graph/transforms/tree.ts';
@@ -26,6 +27,7 @@ const { outputFiles } = await build({
 const {
   xyToolPageConfig, supplyDemandToolPageConfig, scatterToolPageConfig, boxPlotToolPageConfig,
   treeToolPageConfig, calculateBoxPlotStatistics, createTreeData, curveIntersection,
+  exampleMarket, practiceMarket, scenarioNames, surplusScenarios, surplusChart, formatSurplus,
 } = await import(`data:text/javascript;base64,${Buffer.from(outputFiles[0].contents).toString('base64')}`);
 
 const blue = '#2563eb';
@@ -182,4 +184,60 @@ for (const [config, title, draw] of examples) {
   if (Buffer.byteLength(svg) >= 30_000) throw new Error(`Example image exceeds 30 KB: ${src}`);
   await mkdir(new URL('.', output), { recursive: true });
   await writeFile(output, svg);
+}
+function surplusDiagram(model, key) {
+  const result = model[key];
+  const atPolicy = key === 'ceiling' ? model.ceilingDemand : key === 'floor' ? model.floorSupply : result.traded;
+  const maxQ = Math.ceil((Math.max(model.quantity, atPolicy) * 1.18) / 10) * 10;
+  const demandEnd = Math.min(maxQ, model.market.demandIntercept);
+  const x = scale([0, maxQ], 10, frame.left, frame.right);
+  const y = scale([0, model.demandPrice(0), model.supplyPrice(maxQ)], 10, frame.bottom, frame.top);
+  const plot = (q, p) => [x.at(q), y.at(p)];
+  const region = (vertices, color) => `<polygon points="${vertices.map(([q,p]) => plot(q,p).join(',')).join(' ')}" fill="${color}" fill-opacity=".23" />`;
+  const { traded: q, buyer, seller } = result;
+  const { quantity: eq, price } = model;
+  const areas = [
+    ['Consumer surplus', blue, [[0, buyer], [0, model.demandPrice(0)], [q, result.demandAtTraded], [q, buyer]]],
+    ['Producer surplus', green, [[0, seller], [q, seller], [q, result.supplyAtTraded], [0, model.supplyPrice(0)]]],
+  ];
+  if (result.revenue > 0) areas.push(['Tax revenue', '#7c3aed', [[0, buyer], [q, buyer], [q, seller], [0, seller]]]);
+  if (result.loss > 0) areas.push(['Deadweight loss', '#d97706', [[q, result.supplyAtTraded], [q, result.demandAtTraded], [eq, price]]]);
+  const quantities = [...new Set([0, q, eq, atPolicy])].sort((a,b) => a-b);
+  const prices = [...new Set([0, buyer, seller, price, model.demandPrice(0), model.supplyPrice(0)])].sort((a,b) => a-b);
+  const priceGuides = [...new Set([buyer, seller, price])].map(p =>
+    `<line x1="${frame.left}" y1="${y.at(p)}" x2="${frame.right}" y2="${y.at(p)}" stroke="${muted}" stroke-opacity=".6" stroke-dasharray="5 4"/>`);
+  const guides = quantities.slice(1).map(value => {
+    const end = value === atPolicy && value !== q ? buyer : value === eq ? price : Math.max(result.demandAtTraded, result.supplyAtTraded);
+    return `<line x1="${x.at(value)}" y1="${frame.bottom}" x2="${x.at(value)}" y2="${y.at(end)}" stroke="${muted}" stroke-dasharray="5 4"/>`;
+  });
+  const legend = areas.map(([label,color], i) => {
+    const lx = 100 + i * 168;
+    return point(lx, 68, color) + text(lx + 12, 74, label, {anchor:'start', size: 14});
+  }).join('');
+  return axes({...y, ticks: prices}, 'Quantity', 'Price', quantities.map(value => ({position:x.at(value), label:formatSurplus(value)})))
+    + areas.map(([,color,vertices]) => region(vertices,color)).join('') + priceGuides.join('') + guides.join('')
+    + line(...plot(0, model.demandPrice(0)), ...plot(demandEnd, model.demandPrice(demandEnd)), blue, 3)
+    + line(...plot(0, model.supplyPrice(0)), ...plot(maxQ, model.supplyPrice(maxQ)), green, 3)
+    + text(x.at(demandEnd) - 5, y.at(model.demandPrice(demandEnd)) + 20, 'Demand', {anchor:'end', fill:blue})
+    + text(frame.right - 5, y.at(model.supplyPrice(maxQ)) - 10, 'Supply', {anchor:'end', fill:green})
+    + point(...plot(eq, price), ink)
+    + text(x.at(eq) + 9, y.at(price) - 8, 'E', {anchor:'start', size:15}) + legend;
+}
+
+for (const name of [...surplusScenarios, 'practice']) {
+  const isPractice = name === 'practice';
+  const title = isPractice ? 'Practice market: notebook surplus' : scenarioNames[name];
+  const file = new URL(`../public${surplusChart(name)}`, import.meta.url);
+  const diagram = surplusDiagram(isPractice ? practiceMarket : exampleMarket, isPractice ? 'equilibrium' : name);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-labelledby="title">
+  <title id="title">${escapeXml(title)}</title>
+  <rect width="800" height="500" rx="12" fill="white" stroke="${grid}"/>
+  <g font-family="Inter, Arial, sans-serif">
+    ${text(400, 40, title, {size:26})}
+    ${diagram}
+  </g>
+</svg>
+`;
+  await mkdir(new URL('.', file), {recursive:true});
+  await writeFile(file, svg);
 }

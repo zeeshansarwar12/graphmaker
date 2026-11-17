@@ -44,7 +44,7 @@ def save(path, body):
     target.write_bytes(body)
 
 tools = sorted('/' + page.stem + '/' for page in (ROOT / 'src/pages').glob('*maker.astro'))
-routes = ['/', '/tools/', '/about/', '/privacy/', '/terms/', *tools]
+routes = ['/', '/tools/', '/about/', '/privacy/', '/terms/', '/guides/consumer-and-producer-surplus/', *tools]
 requests = [*routes, *[route.rstrip('/') for route in routes if route != '/'], '/deployment-check-missing-page/', '/sitemap.xml', '/robots.txt']
 errors, results, assets = [], [], set()
 with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
