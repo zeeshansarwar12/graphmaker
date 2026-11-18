@@ -201,3 +201,9 @@ Accepted: Zeeshan approved the scope in chat on 17 November 2026. Publish origin
 **Decision:** Consolidate five-number-summary and box-plot-from-summary intent on `/box-plot-maker/`. Add a summary input mode beside raw data, with one row per group and whiskers at the entered extremes. Summary data cannot identify individual outliers.
 
 **Persistence:** Schema-v1 projects have an optional input mode with a raw fallback and an optional summary table alongside raw observations. Switching modes keeps both tables. Converting raw data uses the existing median-of-halves calculation and the true minimum and maximum.
+
+## DEC-039 — Review time-limited dependency audit exceptions
+
+**Status:** Accepted (owner approval, 18 November 2026).
+
+CI fails for any high or critical npm advisory unless its GHSA ID appears in the reviewed `.audit-allowlist.json` file. Each entry includes an ID, a site-specific reason, and a UTC expiry date no more than 60 days out. An expired or invalid entry fails CI. The full npm audit report remains in the workflow logs. Review exceptions in the PR before merging.
