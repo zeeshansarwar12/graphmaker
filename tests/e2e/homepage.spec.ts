@@ -1,7 +1,7 @@
 import { openPage, reloadPage } from './navigation';
 import { readFile } from 'node:fs/promises';
 
-import { expect, test } from './browser-test';
+import { expect, test } from './network-timing-diagnostic';
 
 test('renders the Astro shell and shared editor island', async ({ page }) => {
   await openPage(page, '/');

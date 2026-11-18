@@ -1,4 +1,4 @@
-import {test,expect} from './browser-test';
+import {test,expect} from './network-timing-diagnostic';
 import {openPage} from './navigation';
 
 test('chart families and Excel parser are requested only when needed',async ({page})=>{
