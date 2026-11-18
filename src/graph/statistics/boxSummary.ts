@@ -71,6 +71,7 @@ export function validateBoxSummary(data: TabularData) {
   });
 
   data.rows.forEach(({ id, cells }, index) => {
+    if (cells.every(cell => !cell.trim())) return;
     const name = (cells[0] ?? '').trim();
     const label = name ? `${name} (row ${index + 1})` : `Row ${index + 1}`;
     const problems: string[] = [];

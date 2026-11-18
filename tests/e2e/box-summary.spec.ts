@@ -18,6 +18,10 @@ test('edits and validates summary rows, exports the summary and restores both ta
   await raw.focus();
   await raw.press('ArrowRight');
   await expect(summaryMode(page)).toBeChecked();
+  await page.getByRole('button', { name: 'Add row' }).click();
+  await expect(page.locator('[id^="summary-error-"]')).toHaveCount(0);
+  await expect(page.getByText('Enter a valid five-number summary for at least one group.')).toBeVisible();
+  await page.getByRole('button', { name: 'Remove row 2' }).click();
   const values = ['Group', 'Minimum', 'Q1', 'Median', 'Q3', 'Maximum'];
   for (const [index, value] of ['Group B', '2', '4', '7', '9', '16'].entries()) {
     await page.getByLabel(`${values[index]}, row 1`, { exact: true }).fill(value);
@@ -34,6 +38,16 @@ test('edits and validates summary rows, exports the summary and restores both ta
   await expect(page.getByText('Broken (row 2): use Minimum ≤ Q1 ≤ Median ≤ Q3 ≤ Maximum.')).toBeVisible();
   await expect(readyChart(page)).toContainText('Box plot with 1 group');
   await expect(readyChart(page)).not.toContainText('Broken:');
+  const ordering = page.getByText('Broken (row 2): use Minimum ≤ Q1 ≤ Median ≤ Q3 ≤ Maximum.');
+  expect(await ordering.evaluate(element => {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    return range.getClientRects().length;
+  })).toBe(1);
+  await page.setViewportSize({ width: 375, height: 812 });
+  await expect(ordering).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
+  await page.setViewportSize({ width: 1280, height: 720 });
   await page.locator('#editor').screenshot({ path: info.outputPath('summary-error.png'), animations: 'disabled' });
   const csv = page.waitForEvent('download');
   await page.getByRole('button', { name: 'CSV', exact: true }).click();
@@ -109,6 +123,12 @@ test('pastes and imports aliased summaries, fills from raw, and opens the worked
   await expect(readyChart(page)).toContainText('Class C scores: minimum 12, Q1 13, median 16, Q3 21, maximum 58');
   expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
   await page.locator('#editor').screenshot({ path: info.outputPath('summary-mobile.png'), animations: 'disabled' });
+});
+
+test('loads the fragment without confirmation when the summary table is empty', async ({ page }) => {
+  await openPage(page, route + '#box-summary-example');
+  await expect(summaryMode(page)).toBeChecked();
+  await expect(page.getByLabel('Group, row 1', { exact: true })).toHaveValue('Class C scores');
 });
 
 test('opens a legacy schema-v1 backup in Raw data mode', async ({ page }) => {

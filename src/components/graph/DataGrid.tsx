@@ -376,7 +376,7 @@ export function DataGrid({ data, isSampleData, onChange, headingId = 'data-headi
               </tr>
               {fixedTable?.rowErrors.has(row.id) && <tr className="bg-rose-50 text-rose-900">
                 <td colSpan={data.columns.length + 2} className="px-3 py-2">
-                  <ul className="sticky left-0 w-fit max-w-56 break-words sm:max-w-80" id={`summary-error-${row.id}`}>
+                  <ul className="sticky left-0 w-fit max-w-56 break-words lg:max-w-none" id={`summary-error-${row.id}`}>
                     {fixedTable.rowErrors.get(row.id)?.map(message => <li key={message}>{message}</li>)}
                   </ul>
                 </td>

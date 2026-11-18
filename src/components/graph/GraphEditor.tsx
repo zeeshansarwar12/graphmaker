@@ -180,7 +180,8 @@ export function GraphEditor({ config }: GraphEditorProps) {
   const openBoxSummaryExample = useEffectEvent(() => {
     if (window.location.hash !== '#box-summary-example') return;
     window.history.replaceState(window.history.state, '', '#editor');
-    if (!window.confirm('Load the five-number summary example? This replaces the summary table and keeps your raw data.')) return;
+    if (summaryTable.rows.some(row => row.cells.some(cell => cell.trim()))
+      && !window.confirm('Load the five-number summary example? This replaces the summary table and keeps your raw data.')) return;
     if (selectedChartType !== 'boxplot') selectChartType('boxplot');
     setBoxSummaryData(createBoxSummaryExample());
     dispatchSettings({ type: 'set-box-plot-input-mode', value: 'summary' });

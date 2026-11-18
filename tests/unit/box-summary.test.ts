@@ -7,6 +7,26 @@ import { createDataFromRows } from '../../src/graph/transforms/tabularData';
 import { createProjectSnapshot, deserializeGraphProject, serializeGraphProject } from '../../src/lib/storage/graphProject';
 
 describe('five-number summary', () => {
+  it('ignores a fully blank row', () => {
+    const result = validateBoxSummary(boxSummaryTable([[' ', '', '', '', '', '']]));
+    expect(result.groups).toEqual([]);
+    expect(result.errors.size).toBe(0);
+  });
+
+  it('ignores a blank row between valid groups', () => {
+    const result = validateBoxSummary(boxSummaryTable([
+      ['First', '1', '2', '3', '4', '5'], ['', '', '', '', '', ''], ['Last', '2', '3', '4', '5', '6'],
+    ]));
+    expect(result.groups.map(group => group.name)).toEqual(['First', 'Last']);
+    expect(result.errors.size).toBe(0);
+  });
+
+  it('reports missing values in a partially filled row', () => {
+    const result = validateBoxSummary(boxSummaryTable([['Partial', '1', '', '', '', '']]));
+    expect(result.groups).toEqual([]);
+    expect(result.errors.get('row-1')).toEqual(['Partial (row 1): enter finite numbers for Q1, Median, Q3, Maximum.']);
+  });
+
   it('reports per-row violations and keeps valid groups including equal values', () => {
     const table = boxSummaryTable([
       ['Equal', '2', '2', '2', '2', '2'],
