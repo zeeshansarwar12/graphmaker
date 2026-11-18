@@ -1,5 +1,5 @@
 import { openPage } from './navigation';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 
 async function pasteIntoFirstCell(page: import('@playwright/test').Page, text: string) {
   await page.locator('tbody input').first().evaluate((element, clipboardText) => {

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 import { openPage } from './navigation';
 
 test('grouped workflow adds a third series, exports and restores independently of the bar pillar', async ({ page }) => {

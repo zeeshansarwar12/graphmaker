@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 import { allGranted, consented, mockCmp, setConsent } from './consent-fixture';
 import { openPage, reloadPage } from './navigation';
 

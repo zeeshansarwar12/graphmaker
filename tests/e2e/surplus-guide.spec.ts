@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 import { openPage } from './navigation';
 
 const guide = '/guides/consumer-and-producer-surplus/';

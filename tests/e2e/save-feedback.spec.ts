@@ -1,4 +1,4 @@
-import {expect,test,type Page} from '@playwright/test';
+import {expect,test,type Page} from './browser-test';
 import {instrumentStorage,holdNext,waitHeld,release,attachStorageTelemetry} from './storage-gate';
 import {openPage,reloadPage} from './navigation';
 

@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 import { allGraphTools } from '../../src/content/graphTools';
 import { openPage } from './navigation';
 import { allLinkedRoutes, indexableRoutes, productionOrigin } from './seo-routes';

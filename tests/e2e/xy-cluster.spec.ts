@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./browser-test";
 import { readFile } from "node:fs/promises";
 import { openPage, reloadPage } from "./navigation";
 import type { Page } from "@playwright/test";

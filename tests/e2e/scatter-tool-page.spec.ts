@@ -1,5 +1,5 @@
 import { openPage } from './navigation';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 
 test('serves a complete scatter page with a points-only shared-editor preset', async ({ page }) => {
   await openPage(page, '/scatter-plot-maker/');

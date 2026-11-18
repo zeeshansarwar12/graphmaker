@@ -17,4 +17,16 @@ export default [
     },
     rules: reactHooks.configs.recommended.rules,
   },
+  {
+    files: ['tests/e2e/**/*.spec.ts'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        paths: [{
+          name: '@playwright/test',
+          allowTypeImports: true,
+          message: 'Import test and expect from the shared browser-test fixture.',
+        }],
+      }],
+    },
+  },
 ];

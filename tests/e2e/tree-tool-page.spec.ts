@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './browser-test';
 import { readFile } from 'node:fs/promises';
 import * as XLSX from 'xlsx';
 import { openPage, reloadPage } from './navigation';

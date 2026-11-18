@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { expect, test, type Page, type TestInfo } from '@playwright/test';
+import { expect, test, type Page, type TestInfo } from './browser-test';
 import { openPage } from './navigation';
 
 const outlierColor = [225, 29, 72];

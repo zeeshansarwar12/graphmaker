@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 import { openPage } from './navigation';
 
 test('horizontal workflow preserves ordering, grouped data, orientation and local work', async ({ page }) => {

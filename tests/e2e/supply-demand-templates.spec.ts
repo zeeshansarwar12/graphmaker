@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './browser-test';
 import { openPage, reloadPage } from './navigation';
 
 test('scenario gallery integrates with existing editor and saved projects',async({page})=>{

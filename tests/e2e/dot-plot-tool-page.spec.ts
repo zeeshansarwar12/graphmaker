@@ -1,5 +1,5 @@
 import { openPage } from './navigation';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 
 test('serves a complete Dot Plot page with the shared raw-observation preset', async ({ page }) => {
   await openPage(page, '/dot-plot-maker/');

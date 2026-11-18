@@ -1,6 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { expect, test, type TestInfo } from '@playwright/test';
+import { expect, test, type TestInfo } from './browser-test';
 import { allLinkedRoutes, indexableRoutes } from './seo-routes';
 
 interface Snapshot {

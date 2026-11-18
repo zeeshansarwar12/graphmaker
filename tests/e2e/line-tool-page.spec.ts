@@ -1,5 +1,5 @@
 import { openPage } from './navigation';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 
 test('serves a complete crawlable Line tool page with a true time-axis preset', async ({ page }) => {
   await openPage(page, '/line-graph-maker/');
