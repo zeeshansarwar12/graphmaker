@@ -1,6 +1,7 @@
 import { test as base } from '@playwright/test';
 
 export { expect } from '@playwright/test';
+export type { Page, TestInfo } from '@playwright/test';
 
 const googleHosts = new Set([
   'fundingchoicesmessages.google.com',
