@@ -9,7 +9,7 @@ const tools = [
   { name: 'Equation Graph Maker', label: 'Equation', slug: 'equation-graph-maker', description: 'Graph mathematical expressions directly on coordinate axes.', type: 'equation', icon: 'ƒ', category: 'Explore relationships' },
   { name: 'Scatter Plot Maker', label: 'Scatter', slug: 'scatter-plot-maker', description: 'Explore relationships and trends.', type: 'scatter', icon: '⠿', category: 'Explore relationships' },
   { name: 'Histogram Maker', label: 'Histogram', slug: 'histogram-maker', description: 'See the shape of a numeric distribution.', type: 'histogram', icon: '▟', category: 'Understand distributions' },
-  { name: 'Box Plot Maker', label: 'Box Plot', slug: 'box-plot-maker', description: 'Plot raw data or a five-number summary.', type: 'boxplot', icon: '▣', category: 'Understand distributions' },
+  { name: 'Box Plot Maker', label: 'Box Plot', slug: 'box-plot-maker', description: 'Show spread and quartiles from raw data or a five-number summary.', type: 'boxplot', icon: '▣', category: 'Understand distributions' },
   { name: 'Radar Chart Maker', label: 'Radar', slug: 'radar-chart-maker', description: 'Compare several metrics across profiles.', type: 'radar', icon: '⬡', category: 'Compare profiles' },
   { name: 'Dot Plot Maker', label: 'Dot Plot', slug: 'dot-plot-maker', description: 'Stack repeated observations on a true numeric scale.', type: 'dotplot', icon: '⠇', category: 'Understand distributions' },
   { name: 'Supply and Demand Graph Maker', label: 'Supply & Demand', slug: 'supply-and-demand-graph-maker', description: 'Plot economics curves and estimate equilibrium.', type: 'supplydemand', icon: '⇄', category: 'Explore economics' },
