@@ -132,20 +132,46 @@ function EChart({
     let canceled=false;
     let chart: EChartsType | null=null;
     let resizeObserver: ResizeObserver | null=null;
-    const resize = () => chart?.resize();
+    const showEngineError = () => {
+      if (canceled) return;
+      resizeObserver?.disconnect();
+      window.removeEventListener('resize', renderOrResize);
+      chart?.dispose();
+      if (chartRef.current === chart) chartRef.current = null;
+      chart = null;
+      setEngineError(true);
+      setChartReady(false);
+    };
+    const renderOrResize = () => {
+      if (canceled || container.clientWidth === 0 || container.clientHeight === 0) return;
+      if (chart) {
+        chart.resize();
+        return;
+      }
+
+      try {
+        chart = init(container, undefined, { renderer: 'canvas' });
+        chartRef.current = chart;
+        const latest = latestView.current;
+        const option = latest.axes
+          ? fitCartesianGrid(latest.options, latest.axes, chart.getWidth(), chart.getHeight())
+          : latest.options;
+        chart.setOption(option, { notMerge: true });
+        setEngineError(false);
+        setChartReady(true);
+      } catch {
+        showEngineError();
+      }
+    };
     loadChartEngine(engine).then(() => {
       if (canceled) return;
-      chart = init(container, undefined, {renderer:'canvas'});
-      chartRef.current=chart;
-      const latest=latestView.current;
-      chart.setOption(latest.axes ? fitCartesianGrid(latest.options,latest.axes,chart.getWidth(),chart.getHeight()) : latest.options,{notMerge:true});
-      resizeObserver=typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(resize);
+      resizeObserver=typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(renderOrResize);
       resizeObserver?.observe(container);
-      window.addEventListener('resize',resize);
-      setEngineError(false);setChartReady(true);
-    }).catch(() => { if(!canceled) setEngineError(true); });
+      window.addEventListener('resize', renderOrResize);
+      renderOrResize();
+    }).catch(showEngineError);
     return () => {
-      canceled=true;resizeObserver?.disconnect();window.removeEventListener('resize',resize);
+      canceled=true;resizeObserver?.disconnect();window.removeEventListener('resize',renderOrResize);
       chart?.dispose();if(chartRef.current===chart) chartRef.current=null;
     };
   }, [chartRef,engine]);
