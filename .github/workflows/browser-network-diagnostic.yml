@@ -1,0 +1,28 @@
+name: Browser network timing matrix
+on: push
+permissions:
+  contents: read
+jobs:
+  repeat:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Repeat affected specs
+        run: npx playwright test homepage.spec.ts chart-loading.spec.ts supply-drafts.spec.ts --repeat-each=10 --retries=0 --workers=2 --reporter=line,json
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: browser-network-results.json
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: browser-network-results
+          path: browser-network-results.json

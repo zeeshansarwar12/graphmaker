@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test';
+import {test,expect} from './network-timing-diagnostic';
 import {openPage,reloadPage} from './navigation';
 
 test('templates preserve edited data and settings across switching and reload',async({page})=>{
