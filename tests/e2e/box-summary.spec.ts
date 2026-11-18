@@ -114,13 +114,30 @@ test('pastes and imports aliased summaries, fills from raw, and opens the worked
   const example = page.getByRole('link', { name: 'Try this example' });
   await expect(example).toHaveAttribute('href', '#box-summary-example');
   await page.getByRole('radio', { name: 'Raw data' }).check();
-  page.once('dialog', dialog => dialog.dismiss());
-  await example.click();
+  await page.evaluate(() => {
+    const confirm = window.confirm;
+    document.documentElement.dataset.exampleConfirmCount = '0';
+    window.confirm = message => {
+      const root = document.documentElement;
+      root.dataset.exampleConfirmCount = String(Number(root.dataset.exampleConfirmCount) + 1);
+      return confirm.call(window, message);
+    };
+  });
+
+  const dismissDialog = page.waitForEvent('dialog');
+  const dismissClick = example.click();
+  await (await dismissDialog).dismiss();
+  await dismissClick;
+  await expect(page.locator('html')).toHaveAttribute('data-example-confirm-count', '1');
   await expect(page.getByRole('radio', { name: 'Raw data' })).toBeChecked();
-  page.once('dialog', dialog => dialog.accept());
-  await example.click();
+
+  const acceptDialog = page.waitForEvent('dialog');
+  const acceptClick = example.click();
+  await (await acceptDialog).accept();
+  await acceptClick;
   await expect(summaryMode(page)).toBeChecked();
   await expect(readyChart(page)).toContainText('Class C scores: minimum 12, Q1 13, median 16, Q3 21, maximum 58');
+  await expect(page.locator('html')).toHaveAttribute('data-example-confirm-count', '2');
   expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
   await page.locator('#editor').screenshot({ path: info.outputPath('summary-mobile.png'), animations: 'disabled' });
 });
