@@ -196,6 +196,6 @@ Accepted: Zeeshan approved the scope in chat on 17 November 2026. Publish origin
 
 ## DEC-039 — Review time-limited dependency audit exceptions
 
-**Status:** Proposed (18 November 2026).
+**Status:** Accepted (owner approval, 18 November 2026).
 
 CI fails for any high or critical npm advisory unless its GHSA ID appears in the reviewed `.audit-allowlist.json` file. Each entry includes an ID, a site-specific reason, and a UTC expiry date no more than 60 days out. An expired or invalid entry fails CI. The full npm audit report remains in the workflow logs. Review exceptions in the PR before merging.
