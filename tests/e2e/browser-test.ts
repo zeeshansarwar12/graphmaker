@@ -10,7 +10,7 @@ const googleHosts = new Set([
 ]);
 
 export const test = base.extend({
-  context: async ({ context, baseURL }, use) => {
+  context: async ({ context, baseURL }, runTest) => {
     if (!baseURL) throw new Error('Browser tests require a configured baseURL.');
     const appOrigin = new URL(baseURL).origin;
     const unexpected = new Set<string>();
@@ -35,7 +35,7 @@ export const test = base.extend({
       if (isExternal(url)) unexpected.add(`${request.method()} ${url.origin}${url.pathname}`);
     });
 
-    await use(context);
+    await runTest(context);
 
     if (unexpected.size > 0) {
       throw new Error(`Unstubbed external browser requests:\n${[...unexpected].join('\n')}`);
