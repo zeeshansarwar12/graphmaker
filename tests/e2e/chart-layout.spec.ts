@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 import { openPage } from './navigation';
 
 test('waits for a measurable preview before initializing the chart', async ({ page }) => {
