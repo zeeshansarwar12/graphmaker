@@ -823,7 +823,7 @@ export const boxPlotToolPageConfig = {
     },
     {
       id: 'quartiles-and-outliers',
-      intro: 'The editor calculates quartiles from each numeric group and uses the standard 1.5×IQR rule to separate whiskers from potential outliers.',
+      intro: 'In Raw data mode, the editor calculates quartiles for each numeric group and uses the 1.5×IQR rule to separate whiskers from potential outliers.',
       items: [
         { title: 'Quartiles', description: 'Q1 marks the 25th percentile, the median marks the center, and Q3 marks the 75th percentile of the sorted observations.' },
         { title: 'Whiskers', description: 'Whiskers extend to the smallest and largest observations that remain within 1.5 times the interquartile range.' },
@@ -839,7 +839,7 @@ export const boxPlotToolPageConfig = {
       items: [
         { title: 'Find the median', description: 'The line inside each box marks the median, so it gives a quick view of the typical value in that group.' },
         { title: 'Compare the box', description: 'The box spans Q1 to Q3. A taller or wider box means the middle half of the data is more spread out.' },
-        { title: 'Check whiskers and points', description: 'Whiskers show the non-outlier range, while separate points call attention to unusually low or high values.' },
+        { title: 'Check whiskers and points', description: 'Raw data whiskers show the non-outlier range. In summary mode they mark the entered minimum and maximum.' },
       ],
       title: 'How to read a box plot',
     },
@@ -859,7 +859,7 @@ export const boxPlotToolPageConfig = {
   },
   definition: [
     'A box plot summarizes numeric observations with a median, first quartile (Q1), third quartile (Q3), whiskers, and individual outlier points. It is also called a box-and-whisker plot.',
-    'This box plot graph maker treats each numeric column as a separate group and uses the actual column header as its label. The shared editor makes it easy to compare classes, experiments, teams, or other distributions side by side.',
+    'For raw observations, each numeric column is a group. In summary mode, each row gives one group’s minimum, quartiles, median, and maximum.',
     'Use the online box plot maker directly in your browser: paste raw observations or import CSV and Excel files, then customize and export the result without creating an account.',
   ],
   editor: {
@@ -897,11 +897,19 @@ export const boxPlotToolPageConfig = {
       question: 'How are quartiles, whiskers, and outliers calculated?',
     },
     {
+      question: 'Can I make a box plot from a five-number summary?',
+      answer: 'Yes. Choose Five-number summary and enter a group name, minimum, Q1, median, Q3 and maximum. The box spans Q1 to Q3, and the whiskers reach the entered extremes.',
+    },
+    {
+      question: 'Why are no outliers shown in summary mode?',
+      answer: 'A summary gives the endpoints and quartiles. It does not identify individual observations beyond the outlier fences. Use Raw data mode to calculate and display potential outliers.',
+    },
+    {
       question: 'Which quartile method is used?',
       answer: 'GraphMaker uses median-of-halves: Q1 and Q3 are the medians of the lower and upper sorted halves, excluding the overall median when the count is odd. Results can differ slightly from Excel and Google Sheets defaults, including QUARTILE.INC, which uses inclusive percentile interpolation.',
     },
     {
-      answer: 'Blank cells are skipped. Invalid non-numeric values are ignored and reported beside the graph so you can correct the source data if needed.',
+      answer: 'Raw data ignores blanks and reports invalid numbers. In summary mode, a row needs a unique group name and five ordered numeric values before it can be plotted.',
       question: 'What happens to blanks or invalid values?',
     },
     {
@@ -915,20 +923,20 @@ export const boxPlotToolPageConfig = {
   ],
   features: [
     { title: 'Multiple numeric groups', description: 'Turn each numeric column into a separate labeled box for side-by-side comparison.' },
-    { title: 'Five-number summaries', description: 'Calculate minimum, Q1, median, Q3, and maximum from raw observations.' },
-    { title: 'Outlier detection', description: 'Plot values beyond the 1.5×IQR fences as individual points.' },
+    { title: 'Five-number summaries', description: 'Enter minimum, Q1, median, Q3 and maximum for each group, or fill these values from raw observations.' },
+    { title: 'Outlier detection', description: 'In Raw data mode, plot values beyond the 1.5×IQR fences as individual points.' },
     { title: 'Safe data cleanup', description: 'Ignore blank or invalid cells safely and show an actionable warning.' },
     { title: 'Spreadsheet imports', description: 'Paste tables or upload CSV and Excel files into the existing data grid.' },
     { title: 'Local save and export', description: 'Save on this device and download the finished graph as PNG, SVG, or CSV.' },
   ],
   h1: 'Box Plot Maker',
   howTo: [
-    { title: 'Add raw numeric data', description: 'Enter one group per column, paste a spreadsheet table, or upload a CSV or Excel file.' },
+    { title: 'Add your data', description: 'Enter raw observations by column or a five-number summary by row. You can also paste or upload a spreadsheet.' },
     { title: 'Review the distribution', description: 'Compare each group’s median, Q1, Q3, whiskers, and any outlier points in the live preview.' },
     { title: 'Customize and export', description: 'Adjust labels, orientation, colors, and outlier visibility, then download the finished chart.' },
   ],
-  intro: 'Create a box and whisker plot from raw numeric data with this online box plot maker. Compare one or multiple groups, spot outliers, and export a clean graph for free.',
-  metaDescription: 'Create box and whisker plots online from raw numeric data. Compare multiple groups, calculate quartiles and outliers, and export free with no signup.',
+  intro: 'Make a box and whisker plot from raw observations or a five-number summary. Compare groups, paste or upload data, and export your graph for free.',
+  metaDescription: 'Make a box plot from raw data or a five-number summary. Compare groups, calculate quartiles and outliers from raw data, and export your graph for free.',
   relatedHeading: 'Related tools',
   relatedTools: [
     { name: 'Histogram Maker', description: 'Explore the detailed shape and frequency of one numeric distribution.', href: '/histogram-maker/' },

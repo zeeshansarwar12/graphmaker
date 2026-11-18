@@ -6,7 +6,7 @@ test('serves a complete Box Plot page with the shared grouped-data preset', asyn
   await openPage(page, '/box-plot-maker/');
 
   await expect(page).toHaveTitle('Box Plot Maker — Box and Whisker Plots Online | GraphMaker');
-  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /quartiles and outliers/);
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /raw data or a five-number summary/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/box-plot-maker\/$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Box Plot Maker' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Box Plot Maker');

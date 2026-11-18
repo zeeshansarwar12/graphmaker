@@ -1,3 +1,4 @@
+import { boxSummaryHeaders } from '../../graph/statistics/boxSummary';
 import { cartesianError, defaultCartesian } from '../../graph/configs/cartesian';
 import { createDefaultGraphSettings } from '../../graph/configs/graphSettings';
 import type { GraphSettings } from '../../graph/configs/graphSettings';
@@ -15,6 +16,7 @@ export function graphProjectStorageId(slug = '/'): string {
 }
 
 export interface GraphProject {
+  boxSummaryData?: TabularData;
   tableBackup?: { data: TabularData; settings: GraphSettings };
   createdAt: string;
   data: TabularData;
@@ -31,6 +33,7 @@ export type ProjectParseResult =
   | { error: string; ok: false };
 
 interface CreateProjectInput {
+  boxSummaryData?: TabularData;
   tableBackup?: GraphProject['tableBackup'];
   createdAt?: string;
   data: TabularData;
@@ -71,6 +74,7 @@ function isTabularData(value: unknown): value is TabularData {
 
 function isGraphSettings(value: unknown): value is GraphSettings {
   return isRecord(value)
+    && (value.boxPlotInputMode === undefined || value.boxPlotInputMode === 'raw' || value.boxPlotInputMode === 'summary')
     && (value.cartesian === undefined || (isRecord(value.cartesian) && ['xMin', 'xMax', 'yMin', 'yMax', 'xStep', 'yStep'].every(key => value.cartesian !== null && isRecord(value.cartesian) && (value.cartesian[key] === null || typeof value.cartesian[key] === 'number')) && typeof value.cartesian.origin === 'boolean' && typeof value.cartesian.equalScale === 'boolean' && cartesianError(value.cartesian as unknown as GraphSettings['cartesian']) === null))
     && (value.equations === undefined || (Array.isArray(value.equations) && value.equations.length <= 8 && value.equations.every(expression => typeof expression === 'string' && expression.length <= 512)))
     && ['showTrendline', 'xyPlotOnClick', 'xySnapToGrid'].every(key => value[key] === undefined || typeof value[key] === 'boolean')
@@ -130,6 +134,7 @@ function isGraphSettings(value: unknown): value is GraphSettings {
 }
 
 export function createProjectSnapshot({
+  boxSummaryData,
   tableBackup,
   createdAt,
   data,
@@ -138,6 +143,7 @@ export function createProjectSnapshot({
   settings,
 }: CreateProjectInput): GraphProject {
   return {
+    ...(boxSummaryData ? { boxSummaryData } : {}),
     ...(tableBackup ? { tableBackup } : {}),
     createdAt: createdAt ?? now,
     data,
@@ -172,6 +178,11 @@ export function parseGraphProject(value: unknown): ProjectParseResult {
     || !isIsoDate(value.createdAt)
     || !isIsoDate(value.updatedAt)
     || (value.tableBackup !== undefined && (!isRecord(value.tableBackup) || !isTabularData(value.tableBackup.data) || !isGraphSettings(value.tableBackup.settings)))
+    || (value.boxSummaryData !== undefined && (!isTabularData(value.boxSummaryData)
+      || !value.boxSummaryData.rows.length
+      || value.boxSummaryData.columns.length !== boxSummaryHeaders.length
+      || !value.boxSummaryData.columns.every((column, index) => column.name === boxSummaryHeaders[index]
+        && column.kind === (index === 0 ? 'label' : 'number'))))
     || !isTabularData(value.data)
     || !isGraphSettings(value.settings)
   ) {

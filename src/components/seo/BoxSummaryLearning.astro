@@ -1,0 +1,25 @@
+---
+import { boxSummaryExample, boxSummaryHeaders, createBoxSummaryExample } from '../../graph/statistics/boxSummary';
+
+const cells = createBoxSummaryExample().rows[0].cells;
+---
+<section class="page-shell py-12" id="five-number-summary" aria-labelledby="five-number-summary-heading">
+  <div class="mx-auto max-w-3xl">
+    <h2 class="section-heading" id="five-number-summary-heading">Make a box plot from a five-number summary</h2>
+    <ol class="text-text-muted mt-4 list-decimal space-y-2 pl-5 leading-7">
+      <li>Select <strong>Five-number summary</strong> above the data table.</li>
+      <li>Enter a group name and its minimum, Q1, median, Q3 and maximum in one row. Repeat for each group.</li>
+      <li>Check the box and whiskers in the preview, then download the chart as PNG or SVG.</li>
+    </ol>
+    <h3 class="mt-6 text-lg font-bold">Worked example</h3>
+    <p class="text-text-muted mt-2 leading-7">The scores {boxSummaryExample.observations.join(', ')} give this summary using the median-of-halves method.</p>
+    <div class="border-border mt-3 overflow-x-auto rounded-md border">
+      <table class="w-full border-collapse text-left text-sm">
+        <thead class="bg-surface-subtle"><tr>{boxSummaryHeaders.map(header => <th class="px-3 py-2" scope="col">{header}</th>)}</tr></thead>
+        <tbody><tr>{cells.map(cell => <td class="px-3 py-2">{cell}</td>)}</tr></tbody>
+      </table>
+    </div>
+    <p class="text-text-muted mt-3 leading-7">Draw the box from {cells[2]} to {cells[4]}, place the median at {cells[3]}, and extend the whiskers to {cells[1]} and {cells[5]}.</p>
+    <a class="button-secondary mt-4" href="#box-summary-example">Try this example</a>
+  </div>
+</section>

@@ -6,7 +6,7 @@ import type {GraphProject} from '../../lib/storage/graphProject';
 import {readSupplyWorkspace, writeSupplyWorkspace} from '../../lib/storage/supplyDrafts';
 import {createSupplyDemandTemplateData} from '../../content/supplyDemandTemplates';
 import { createTreeTemplateData } from '../../content/treeTemplates';
-import { lazy, Suspense, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useEffectEvent, useMemo, useReducer, useRef, useState } from 'react';
 import { xyColumns, xyLabels } from '../../graph/transforms/xy';
 import { coordinatePlane, cartesianError } from '../../graph/configs/cartesian';
 import type { CartesianSettings } from '../../graph/configs/cartesian';
@@ -44,6 +44,10 @@ import {
   createBoxPlotData,
   createBoxPlotSuggestedLabels,
 } from '../../graph/statistics/boxPlot';
+import {
+  boxSummaryFromRaw, boxSummaryHeaderIndexes, boxSummaryTable, createBoxSummaryExample,
+  prepareBoxSummaryImport, validateBoxSummary,
+} from '../../graph/statistics/boxSummary';
 import { createSampleData } from '../../graph/transforms/tabularData';
 import type { TabularData } from '../../graph/transforms/tabularData';
 import {
@@ -61,6 +65,7 @@ import { DataGrid } from './DataGrid';
 import { GraphCanvas } from './GraphCanvas';
 import type { GraphCanvasHandle } from './GraphCanvas';
 
+const emptyBoxSummary = boxSummaryTable();
 const BarTemplateControls = lazy(() => import('./BarTemplateControls'));
 const SupplyDemandResults = lazy(() => import('./SupplyDemandResults'));
 const SupplyDemandInput = lazy(() => import('./SupplyDemandInput'));
@@ -103,6 +108,8 @@ export function GraphEditor({ config }: GraphEditorProps) {
   const tableBackupRef = useRef<GraphProject['tableBackup']>(undefined);
   const createdAtRef = useRef(new Date().toISOString());
   const [data, setData] = useState(() => createConfiguredData(config));
+  const isBoxPlotPage = config.slug === '/box-plot-maker/';
+  const [boxSummaryData, setBoxSummaryData] = useState<TabularData>();
   const isTreePage=config.graphType==='tree';
   const isSupplyPage=config.graphType==='supplydemand';
   const isBarPage=['/bar-graph-maker/','/grouped-bar-chart-maker/','/horizontal-bar-graph-maker/','/stacked-bar-graph-maker/'].includes(config.slug);
@@ -143,13 +150,53 @@ export function GraphEditor({ config }: GraphEditorProps) {
   const [storageError, setStorageError] = useState<string | null>(null);
   const [projectNotice, setProjectNotice] = useState<string | null>(null);
   const [selectedChartType, setSelectedChartType] = useState<RenderedChartType>(config.graphType);
-  const [savedState, setSavedState] = useState<{ data: TabularData; settings: ReturnType<typeof createConfiguredSettings>; chartType: RenderedChartType } | null>(null);
+  const [savedState, setSavedState] = useState<{ data: TabularData; boxSummaryData?: TabularData; settings: ReturnType<typeof createConfiguredSettings>; chartType: RenderedChartType } | null>(null);
   const [saveStatus, setSaveStatus] = useState<'checking' | 'error' | 'saved' | 'saving'>('checking');
   const [settings, dispatchSettings] = useReducer(
     graphSettingsReducer,
     config,
     createConfiguredSettings,
   );
+
+  const isSummaryMode = isBoxPlotPage && selectedChartType === 'boxplot' && settings.boxPlotInputMode === 'summary';
+  const summaryTable = boxSummaryData ?? emptyBoxSummary;
+  const summaryErrors = useMemo(() => isSummaryMode ? validateBoxSummary(summaryTable).errors : new Map<string, string[]>(), [isSummaryMode, summaryTable]);
+  const chartSettings = !isSummaryMode && settings.boxPlotInputMode === 'summary'
+    ? { ...settings, boxPlotInputMode: 'raw' as const } : settings;
+
+  function fillBoxSummary() {
+    const converted = boxSummaryFromRaw(data);
+    if (!converted) {
+      setProjectError('Add compatible numeric observations in Raw data before filling a summary.');
+      return;
+    }
+    if (summaryTable.rows.some(row => row.cells.some(cell => cell.trim()))
+      && !window.confirm('Replace the current summary with values calculated from your raw data?')) return;
+    setBoxSummaryData(converted);
+    setProjectError(null);
+    setProjectNotice('Filled the summary using the true minimum and maximum.');
+  }
+
+  const openBoxSummaryExample = useEffectEvent(() => {
+    if (window.location.hash !== '#box-summary-example') return;
+    window.history.replaceState(window.history.state, '', '#editor');
+    if (summaryTable.rows.some(row => row.cells.some(cell => cell.trim()))
+      && !window.confirm('Load the five-number summary example? This replaces the summary table and keeps your raw data.')) return;
+    if (selectedChartType !== 'boxplot') selectChartType('boxplot');
+    setBoxSummaryData(createBoxSummaryExample());
+    dispatchSettings({ type: 'set-box-plot-input-mode', value: 'summary' });
+    setProjectError(null);
+    setProjectNotice('Loaded the five-number summary example.');
+    window.requestAnimationFrame(() => dataSectionRef.current?.scrollIntoView({ block: 'start' }));
+  });
+
+  useEffect(() => {
+    if (!isBoxPlotPage || !isProjectReady) return;
+    const handleHash = () => openBoxSummaryExample();
+    window.addEventListener('hashchange', handleHash);
+    handleHash();
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, [isBoxPlotPage, isProjectReady]);
 
   function applyBarTemplate(template: BarTemplate) {
     if(!isBarPage||template.page!==config.slug)return;
@@ -210,7 +257,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
   );
   const boxPlotData = useMemo(() => createBoxPlotData(data), [data]);
   const activeSeriesColumnIndexes = selectedChartType === 'tree' ? [] : selectedChartType === 'boxplot'
-    ? boxPlotData.groups.map((group) => group.columnIndex)
+    ? isSummaryMode ? [] : boxPlotData.groups.map((group) => group.columnIndex)
     : selectedChartType === 'histogram'
     ? histogramData.numericColumnIndexes
     : selectedChartType === 'dotplot'
@@ -268,7 +315,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     ? 'Scatter plot'
     : `${interpretation.recommendation} chart`;
   const hasUsableScatterColumns = scatterData.xColumnIndex !== null && scatterData.yColumnIndex !== null;
-  const suppressRecommendation = selectedChartType === 'tree' || selectedChartType === 'equation' || (selectedChartType === 'xy' && hasUsableScatterColumns)
+  const suppressRecommendation = isSummaryMode || selectedChartType === 'tree' || selectedChartType === 'equation' || (selectedChartType === 'xy' && hasUsableScatterColumns)
     || (selectedChartType === 'scatter' && hasUsableScatterColumns)
     || (selectedChartType === 'dotplot' && dotPlotData.isCompatible)
     || (selectedChartType === 'supplydemand' && supplyDemandData.isCompatible)
@@ -418,10 +465,11 @@ export function GraphEditor({ config }: GraphEditorProps) {
         if (cancelled) return;
 
         const storedProjectMatchesPage = stored.status === 'ready'
-          && (config.slug === '/' || stored.project.graphType === config.graphType || (stored.project.graphType === 'equation' && !!stored.project.tableBackup));
+          && (config.slug === '/' || stored.project.graphType === config.graphType || (isBoxPlotPage && !!stored.project.boxSummaryData) || (stored.project.graphType === 'equation' && !!stored.project.tableBackup));
 
         if (storedProjectMatchesPage) {
           tableBackupRef.current = stored.project.tableBackup;
+          if (isBoxPlotPage) setBoxSummaryData(stored.project.boxSummaryData);
           setData(stored.project.data);
           dispatchSettings({ type: 'replace-settings', value: stored.project.settings });
           setSelectedChartType(stored.project.graphType);
@@ -458,14 +506,14 @@ export function GraphEditor({ config }: GraphEditorProps) {
     return () => {
       cancelled = true;
     };
-  }, [config,isTreePage,isSupplyPage,isBarPage]);
+  }, [config,isTreePage,isSupplyPage,isBarPage,isBoxPlotPage]);
 
   useEffect(() => {
     if (!isProjectReady || !isStorageAvailable) return;
 
     const timer = window.setTimeout(() => {
       setSaveStatus('saving');
-      const project = createProjectSnapshot({tableBackup:tableBackupRef.current,
+      const project = createProjectSnapshot({tableBackup:tableBackupRef.current, boxSummaryData,
         createdAt: createdAtRef.current,
         data,
         graphType: selectedChartType,
@@ -475,7 +523,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
       void persistProject(project)
         .then(() => {
           setStorageError(null);
-          setSavedState({ data, settings, chartType: selectedChartType });
+          setSavedState({ data, boxSummaryData, settings, chartType: selectedChartType });
           setSaveStatus('saved');
         })
         .catch(() => {
@@ -486,7 +534,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     }, 350);
 
     return () => window.clearTimeout(timer);
-  }, [config.slug, data, isProjectReady, isStorageAvailable, selectedChartType, settings,rememberTrees,persistProject]);
+  }, [config.slug, data, boxSummaryData, isProjectReady, isStorageAvailable, selectedChartType, settings,rememberTrees,persistProject]);
 
   const setEquationData = useCallback((nextData: TabularData) => { setData(nextData); }, []);
   function setCartesian(axes: CartesianSettings) { const error=cartesianError(axes); if(error) {setProjectError(error);return;} dispatchSettings({type:'replace-settings', value:{...settings,cartesian:axes}}); }
@@ -555,7 +603,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
   async function saveNow() {
     setSaveStatus('saving');
     try {
-      await persistProject(createProjectSnapshot({tableBackup:tableBackupRef.current,
+      await persistProject(createProjectSnapshot({tableBackup:tableBackupRef.current, boxSummaryData,
         createdAt: createdAtRef.current,
         data,
         graphType: selectedChartType,
@@ -564,7 +612,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
       setIsStorageAvailable(true);
       setStorageError(null);
       setProjectNotice(null);
-      setSavedState({ data, settings, chartType: selectedChartType });
+      setSavedState({ data, boxSummaryData, settings, chartType: selectedChartType });
       setSaveStatus('saved');
       return true;
     } catch {
@@ -588,14 +636,14 @@ export function GraphEditor({ config }: GraphEditorProps) {
 
   function exportCsv() {
     downloadTextFile(
-      serializeDatasetAsCsv(data),
+      serializeDatasetAsCsv(isSummaryMode ? summaryTable : data),
       createDownloadFilename(settings.title, 'csv'),
       'text/csv;charset=utf-8',
     );
   }
 
   function exportProject() {
-    const project = createProjectSnapshot({tableBackup:tableBackupRef.current,
+    const project = createProjectSnapshot({tableBackup:tableBackupRef.current, boxSummaryData,
       createdAt: createdAtRef.current,
       data,
       graphType: selectedChartType,
@@ -619,7 +667,10 @@ export function GraphEditor({ config }: GraphEditorProps) {
         setProjectError(parsed.error);
         return;
       }
+      if (isBoxPlotPage && (!isSampleData || boxSummaryData?.rows.some(row => row.cells.some(cell => cell.trim())))
+        && !window.confirm('Replace the current project with this backup?')) return;
       tableBackupRef.current = parsed.project.tableBackup;
+      if (isBoxPlotPage) setBoxSummaryData(parsed.project.boxSummaryData);
       setData(parsed.project.data);
       dispatchSettings({ type: 'replace-settings', value: parsed.project.settings });
       setSelectedChartType(parsed.project.graphType);
@@ -642,6 +693,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     }
 
     tableBackupRef.current = undefined;
+    setBoxSummaryData(undefined);
     setData(createConfiguredData(config));
     dispatchSettings({
       type: 'replace-settings',
@@ -657,7 +709,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
     setSaveStatus('saving');
   }
 
-  const currentSaveStatus = saveStatus === 'saved' && (savedState?.data !== data || savedState?.settings !== settings || savedState?.chartType !== selectedChartType) ? 'saving' : saveStatus;
+  const currentSaveStatus = saveStatus === 'saved' && (savedState?.data !== data || savedState?.boxSummaryData !== boxSummaryData || savedState?.settings !== settings || savedState?.chartType !== selectedChartType) ? 'saving' : saveStatus;
 
   return (
     <section
@@ -774,8 +826,25 @@ export function GraphEditor({ config }: GraphEditorProps) {
         </button>
       </nav>
 
-      <div className="grid min-w-0 lg:grid-cols-[2fr_3fr]">
+      <div className={isSummaryMode ? "grid min-w-0 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]" : "grid min-w-0 lg:grid-cols-[2fr_3fr]"}>
         <section aria-labelledby="data-heading" className="border-border order-2 min-w-0 scroll-mt-14 border-t p-4 sm:p-5 lg:order-1 lg:border-t-0 lg:border-r" id="data-editor" ref={dataSectionRef}>
+          {isBoxPlotPage && selectedChartType === 'boxplot' && <fieldset className="border-border mb-4 rounded-md border p-3" id="box-summary-example">
+            <legend className="px-1 text-sm font-semibold">Box plot input mode</legend>
+            <div className="flex flex-wrap gap-x-4 gap-y-2">
+              {(['raw', 'summary'] as const).map(mode => <label className="flex min-h-10 items-center gap-2 text-sm font-medium" key={mode}>
+                <input className="accent-brand" type="radio" name="box-plot-input-mode" checked={isSummaryMode === (mode === 'summary')}
+                  onChange={() => {
+                    dispatchSettings({ type: 'set-box-plot-input-mode', value: mode });
+                    setProjectError(null);
+                  }} />
+                {mode === 'raw' ? 'Raw data' : 'Five-number summary'}
+              </label>)}
+            </div>
+            {isSummaryMode && <>
+              <button className="button-secondary mt-2" type="button" onClick={fillBoxSummary}>Fill from my raw data</button>
+              <p className="text-text-muted mt-1 text-sm">Uses each group’s true minimum and maximum, including any outliers in the raw data.</p>
+            </>}
+          </fieldset>}
           {config.graphType === 'scatter' && <button
             className="button-secondary mb-3"
             onClick={() => {
@@ -831,7 +900,15 @@ export function GraphEditor({ config }: GraphEditorProps) {
               if(isSupplyPage)void persistProject(next).catch(()=>setStorageError('Your graphs are available for this session, but saving failed. Download project backups to keep them.'));
               return true;
             }}/></Suspense>
-            : <><DataGrid data={data} isSampleData={isSampleData} onChange={updateData} />{selectedChartType === 'xy' && <div className="mt-3"><p className="text-sm text-text-muted">Use X followed by one or more Y columns. Optional point names appear with coordinate labels.</p>{!data.columns.some(column => column.kind === 'label') && <button className="button-secondary mt-2" onClick={addPointNames} type="button">Add point names</button>}</div>}</>}
+            : <>{isSummaryMode ? <DataGrid key="box-summary" data={summaryTable} isSampleData={false}
+              protectData fixedTable={{
+                prepareImport: prepareBoxSummaryImport,
+                hasHeader: row => boxSummaryHeaderIndexes(row).filter(index => index >= 0).length >= 2,
+                rowErrors: summaryErrors,
+              }}
+              headingLabel="Summary data"
+              onChange={next => setBoxSummaryData(next.rows.length ? next : emptyBoxSummary)}
+            /> : <DataGrid key="raw" data={data} isSampleData={isSampleData} onChange={updateData} protectData={isBoxPlotPage} />}{selectedChartType === 'xy' && <div className="mt-3"><p className="text-sm text-text-muted">Use X followed by one or more Y columns. Optional point names appear with coordinate labels.</p>{!data.columns.some(column => column.kind === 'label') && <button className="button-secondary mt-2" onClick={addPointNames} type="button">Add point names</button>}</div>}</>}
 
         </section>
 
@@ -895,7 +972,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
                 yColumnId: data.columns[scatterData.yColumnIndex!].id,
               } : undefined}
               series={seriesDefinitions}
-              settings={settings}
+              settings={chartSettings}
               supplyDemandMapping={selectedChartType === 'supplydemand' ? {
                 columns: data.columns.map((column, index) => ({
                   id: column.id,
@@ -914,7 +991,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
             />
           )}
 
-          {selectedChartType !== 'tree' && selectedChartType !== 'equation' && <section aria-label="Detected data" className="border-border bg-surface-subtle mt-3 rounded-md border px-3 py-2 text-sm">
+          {!isSummaryMode && selectedChartType !== 'tree' && selectedChartType !== 'equation' && <section aria-label="Detected data" className="border-border bg-surface-subtle mt-3 rounded-md border px-3 py-2 text-sm">
             <p className="text-text-muted flex flex-wrap items-center gap-x-1.5 gap-y-1">
               <span><span className="text-text font-semibold">Detected:</span> {detectedRelationship}</span>
               <span aria-hidden="true">·</span>
@@ -939,7 +1016,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
             {selectedChartType === 'dotplot' && dotPlotData.isCompatible && dotPlotData.numericColumnIndexes.length > 1 && (
               <p className="text-text-muted mt-1">Dot plot uses {dotPlotData.seriesName || 'the first numeric series'}. Change the selected series in Customize.</p>
             )}
-            {selectedChartType === 'boxplot' && boxPlotData.isCompatible && (
+            {selectedChartType === 'boxplot' && !isSummaryMode && boxPlotData.isCompatible && (
               <p className="text-text-muted mt-1">Box plot groups: {boxPlotData.groups.map((group) => group.name).join(', ') || 'None'}.</p>
             )}
           </section>}
@@ -960,7 +1037,7 @@ export function GraphEditor({ config }: GraphEditorProps) {
               onRetryChart={() => { if(isTreePage && !rememberTreesRef.current){setProjectError('Download a project backup before reloading. Session-only diagrams will be lost when this page closes.');return;} void saveNow().then(saved => {if(saved) window.location.reload();}); }}
               treeFitRequest={treeFitRequest}
               chartType={selectedChartType}
-              data={data}
+              data={isSummaryMode ? summaryTable : data}
               incompatibleAction={isSelectedChartIncompatible && recommendedRenderedType ? {
                 label: `Switch to ${interpretation.recommendation}`,
                 onClick: () => selectChartType(recommendedRenderedType),
@@ -968,12 +1045,13 @@ export function GraphEditor({ config }: GraphEditorProps) {
               onRenameTreeNode={(id, label) => updateData({...data, rows: data.rows.map(row => row.cells[0].trim() === id ? {...row,cells:[row.cells[0],label,row.cells[2]]} : row)})}
               onToggleSeries={toggleSeriesVisibility}
               ref={graphCanvasRef}
-              settings={settings}
+              settings={chartSettings}
               onPlotPoint={selectedChartType === 'xy' && settings.xyPlotOnClick ? plotCoordinate : undefined}
               onViewportChange={selectedChartType === 'equation' ? setCartesian : undefined}
             />
           </div>
 
+          {isSummaryMode && <p className="text-text-muted my-3 text-sm">Whiskers show the minimum and maximum. Outliers can't be identified from a five-number summary.</p>}
           {config.graphType === 'scatter' && selectedChartType === 'scatter' && (
             <ScatterResults points={scatterData.points} skipped={scatterData.skippedRowCount} xName={scatterData.xName} yName={scatterData.yName} />
           )}

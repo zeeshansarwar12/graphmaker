@@ -118,7 +118,7 @@ export function CustomizePanel({
             />
             Show grid
           </label>}
-          {chartType === 'boxplot' && <label className="flex items-center gap-2 text-sm font-medium">
+          {chartType === 'boxplot' && settings.boxPlotInputMode !== 'summary' && <label className="flex items-center gap-2 text-sm font-medium">
             <input
               checked={settings.showOutliers}
               className="accent-brand h-4 w-4"

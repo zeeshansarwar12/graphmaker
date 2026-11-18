@@ -194,6 +194,14 @@ Accepted: Zeeshan approved the scope in chat on 17 November 2026. Publish origin
 
 **Scope:** This exception supersedes the blanket informational-page and guide-route bans for qualifying guides only. The bans on thin, keyword-variant, modifier, Word/Excel, and AI pages remain. There is no `/guides/` hub. The first approved guide is consumer and producer surplus, paired with Supply and Demand Graph Maker.
 
+## DEC-038 — Box plots from five-number summaries
+
+**Status:** Accepted (owner approval, 17 November 2026).
+
+**Decision:** Consolidate five-number-summary and box-plot-from-summary intent on `/box-plot-maker/`. Add a summary input mode beside raw data, with one row per group and whiskers at the entered extremes. Summary data cannot identify individual outliers.
+
+**Persistence:** Schema-v1 projects have an optional input mode with a raw fallback and an optional summary table alongside raw observations. Switching modes keeps both tables. Converting raw data uses the existing median-of-halves calculation and the true minimum and maximum.
+
 ## DEC-039 — Review time-limited dependency audit exceptions
 
 **Status:** Accepted (owner approval, 18 November 2026).

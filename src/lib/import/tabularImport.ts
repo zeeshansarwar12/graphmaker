@@ -12,6 +12,8 @@ export type TabularImportResult =
   }
   | { error: string; ok: false };
 
+export type TabularImportAdapter = (rows: string[][]) => TabularImportResult;
+
 type ImportedCell = boolean | Date | number | string | null | undefined;
 
 function cellToString(value: ImportedCell): string {
@@ -33,12 +35,13 @@ export function normalizeImportedRows(inputRows: ImportedCell[][]): string[][] {
   ));
 }
 
-export function prepareTabularImport(inputRows: ImportedCell[][], blankMessage: string): TabularImportResult {
+export function prepareTabularImport(inputRows: ImportedCell[][], blankMessage: string, adapt?: TabularImportAdapter): TabularImportResult {
   const rows = normalizeImportedRows(inputRows);
   if (rows.length === 0 || rows.every((row) => row.every((value) => value.trim() === ''))) {
     return { error: blankMessage, ok: false };
   }
 
+  if (adapt) return adapt(rows);
   return {
     data: createDataFromRows(rows),
     headerDetected: rowsHaveHeader(rows),
@@ -46,7 +49,7 @@ export function prepareTabularImport(inputRows: ImportedCell[][], blankMessage: 
   };
 }
 
-export function parseCsvText(input: string): TabularImportResult {
+export function parseCsvText(input: string, adapt?: TabularImportAdapter): TabularImportResult {
   if (input.trim() === '') {
     return { error: 'This CSV file is blank. Choose a file with at least one row of data.', ok: false };
   }
@@ -63,10 +66,11 @@ export function parseCsvText(input: string): TabularImportResult {
   return prepareTabularImport(
     parsed.data,
     'This CSV file is blank. Choose a file with at least one row of data.',
+    adapt,
   );
 }
 
-export async function parseXlsxBuffer(input: ArrayBuffer): Promise<TabularImportResult> {
+export async function parseXlsxBuffer(input: ArrayBuffer, adapt?: TabularImportAdapter): Promise<TabularImportResult> {
   const bytes = new Uint8Array(input);
   const isZipFile = bytes.length >= 4
     && bytes[0] === 0x50
@@ -96,6 +100,7 @@ export async function parseXlsxBuffer(input: ArrayBuffer): Promise<TabularImport
     return prepareTabularImport(
       rows,
       'This Excel workbook is blank. Add data to its first sheet and try again.',
+      adapt,
     );
   } catch {
     return { error: 'This XLSX file is malformed or could not be read.', ok: false };
