@@ -7,6 +7,7 @@ import {
   createBoxPlotData,
   minimumBoxPlotObservations,
 } from '../statistics/boxPlot';
+import { validateBoxSummary } from '../statistics/boxSummary';
 import type { BoxPlotGroup } from '../statistics/boxPlot';
 import type { TabularData } from '../transforms/tabularData';
 
@@ -22,7 +23,10 @@ export type BoxPlotChartView =
   };
 
 export function createBoxPlotChartView(data: TabularData, settings: GraphSettings): BoxPlotChartView {
-  const boxPlot = createBoxPlotData(data);
+  const isSummary = settings.boxPlotInputMode === 'summary';
+  const boxPlot = isSummary
+    ? { ...validateBoxSummary(data), isCompatible: true, recommendedChart: null }
+    : createBoxPlotData(data);
   if (!boxPlot.isCompatible) {
     if (boxPlot.recommendedChart) {
       return {
@@ -37,8 +41,12 @@ export function createBoxPlotChartView(data: TabularData, settings: GraphSetting
     };
   }
 
+  if (isSummary && boxPlot.groups.length === 0) {
+    return { message: 'Enter a valid five-number summary for at least one group.', status: 'empty' };
+  }
+
   const columnIds = boxPlot.groups.map((group) => group.columnId);
-  const visibleIndexes = getVisibleSeriesIndexes(settings, columnIds);
+  const visibleIndexes = isSummary ? columnIds.map((_, index) => index) : getVisibleSeriesIndexes(settings, columnIds);
   const groups = visibleIndexes.map((index) => boxPlot.groups[index]).filter(Boolean);
   if (groups.length === 0) {
     return {
@@ -88,7 +96,7 @@ export function createBoxPlotChartView(data: TabularData, settings: GraphSetting
     splitLine: { lineStyle: { color: '#e2e8f0' }, show: settings.showGrid },
     type: 'value' as const,
   };
-  const smallGroups = groups.filter((group) => group.values.length < minimumBoxPlotObservations);
+  const smallGroups = isSummary ? [] : groups.filter((group) => group.values.length < minimumBoxPlotObservations);
   const invalidValueCount = groups.reduce((sum, group) => sum + group.invalidValueCount, 0);
   const warnings = [
     smallGroups.length > 0
@@ -100,7 +108,7 @@ export function createBoxPlotChartView(data: TabularData, settings: GraphSetting
   ].filter(Boolean);
   const summary = groups.map((group) => {
     const stats = group.statistics;
-    return `${group.name}: minimum ${stats.minimum}, Q1 ${stats.q1}, median ${stats.median}, Q3 ${stats.q3}, maximum ${stats.maximum}, IQR ${stats.interquartileRange}, ${stats.outliers.length} outlier${stats.outliers.length === 1 ? '' : 's'}`;
+    return `${group.name}: minimum ${stats.minimum}, Q1 ${stats.q1}, median ${stats.median}, Q3 ${stats.q3}, maximum ${stats.maximum}, IQR ${stats.interquartileRange}${isSummary ? '' : `, ${stats.outliers.length} outlier${stats.outliers.length === 1 ? '' : 's'}`}`;
   }).join('. ');
 
   return {
@@ -109,7 +117,7 @@ export function createBoxPlotChartView(data: TabularData, settings: GraphSetting
       animationDuration: 250,
       aria: { enabled: true },
       grid: { bottom: 58, containLabel: true, left: 58, right: 24, top: 28 },
-      series: settings.showOutliers ? [boxSeries, outlierSeries] : [boxSeries],
+      series: !isSummary && settings.showOutliers ? [boxSeries, outlierSeries] : [boxSeries],
       tooltip: { confine: true, trigger: 'item' },
       xAxis: isVertical
         ? { ...categoryAxis, name: settings.xAxisTitle || 'Group', nameGap: 36, nameLocation: 'middle' }

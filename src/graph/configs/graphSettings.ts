@@ -15,6 +15,7 @@ export interface GraphSettings {
   histogramBinCount: number | null;
   histogramSeriesColumnId: string | null;
   orientation: GraphOrientation;
+  boxPlotInputMode?: 'raw' | 'summary';
   barLayout?: 'grouped' | 'stacked';
   pieSeriesColumnId: string | null;
   radarFilled: boolean;
@@ -49,6 +50,7 @@ export type GraphSettingsAction =
   | { type: 'set-grid'; value: boolean }
   | { type: 'set-legend'; value: boolean }
   | { type: 'set-orientation'; value: GraphOrientation }
+  | { type: 'set-box-plot-input-mode'; value: NonNullable<GraphSettings['boxPlotInputMode']> }
   | { type: 'set-bar-layout'; value: 'grouped' | 'stacked' }
   | { type: 'set-outliers'; value: boolean }
   | { type: 'set-pie-series'; value: string }
@@ -137,6 +139,8 @@ export function graphSettingsReducer(
       return { ...settings, showGrid: action.value };
     case 'set-legend':
       return { ...settings, showLegend: action.value };
+    case 'set-box-plot-input-mode':
+      return { ...settings, boxPlotInputMode: action.value };
     case 'set-bar-layout':
       return { ...settings, barLayout: action.value };
     case 'set-orientation':

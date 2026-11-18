@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { Fragment, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent, ClipboardEvent, KeyboardEvent } from 'react';
 
 import {
@@ -16,7 +16,7 @@ import {
   validateData,
 } from '../../graph/transforms/tabularData';
 import type { TabularData } from '../../graph/transforms/tabularData';
-import type { TabularImportResult } from '../../lib/import/tabularImport';
+import type { TabularImportAdapter, TabularImportResult } from '../../lib/import/tabularImport';
 import { ImportPreview } from './ImportPreview';
 
 interface DataGridProps {
@@ -24,6 +24,12 @@ interface DataGridProps {
   headingLabel?: string;
   data: TabularData;
   isSampleData: boolean;
+  protectData?: boolean;
+  fixedTable?: {
+    prepareImport: TabularImportAdapter;
+    hasHeader: (row: string[]) => boolean;
+    rowErrors: ReadonlyMap<string, string[]>;
+  };
   onChange: (data: TabularData, intent?: 'edit' | 'replace' | 'structure', title?: string) => void;
 }
 
@@ -68,7 +74,7 @@ function clipboardReadErrorMessage(error: unknown): string {
   return 'The clipboard could not be read. Paste directly into a selected cell, or try the Paste data button again.';
 }
 
-export function DataGrid({ data, isSampleData, onChange, headingId = 'data-heading', headingLabel = 'Data' }: DataGridProps) {
+export function DataGrid({ data, isSampleData, onChange, headingId = 'data-heading', headingLabel = 'Data', fixedTable, protectData }: DataGridProps) {
   const csvInputRef = useRef<HTMLInputElement>(null);
   const excelInputRef = useRef<HTMLInputElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -76,11 +82,17 @@ export function DataGrid({ data, isSampleData, onChange, headingId = 'data-headi
   const [importError, setImportError] = useState<string | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [pendingImport, setPendingImport] = useState<PendingImport | null>(null);
-  const issues = useMemo(() => validateData(data), [data]);
+  const issues = useMemo(() => fixedTable ? [] : validateData(data), [data, fixedTable]);
   const issueMap = useMemo(
     () => new Map(issues.map((issue) => [`${issue.rowId}:${issue.columnId}`, issue])),
     [issues],
   );
+
+  function confirmClear() {
+    if (protectData && !isSampleData && data.rows.some(row => row.cells.some(cell => cell.trim()))
+      && !window.confirm('Clear the current data table?')) return;
+    commit(clearData(data), 'structure');
+  }
 
   function commit(nextData: TabularData, intent: 'edit' | 'replace' | 'structure' = 'edit') {
     setImportMessage(null);
@@ -147,7 +159,23 @@ export function DataGrid({ data, isSampleData, onChange, headingId = 'data-headi
       return;
     }
 
-    const replacesDataset = rowIndex === 0 && columnIndex === 0 && rowsHaveHeader(result.rows);
+    if (fixedTable && rowIndex === 0 && columnIndex === 0 &&
+      (fixedTable.hasHeader(result.rows[0]) || result.rows[0].length === data.columns.length)) {
+      presentImport(fixedTable.prepareImport(result.rows), 'Clipboard data');
+      return;
+    }
+    if (fixedTable && result.rows.some(row => columnIndex + row.length > data.columns.length)) {
+      setImportMessage(null);
+      setImportError('The pasted values do not fit the table columns.');
+      return;
+    }
+
+    const replacesDataset = !fixedTable && rowIndex === 0 && columnIndex === 0 && rowsHaveHeader(result.rows);
+    const overwritesCells = protectData && !isSampleData && result.rows.some((row, rowOffset) => row.some(
+      (_, columnOffset) => data.rows[rowIndex + rowOffset]?.cells[columnIndex + columnOffset]?.trim(),
+    ));
+    if (protectData && !isSampleData && (replacesDataset ? data.rows.some(row => row.cells.some(cell => cell.trim())) : overwritesCells)
+      && !window.confirm('Replace the current values with the pasted data?')) return;
     onChange(
       replacesDataset ? createDataFromClipboard(result.rows) : pasteRectangularData(data, result.rows, rowIndex, columnIndex),
       replacesDataset ? 'replace' : 'edit',
@@ -195,7 +223,7 @@ export function DataGrid({ data, isSampleData, onChange, headingId = 'data-headi
       return;
     }
 
-    presentImport({
+    presentImport(fixedTable ? fixedTable.prepareImport(result.rows) : {
       data: createDataFromClipboard(result.rows),
       headerDetected: rowsHaveHeader(result.rows),
       ok: true,
@@ -217,7 +245,7 @@ export function DataGrid({ data, isSampleData, onChange, headingId = 'data-headi
         import('../../lib/import/tabularImport'),
         file.text(),
       ]);
-      presentImport(parseCsvText(text), file.name);
+      presentImport(parseCsvText(text, fixedTable?.prepareImport), file.name);
     } catch {
       setPendingImport(null);
       setImportError('This CSV file could not be opened. Choose another file and try again.');
@@ -239,7 +267,7 @@ export function DataGrid({ data, isSampleData, onChange, headingId = 'data-headi
         import('../../lib/import/tabularImport'),
         file.arrayBuffer(),
       ]);
-      presentImport(await parseXlsxBuffer(buffer), file.name);
+      presentImport(await parseXlsxBuffer(buffer, fixedTable?.prepareImport), file.name);
     } catch {
       setPendingImport(null);
       setImportError('This Excel file could not be opened. Choose another XLSX file and try again.');
@@ -263,7 +291,7 @@ export function DataGrid({ data, isSampleData, onChange, headingId = 'data-headi
         <h3 className="text-lg font-bold" id={headingId}>{headingLabel}</h3>
         <div className="flex items-center gap-3 text-sm">
           {isSampleData && <span className="text-brand font-semibold">Sample data</span>}
-          <button className="text-text-muted hover:text-text font-medium" onClick={() => commit(clearData(data), 'structure')} type="button">Clear</button>
+          <button className="text-text-muted hover:text-text font-medium" onClick={confirmClear} type="button">Clear</button>
         </div>
       </div>
 
@@ -271,14 +299,14 @@ export function DataGrid({ data, isSampleData, onChange, headingId = 'data-headi
         <table
           aria-label="Graph data"
           className="w-full table-fixed border-collapse text-left text-sm"
-          style={{ minWidth: `${Math.max(26, data.columns.length * 9 + 5)}rem` }}
+          style={{ minWidth: `${Math.max(26, data.columns.length * (fixedTable ? 5.5 : 9) + 5)}rem` }}
         >
           <thead className="bg-surface-subtle text-text-muted">
             <tr>
               <th aria-label="Row number" className="border-border w-10 border-r px-2 py-2 text-center font-medium" scope="col"></th>
               {data.columns.map((column, columnIndex) => (
                 <th className="border-border border-r p-1 font-semibold last:border-r-0" key={column.id} scope="col">
-                  <div className="flex items-center gap-1">
+                  {fixedTable ? <span className="block px-2 py-1.5">{column.name}</span> : <div className="flex items-center gap-1">
                     <input
                       aria-label={`Rename ${column.name || `column ${columnIndex + 1}`} header`}
                       className="focus:border-brand min-w-0 flex-1 rounded-sm border border-transparent bg-transparent px-2 py-1.5 font-semibold outline-none"
@@ -297,7 +325,7 @@ export function DataGrid({ data, isSampleData, onChange, headingId = 'data-headi
                         <span aria-hidden="true">×</span>
                       </button>
                     )}
-                  </div>
+                  </div>}
                 </th>
               ))}
               <th aria-label="Row actions" className="w-10 px-1 py-2" scope="col"></th>
@@ -305,10 +333,11 @@ export function DataGrid({ data, isSampleData, onChange, headingId = 'data-headi
           </thead>
           <tbody>
             {data.rows.map((row, rowIndex) => (
-              <tr className="border-border border-t" key={row.id}>
+              <Fragment key={row.id}>
+              <tr className="border-border border-t" aria-invalid={fixedTable?.rowErrors.has(row.id) || undefined} aria-describedby={fixedTable?.rowErrors.has(row.id) ? `summary-error-${row.id}` : undefined}>
                 <th className="border-border bg-surface-subtle text-text-muted border-r px-2 py-2 text-center font-normal" scope="row">{rowIndex + 1}</th>
                 {data.columns.map((column, columnIndex) => {
-                  const issue = issueMap.get(`${row.id}:${column.id}`);
+                  const issue = fixedTable ? undefined : issueMap.get(`${row.id}:${column.id}`);
                   const issueId = `issue-${row.id}-${column.id}`;
 
                   return (
@@ -335,6 +364,7 @@ export function DataGrid({ data, isSampleData, onChange, headingId = 'data-headi
                 <td className="bg-surface-subtle p-1 text-center">
                   <button
                     aria-label={`Remove row ${rowIndex + 1}`}
+                    disabled={!!fixedTable && data.rows.length === 1}
                     className="text-text-muted hover:text-rose-600 grid h-8 w-8 place-items-center rounded-sm"
                     onClick={() => commit(removeRow(data, row.id), 'structure')}
                     title="Remove row"
@@ -344,6 +374,14 @@ export function DataGrid({ data, isSampleData, onChange, headingId = 'data-headi
                   </button>
                 </td>
               </tr>
+              {fixedTable?.rowErrors.has(row.id) && <tr className="bg-rose-50 text-rose-900">
+                <td colSpan={data.columns.length + 2} className="px-3 py-2">
+                  <ul className="sticky left-0 w-fit max-w-56 break-words sm:max-w-80" id={`summary-error-${row.id}`}>
+                    {fixedTable.rowErrors.get(row.id)?.map(message => <li key={message}>{message}</li>)}
+                  </ul>
+                </td>
+              </tr>}
+              </Fragment>
             ))}
           </tbody>
         </table>
@@ -357,7 +395,7 @@ export function DataGrid({ data, isSampleData, onChange, headingId = 'data-headi
 
       <div className="mt-3 flex flex-wrap gap-2">
         <button className="button-secondary" onClick={() => commit(addRow(data), 'structure')} type="button"><span aria-hidden="true" className="text-brand">＋</span>Add row</button>
-        <button className="button-secondary" onClick={() => commit(addColumn(data), 'structure')} type="button"><span aria-hidden="true" className="text-brand">＋</span>Add series</button>
+        {!fixedTable && <button className="button-secondary" onClick={() => commit(addColumn(data), 'structure')} type="button"><span aria-hidden="true" className="text-brand">＋</span>Add series</button>}
       </div>
 
       <div className="border-border mt-5 grid gap-2 border-t pt-4 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
