@@ -1,0 +1,7 @@
+[
+  {
+    "id": "GHSA-fc5q-39xc-vjpf",
+    "reason": "Picomatch is reached through the Node build, lint and test toolchain. GraphMaker deploys static files and has no request-time Node matcher or visitor-controlled glob input. Recheck for an upstream patch before expiry.",
+    "expires": "2027-01-16"
+  }
+]

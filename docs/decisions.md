@@ -193,3 +193,9 @@ Accepted: Zeeshan approved the scope in chat on 17 November 2026. Publish origin
 **Decision:** Qualifying guides can live at `/guides/<slug>/`. Each must answer a distinct educational question too detailed for a tool page, avoid repeating the tool page, contain substantially deeper original worked examples and charts, have visible breadcrumbs and Article + BreadcrumbList schema, use a self canonical and its own social image, and link contextually in both directions with at least one relevant tool.
 
 **Scope:** This exception supersedes the blanket informational-page and guide-route bans for qualifying guides only. The bans on thin, keyword-variant, modifier, Word/Excel, and AI pages remain. There is no `/guides/` hub. The first approved guide is consumer and producer surplus, paired with Supply and Demand Graph Maker.
+
+## DEC-039 — Review time-limited dependency audit exceptions
+
+**Status:** Proposed (18 November 2026).
+
+CI fails for any high or critical npm advisory unless its GHSA ID appears in the reviewed `.audit-allowlist.json` file. Each entry includes an ID, a site-specific reason, and a UTC expiry date no more than 60 days out. An expired or invalid entry fails CI. The full npm audit report remains in the workflow logs. Review exceptions in the PR before merging.
