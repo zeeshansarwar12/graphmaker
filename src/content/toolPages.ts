@@ -860,7 +860,7 @@ export const boxPlotToolPageConfig = {
   definition: [
     'A box plot summarizes numeric observations with a median, first quartile (Q1), third quartile (Q3), whiskers, and individual outlier points. It is also called a box-and-whisker plot.',
     'For raw observations, each numeric column is a group. In summary mode, each row gives one group’s minimum, quartiles, median, and maximum.',
-    'Use the online box plot maker directly in your browser: paste raw observations or import CSV and Excel files, then customize and export the result without creating an account.',
+    'Work directly in your browser. Paste raw observations or a five-number summary, or import data from CSV or Excel, then customize and export without an account.',
   ],
   editor: {
     graphType: 'boxplot',
@@ -948,7 +948,7 @@ export const boxPlotToolPageConfig = {
     definition: 'What is a box plot?',
     example: 'Example box plot data',
     faq: 'Box plot maker FAQ',
-    faqIntro: 'Answers about arranging raw data, calculating quartiles, and handling outliers.',
+    faqIntro: 'Answers about raw data, five-number summaries, quartiles, and outliers.',
     features: 'Box plot maker features',
     howTo: 'How to make a box plot',
   },
@@ -1155,7 +1155,7 @@ export const histogramToolPageConfig = {
   intro: 'Create a histogram from raw numeric data and inspect the shape of its distribution. Paste values or import CSV and Excel files, then export the result for free.',
   metaDescription: 'Create a histogram online from raw numeric data. Use automatic or adjustable bins, import CSV or Excel values, and export free with no signup.',
   relatedTools: [
-    { name: 'Box Plot Maker', description: 'Summarize median, quartiles, spread, and outliers from raw numeric data.', href: '/box-plot-maker/' },
+    { name: 'Box Plot Maker', description: 'Compare spread and quartiles from raw data or a five-number summary.', href: '/box-plot-maker/' },
     { name: 'Dot Plot Maker', description: 'Show every raw observation and stack repeated values by frequency.', href: '/dot-plot-maker/' },
     { name: 'Bar Graph Maker', description: 'Compare values across separate named categories instead of continuous ranges.', href: '/bar-graph-maker/' },
     { name: 'Scatter Plot Maker', description: 'Explore the relationship between two numeric measurements.', href: '/scatter-plot-maker/' },
@@ -1244,7 +1244,7 @@ export const dotPlotToolPageConfig = {
   metaDescription: 'Create a dot plot online from raw numeric data. Stack repeated values, import CSV or Excel, customize dot size, and export free with no signup.',
   relatedTools: [
     { name: 'Histogram Maker', description: 'Group numeric observations into intervals to see the overall distribution shape.', href: '/histogram-maker/' },
-    { name: 'Box Plot Maker', description: 'Summarize median, quartiles, spread, and outliers from raw observations.', href: '/box-plot-maker/' },
+    { name: 'Box Plot Maker', description: 'Show the median and quartiles from raw data or a five-number summary.', href: '/box-plot-maker/' },
     { name: 'Scatter Plot Maker', description: 'Plot paired numeric measurements to explore relationships between variables.', href: '/scatter-plot-maker/' },
   ],
   sectionHeadings: {

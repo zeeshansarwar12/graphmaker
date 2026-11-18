@@ -14,7 +14,7 @@ export const pageLastModified: Readonly<Record<string, string>> = {
   '/equation-graph-maker/': '2026-10-22',
   '/scatter-plot-maker/': '2026-11-17',
   '/histogram-maker/': '2026-10-22',
-  '/box-plot-maker/': '2026-11-17',
+  '/box-plot-maker/': '2026-11-18',
   '/radar-chart-maker/': '2026-10-22',
   '/dot-plot-maker/': '2026-10-22',
   '/tree-graph-maker/': '2026-11-17',

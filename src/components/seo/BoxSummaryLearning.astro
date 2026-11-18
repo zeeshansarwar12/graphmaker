@@ -1,6 +1,10 @@
 ---
 import { boxSummaryExample, boxSummaryHeaders, createBoxSummaryExample } from '../../graph/statistics/boxSummary';
 
+import { calculateBoxPlotStatistics } from '../../graph/statistics/boxPlot';
+
+const stats = calculateBoxPlotStatistics(boxSummaryExample.observations)!;
+const upperFence = stats.q3 + 1.5 * stats.interquartileRange;
 const cells = createBoxSummaryExample().rows[0].cells;
 ---
 <section class="page-shell py-12" id="five-number-summary" aria-labelledby="five-number-summary-heading">
@@ -19,7 +23,7 @@ const cells = createBoxSummaryExample().rows[0].cells;
         <tbody><tr>{cells.map(cell => <td class="px-3 py-2">{cell}</td>)}</tr></tbody>
       </table>
     </div>
-    <p class="text-text-muted mt-3 leading-7">Draw the box from {cells[2]} to {cells[4]}, place the median at {cells[3]}, and extend the whiskers to {cells[1]} and {cells[5]}.</p>
+    <p class="text-text-muted mt-3 leading-7">Draw the box from {cells[2]} to {cells[4]}, place the median at {cells[3]}, and extend the whiskers to {cells[1]} and {cells[5]}. Raw data mode plots {stats.maximum} as an outlier because it exceeds the upper fence (Q3 + 1.5 × IQR = {stats.q3} + 1.5 × {stats.interquartileRange} = {upperFence}) and stops the whisker at {stats.upperWhisker}. A five-number summary cannot identify individual outliers, so its whiskers reach the entered extremes.</p>
     <a class="button-secondary mt-4" href="#box-summary-example">Try this example</a>
   </div>
 </section>
