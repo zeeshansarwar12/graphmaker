@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 import type { Page } from '@playwright/test';
 import * as XLSX from 'xlsx';
 import { createDefaultGraphSettings } from '../../src/graph/configs/graphSettings';

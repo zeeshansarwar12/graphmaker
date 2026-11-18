@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './browser-test';
 import { openPage, reloadPage } from './navigation';
 import { createProjectSnapshot } from '../../src/lib/storage/graphProject';
 import { createDefaultGraphSettings } from '../../src/graph/configs/graphSettings';

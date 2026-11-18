@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 import { openPage, reloadPage } from './navigation';
 
 test('cell edits preserve default and custom titles through autosave', async ({ page }) => {

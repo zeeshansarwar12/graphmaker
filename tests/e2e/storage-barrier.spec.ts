@@ -1,4 +1,4 @@
-import {expect,test} from '@playwright/test';
+import {expect,test} from './browser-test';
 import {instrumentStorage,holdNext,waitHeld,attachStorageTelemetry} from './storage-gate';
 
 test.afterEach(async({page})=>{await attachStorageTelemetry(page);});

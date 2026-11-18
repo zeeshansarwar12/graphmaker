@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './browser-test';
 import { openPage } from './navigation';
 
 test('compact keyword resources are static and open the existing tool controls',async({page,request})=>{

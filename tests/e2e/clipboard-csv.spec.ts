@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test';
+import {test,expect} from './browser-test';
 import {openPage,reloadPage} from './navigation';
 const exam='Exam results\nCategory,Value\nEnglish,72\nMath,88\nScience,81\nHistory,65\nComputer,94';
 for(const button of [false,true]) test(`exam CSV paste renders five correct bars (${button?'Paste data':'cell paste'})`,async ({page},testInfo)=>{

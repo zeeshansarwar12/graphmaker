@@ -11,6 +11,7 @@ export default defineConfig({
   reporter: 'html',
   use: {
     baseURL: deployedBaseURL ?? 'http://127.0.0.1:4321',
+    serviceWorkers: 'block',
     trace: 'on-first-retry',
   },
   projects: [

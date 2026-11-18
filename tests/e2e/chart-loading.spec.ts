@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test';
+import {test,expect} from './browser-test';
 import {openPage} from './navigation';
 
 test('chart families and Excel parser are requested only when needed',async ({page})=>{

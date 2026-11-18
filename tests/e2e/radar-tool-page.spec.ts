@@ -1,5 +1,5 @@
 import { openPage } from './navigation';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 import * as XLSX from 'xlsx';
 
 test('serves a complete Radar page with a percentage-scaled multi-series preset', async ({ page }) => {

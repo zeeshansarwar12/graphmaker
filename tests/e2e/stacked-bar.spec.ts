@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 import { openPage } from './navigation';
 
 test('stacked bars preserve layout, edits, templates and downloads', async ({page,request})=>{

@@ -1,5 +1,5 @@
 import { openPage } from './navigation';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 
 test('serves a complete crawlable XY tool page with the shared editor preset', async ({ page }) => {
   await openPage(page, '/xy-graph-maker/');

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 
 test('protects early input until editor handlers attach', async ({ page }) => {
   let resume!: () => void;

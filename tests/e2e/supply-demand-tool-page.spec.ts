@@ -1,5 +1,5 @@
 import { openPage, reloadPage } from './navigation';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 
 test('serves a complete Supply and Demand page with equilibrium on numeric axes', async ({ page }) => {
   await openPage(page, '/supply-and-demand-graph-maker/');

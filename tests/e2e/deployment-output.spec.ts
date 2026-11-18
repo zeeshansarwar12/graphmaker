@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 import { allGraphTools } from '../../src/content/graphTools';
 
 test('built indexable pages return 200 and permit indexing', async ({ request }) => {

@@ -1,5 +1,5 @@
 import { openPage } from './navigation';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 
 test('serves a complete crawlable Bar tool page with grouped sample series', async ({ page }) => {
   await openPage(page, '/bar-graph-maker/');

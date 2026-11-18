@@ -1,5 +1,5 @@
 import { openPage } from './navigation';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 import * as XLSX from 'xlsx';
 
 test('serves a complete Box Plot page with the shared grouped-data preset', async ({ page }) => {

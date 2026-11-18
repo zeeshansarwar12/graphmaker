@@ -1,5 +1,5 @@
 import { openPage } from './navigation';
-import { expect, test } from '@playwright/test';
+import { expect, test } from './browser-test';
 
 import { allLinkedRoutes, indexableRoutes, productionOrigin, toolRoutes } from './seo-routes';
 import { mockCmp } from './consent-fixture';
