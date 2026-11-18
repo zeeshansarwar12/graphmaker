@@ -1,10 +1,15 @@
 import { spawnSync } from 'node:child_process';
+import console from 'node:console';
 import { readFileSync } from 'node:fs';
+import process from 'node:process';
+import { URL } from 'node:url';
 
-const audit = spawnSync('npm', ['audit', '--audit-level=high', '--json'], {
+const windows = process.platform === 'win32';
+const audit = spawnSync(windows ? 'npm.cmd audit --audit-level=high --json' : 'npm',
+  windows ? [] : ['audit', '--audit-level=high', '--json'], {
   encoding: 'utf8',
   maxBuffer: 32 * 1024 * 1024,
-  shell: process.platform === 'win32',
+  shell: windows,
 });
 process.stdout.write(audit.stdout ?? '');
 process.stderr.write(audit.stderr ?? '');
