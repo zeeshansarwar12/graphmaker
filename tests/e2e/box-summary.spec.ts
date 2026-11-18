@@ -53,7 +53,7 @@ test('edits and validates summary rows, exports the summary and restores both ta
   expect(saved.boxSummaryData.rows[0].cells[0]).toBe('Group B');
   await page.getByRole('button', { name: 'Save locally', exact: true }).click();
   await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
-  await reloadPage(page, route);
+  await reloadPage(page);
   await expect(summaryMode(page)).toBeChecked();
   await expect(page.getByLabel('Group, row 1', { exact: true })).toHaveValue('Group B');
   await raw.check();
@@ -129,7 +129,7 @@ test('opens a legacy schema-v1 backup in Raw data mode', async ({ page }) => {
   await expect(readyChart(page)).toContainText('Legacy scores: minimum 1');
   await page.getByRole('button', { name: 'Save locally', exact: true }).click();
   await expect(page.getByText('Autosaved on this device. No cloud backup.')).toBeVisible();
-  await reloadPage(page, route);
+  await reloadPage(page);
   await expect(page.getByRole('radio', { name: 'Raw data' })).toBeChecked();
   await expect(page.getByLabel('Legacy scores, row 1', { exact: true })).toHaveValue('1');
 });
