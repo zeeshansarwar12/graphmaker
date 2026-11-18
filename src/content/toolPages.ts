@@ -860,7 +860,7 @@ export const boxPlotToolPageConfig = {
   definition: [
     'A box plot summarizes numeric observations with a median, first quartile (Q1), third quartile (Q3), whiskers, and individual outlier points. It is also called a box-and-whisker plot.',
     'For raw observations, each numeric column is a group. In summary mode, each row gives one group’s minimum, quartiles, median, and maximum.',
-    'Use the online box plot maker directly in your browser: paste raw observations or import CSV and Excel files, then customize and export the result without creating an account.',
+    'Work directly in your browser. Paste raw observations or a five-number summary, or import data from CSV or Excel, then customize and export without an account.',
   ],
   editor: {
     graphType: 'boxplot',
@@ -948,7 +948,7 @@ export const boxPlotToolPageConfig = {
     definition: 'What is a box plot?',
     example: 'Example box plot data',
     faq: 'Box plot maker FAQ',
-    faqIntro: 'Answers about arranging raw data, calculating quartiles, and handling outliers.',
+    faqIntro: 'Answers about raw data, five-number summaries, quartiles, and outliers.',
     features: 'Box plot maker features',
     howTo: 'How to make a box plot',
   },

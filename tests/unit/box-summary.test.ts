@@ -72,6 +72,15 @@ describe('five-number summary', () => {
     expect(boxSummaryFromRaw(createDataFromRows([['A'], ['none']]))).toBeNull();
   });
 
+  it('places the example maximum of 58 above the raw upper fence', () => {
+    const stats = calculateBoxPlotStatistics(boxSummaryExample.observations)!;
+    const upperFence = stats.q3 + 1.5 * stats.interquartileRange;
+    expect(upperFence).toBe(33);
+    expect(stats.maximum).toBe(58);
+    expect(stats.maximum).toBeGreaterThan(upperFence);
+    expect(stats.upperWhisker).toBe(21);
+  });
+
   it('renders exact whiskers and quartiles with no scatter series even when outliers are enabled', () => {
     const data = boxSummaryTable([['Scores', '-4', '-1', '0', '2', '58'], ['Invalid', '0', '5', '1', '3', '9']]);
     const settings = { ...createDefaultGraphSettings(), boxPlotInputMode: 'summary' as const, showOutliers: true };

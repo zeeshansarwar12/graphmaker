@@ -20,6 +20,7 @@ import ContactLine from '../ui/ContactLine.astro';
         <li><a class="hover:text-brand" href="/tools/">All graph tools</a></li>
         {graphTools.map((tool) => <li>
           <a class="hover:text-brand" href={tool.href}>{tool.name}</a>
+          {tool.type === 'boxplot' && <p class="mt-1 text-xs">{tool.description}</p>}
           {tool.type === 'bar' && <ul aria-label="Bar graph makers" class="border-border mt-2 ml-2 grid gap-2 border-l pl-3">
             {barWorkflowTools.map(child => <li><a class="hover:text-brand" href={child.href}>{child.name}</a></li>)}
           </ul>}
